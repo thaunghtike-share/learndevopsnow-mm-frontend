@@ -666,7 +666,7 @@ export function YouTubePlaylists() {
   return (
     <section className="relative min-h-screen bg-white/95 dark:bg-[#0A0A0A] overflow-hidden">
       <div className="py-8 md:py-12 px-4 md:px-11">
-        {/* Header Section */}
+        {/* Header Section - Keep original design */}
         <div className="text-center mb-8 md:mb-12 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -730,6 +730,7 @@ export function YouTubePlaylists() {
             </div>
           </motion.div>
         </div>
+
         {/* Content */}
         <div className="pb-8 md:pb-12">
           {!searchQuery ? (
@@ -758,7 +759,7 @@ export function YouTubePlaylists() {
                       } mb-6 md:mb-8`}
                     >
                       <div
-                        className={`max-w-3xl ${
+                        className={`max-w-full lg:max-w-3xl w-full ${
                           isLeft ? "text-left" : "text-right"
                         }`}
                       >
@@ -772,8 +773,8 @@ export function YouTubePlaylists() {
                           >
                             <DifficultyIcon className="w-6 h-6" />
                           </div>
-                          <div>
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                          <div className="flex-1 min-w-0">
+                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
                               {path.title}
                             </h2>
                             <span className="text-sm font-medium text-sky-600 dark:text-sky-400 mt-1 block">
@@ -786,37 +787,36 @@ export function YouTubePlaylists() {
                           {path.description}
                         </p>
 
+                        {/* Learning Path - Made scrollable on mobile */}
                         <div
-                          className={`inline-flex flex-col gap-2 ${
+                          className={`inline-flex flex-col gap-2 w-full ${
                             isLeft ? "" : "items-end"
                           }`}
                         >
                           <span className="text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
                             Recommended Learning Path
                           </span>
-                          {/* Updated Learning Path - All in one line */}
-                          <div className="flex items-center gap-1 flex-nowrap overflow-x-auto py-2 scrollbar-hide">
-                            {path.learningPath.map((step, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-1 flex-shrink-0"
-                              >
+                          <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+                            <div className="flex items-center gap-1 flex-nowrap min-w-max">
+                              {path.learningPath.map((step, index) => (
                                 <div
-                                  className={`flex items-center gap-2 bg-white dark:bg-gray-800 border-2 ${config.borderColor} rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow`}
+                                  key={index}
+                                  className="flex items-center gap-1 flex-shrink-0"
                                 >
-                                  <span className="text-lg">{step.icon}</span>
-                                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                    {step.title
-                                      .split(" ")
-                                      .slice(0, 2)
-                                      .join(" ")}
-                                  </span>
+                                  <div
+                                    className={`flex items-center gap-2 bg-white dark:bg-gray-800 border-2 ${config.borderColor} rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow`}
+                                  >
+                                    <span className="text-lg">{step.icon}</span>
+                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                      {step.title.split(" ").slice(0, 2).join(" ")}
+                                    </span>
+                                  </div>
+                                  {index < path.learningPath.length - 1 && (
+                                    <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0 mx-1" />
+                                  )}
                                 </div>
-                                {index < path.learningPath.length - 1 && (
-                                  <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-600 flex-shrink-0" />
-                                )}
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -912,7 +912,7 @@ function HorizontalScrollSection({
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = 400;
+      const scrollAmount = window.innerWidth < 768 ? 300 : 400;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -929,30 +929,30 @@ function HorizontalScrollSection({
 
   return (
     <div className="relative">
-      {/* Updated Chevron Buttons - Positioned higher */}
+      {/* Scroll buttons - hidden on mobile, shown on larger screens */}
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute -left-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all"
+          className="absolute -left-4 md:-left-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
           aria-label="Scroll left"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
       )}
 
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="absolute -right-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all"
+          className="absolute -right-4 md:-right-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
           aria-label="Scroll right"
         >
-          <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
       )}
 
       <div
         ref={scrollRef}
-        className="flex gap-6 overflow-x-auto pb-6 px-4 scrollbar-hide snap-x snap-mandatory"
+        className="flex gap-4 md:gap-6 overflow-x-auto pb-4 md:pb-6 px-2 md:px-4 scrollbar-hide snap-x snap-mandatory"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -966,7 +966,7 @@ function HorizontalScrollSection({
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
-            className="flex-shrink-0 w-80 snap-start"
+            className="flex-shrink-0 w-72 sm:w-80 snap-start"
           >
             <PlaylistCard
               playlist={playlist}
