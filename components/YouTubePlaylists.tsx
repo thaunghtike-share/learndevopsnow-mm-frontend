@@ -796,7 +796,12 @@ export function YouTubePlaylists() {
                           <span className="text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
                             Recommended Learning Path
                           </span>
-                          <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+                          <div
+                            className="w-full overflow-x-auto pb-2 
+                  [&::-webkit-scrollbar]:hidden 
+                  [-ms-overflow-style:none] 
+                  [scrollbar-width:none]"
+                          >
                             <div className="flex items-center gap-1 flex-nowrap min-w-max">
                               {path.learningPath.map((step, index) => (
                                 <div
@@ -808,7 +813,10 @@ export function YouTubePlaylists() {
                                   >
                                     <span className="text-lg">{step.icon}</span>
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                      {step.title.split(" ").slice(0, 2).join(" ")}
+                                      {step.title
+                                        .split(" ")
+                                        .slice(0, 2)
+                                        .join(" ")}
                                     </span>
                                   </div>
                                   {index < path.learningPath.length - 1 && (
