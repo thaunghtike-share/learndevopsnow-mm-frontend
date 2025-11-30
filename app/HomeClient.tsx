@@ -9,7 +9,6 @@ import { CertificationRoadmap } from "@/components/CertificationRoadmap";
 import { SuccessStoriesSection } from "@/components/SuccessStoriesSection";
 import { YouTubePlaylists } from "@/components/YouTubePlaylists";
 import { FreeLabs } from "@/components/FreeLabs";
-import { CareerPath } from "@/components/CareerPath";
 import {
   Server,
   Container,
@@ -162,16 +161,12 @@ export default function HomeClient() {
             <CertificationRoadmap />
           </div>
 
-          <section id="career" className="bg-white dark:bg-[#0A0A0A] -mt-14 hidden md:block">
-            <CareerPath />
-          </section>
-
-          <div className="bg-white dark:bg-[#0A0A0A] -mt-17 md:-mt-12">
+          <div className="bg-white dark:bg-[#0A0A0A] md:-mt-30">
             <SuccessStoriesSection />
           </div>
         </main>
 
-        <div id="faqs" className="bg-white dark:bg-[#0A0A0A] -mt-12">
+        <div id="faqs" className="bg-white dark:bg-[#0A0A0A] ">
           <MinimalFooter />
         </div>
       </div>

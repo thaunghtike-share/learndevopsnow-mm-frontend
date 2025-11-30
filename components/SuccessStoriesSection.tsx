@@ -113,7 +113,7 @@ export function SuccessStoriesSection() {
   return (
     <section ref={sectionRef} className="relative bg-white dark:bg-[#0A0A0A] overflow-hidden">
       <div className="relative w-full">
-        <div className="px-4 md:px-11 py-12 md:py-18 font-open-sans">
+        <div className="px-4 md:px-11 font-open-sans">
           {/* Header */}
           <motion.div
             className="flex flex-col lg:flex-row items-start justify-between gap-8 md:gap-12 mb-8 md:mb-16"
