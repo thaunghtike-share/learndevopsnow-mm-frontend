@@ -691,12 +691,12 @@ export function ArticleContent({
           transition={{ duration: 0.6 }}
           className="relative mb-12 mt-16"
         >
-          <div className="bg-gradient-to-br from-white dark:from-gray-800 to-slate-50 dark:to-gray-900 rounded-3xl border border-slate-200 dark:border-gray-700 p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
-            <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left gap-6">
+          <div className="bg-gradient-to-br from-white dark:from-gray-800 to-slate-50 dark:to-gray-900 rounded-3xl border border-slate-200 dark:border-gray-700 p-4 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
+            <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left gap-4 md:gap-6">
               <div className="group relative">
                 <Link href={`/authors/${authorSlug}`} className="block">
                   <div className="relative">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 p-1.5 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 p-1 shadow-lg md:shadow-2xl group-hover:scale-105 transition-transform duration-300">
                       <img
                         src={effectiveAuthor?.avatar || "/placeholder.svg"}
                         alt={effectiveAuthor?.name || "Author"}
@@ -710,45 +710,40 @@ export function ArticleContent({
                     </div>
                   </div>
                 </Link>
-                {effectiveAuthor?.linkedin && (
-                  <a
-                    href={effectiveAuthor.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute -bottom-2 -right-2 bg-sky-600 hover:bg-sky-700 p-2 rounded-xl shadow-2xl transition-all duration-300 hover:scale-110"
-                  >
-                    <Linkedin className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                  </a>
-                )}
               </div>
 
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-sky-600 to-blue-600 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-2xl text-sm font-semibold mb-3 shadow-lg">
-                  <Crown className="w-3 h-3 md:w-4 md:h-4" />
-                  Author
+              <div className="flex-1 w-full">
+                <div className="inline-flex items-center gap-1.5 md:gap-2 bg-gradient-to-r from-sky-600 to-blue-600 text-white px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl text-xs md:text-sm font-semibold mb-3 shadow-md md:shadow-lg">
+                  <Crown className="w-2.5 h-2.5 md:w-4 md:h-4" />
+                  <span className="hidden md:inline">Author</span>
+                  <span className="md:hidden">Author</span>
                 </div>
 
-                <h3 className="font-bold text-slate-900 dark:text-white leading-tight mb-2 text-lg md:text-xl">
-                  Written By
+                <h3 className="font-bold text-slate-900 dark:text-white leading-tight mb-1 md:mb-2 text-base md:text-xl">
+                  <span className="md:hidden">Written By</span>
+                  <span className="hidden md:inline">Written By</span>
                 </h3>
 
                 <Link
                   href={`/authors/${authorSlug}`}
-                  className="group block mb-3"
+                  className="group block mb-2 md:mb-3"
                 >
-                  <p className="text-lg md:text-xl text-sky-700 dark:text-sky-400 font-semibold mb-3 group-hover:text-sky-800 dark:group-hover:text-sky-300 transition-colors">
+                  <p className="text-base md:text-xl text-sky-700 dark:text-sky-400 font-semibold mb-2 md:mb-3 group-hover:text-sky-800 dark:group-hover:text-sky-300 transition-colors line-clamp-1 md:line-clamp-none">
                     {effectiveAuthor?.name || "Unknown Author"}
                   </p>
                 </Link>
 
-                <p className="text-slate-700 dark:text-gray-300 leading-relaxed mb-6 max-w-2xl text-sm md:text-base">
+                <p className="text-slate-700 dark:text-gray-300 leading-relaxed mb-4 md:mb-6 text-xs md:text-base line-clamp-3 md:line-clamp-none">
                   {effectiveAuthor?.bio || "No bio available."}
                 </p>
 
-                <Link href={`/authors/${authorSlug}`}>
-                  <Button className="group bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white px-5 py-2.5 md:px-6 md:py-3 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base">
-                    View Author Profile
-                    <ArrowRight className="w-3 h-3 md:w-4 md:h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <Link href={`/authors/${authorSlug}`} className="block">
+                  <Button className="group w-full md:w-auto bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base">
+                    <span className="hidden md:inline">
+                      View Author Profile
+                    </span>
+                    <span className="md:hidden">View Profile</span>
+                    <ArrowRight className="w-2.5 h-2.5 md:w-4 md:h-4 ml-1.5 md:ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
               </div>
@@ -799,7 +794,7 @@ export function ArticleContent({
 
       <aside className="lg:col-span-1 space-y-6 hidden md:block">
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-          <CardContent className="p-5">
+          <CardContent className="">
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
               <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <ListOrdered className="w-4 h-4 text-white" />
@@ -829,10 +824,10 @@ export function ArticleContent({
         </Card>
 
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-          <CardContent className="p-5">
+          <CardContent className="">
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
               <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <PlusCircle className="w-4 h-4 text-white" />
+                <TrendingUp className="w-4 h-4 text-white" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Recent Articles
@@ -900,10 +895,10 @@ export function ArticleContent({
         </Card>
 
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-          <CardContent className="p-5">
+          <CardContent className="">
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
               <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <TrendingUp className="w-4 h-4 text-white" />
+                <Star className="w-4 h-4 text-white" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Featured Authors
@@ -952,7 +947,7 @@ export function ArticleContent({
         </Card>
 
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-          <CardContent className="p-5">
+          <CardContent className="">
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
               <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <TrendingUp className="w-4 h-4 text-white" />
