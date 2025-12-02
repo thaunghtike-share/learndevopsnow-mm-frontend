@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { Award, Crown, Zap } from "lucide-react";
+import { Award, Crown, Zap, Upload, User, Briefcase, LinkIcon, FileText, Hash } from "lucide-react";
 
 export default function ProfileForm() {
   const [formData, setFormData] = useState({
@@ -24,25 +24,19 @@ export default function ProfileForm() {
   const { user, updateProfile } = useAuth();
   const router = useRouter();
 
-  // Add this state to track if user has existing completed profile
   const [hasCompletedProfile, setHasCompletedProfile] = useState(false);
-
-  // Add loading state for initial profile data
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   useEffect(() => {
-    // Load existing profile data if available
     const loadProfile = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          // Wait 5 seconds even if no token
           await new Promise((resolve) => setTimeout(resolve, 5000));
           setIsLoadingProfile(false);
           return;
         }
 
-        // Wait 5 seconds before making the API call to ensure loading shows
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
         const profileRes = await fetch(
@@ -64,12 +58,10 @@ export default function ProfileForm() {
             slug: profileData.slug || "",
           });
 
-          // Check if user already has an avatar (existing user)
           if (profileData.avatar && profileData.avatar.trim() !== "") {
             setHasExistingAvatar(true);
           }
 
-          // ✅ Check if user already has a completed profile
           if (profileData.profile_complete) {
             setHasCompletedProfile(true);
           }
@@ -84,7 +76,6 @@ export default function ProfileForm() {
     loadProfile();
   }, []);
 
-  // ✅ EXISTING SUBMIT FUNCTION - NO CHANGES
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -117,14 +108,12 @@ export default function ProfileForm() {
 
       const savedProfile = await response.json();
 
-      // Update the auth state
       updateProfile({
         profileComplete: true,
         username: savedProfile.name || user?.username,
         avatar: savedProfile.avatar,
       });
 
-      // Show success message
       setSuccess("redirect");
 
       setTimeout(() => {
@@ -137,13 +126,11 @@ export default function ProfileForm() {
     }
   };
 
-  // ✅ UPDATED FUNCTION: Save and go back to previous page with validation
   const handleSaveAndStay = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Validate all required fields are filled (company is optional)
     if (
       !formData.name?.trim() ||
       !formData.bio?.trim() ||
@@ -157,7 +144,6 @@ export default function ProfileForm() {
       return;
     }
 
-    // Validate LinkedIn URL format
     const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/in\/.+/;
     if (!linkedinRegex.test(formData.linkedin)) {
       setError(
@@ -167,7 +153,6 @@ export default function ProfileForm() {
       return;
     }
 
-    // Validate avatar URL format if it's a custom URL
     if (formData.avatar && !formData.avatar.startsWith("http")) {
       setError(
         "Please enter a valid avatar URL starting with http:// or https://"
@@ -203,19 +188,16 @@ export default function ProfileForm() {
 
       const savedProfile = await response.json();
 
-      // Update the auth state
       updateProfile({
         profileComplete: true,
         username: savedProfile.name || user?.username,
         avatar: savedProfile.avatar,
       });
 
-      // Show success message for staying
       setSuccess("stay");
 
-      // Go back to previous page after success
       setTimeout(() => {
-        router.back(); // Go back to the article page
+        router.back();
       }, 1500);
     } catch (error: any) {
       setError(error.message);
@@ -228,7 +210,6 @@ export default function ProfileForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
       setUploadError(
@@ -237,7 +218,6 @@ export default function ProfileForm() {
       return;
     }
 
-    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       setUploadError("File size must be less than 5MB");
       return;
@@ -280,16 +260,13 @@ export default function ProfileForm() {
 
       setUploadProgress(100);
 
-      // Update the form with the new avatar URL
       setFormData((prev) => ({
         ...prev,
         avatar: data.avatar_url,
       }));
 
-      // Mark as having an avatar now
       setHasExistingAvatar(true);
 
-      // Show success message
       setTimeout(() => {
         setUploadProgress(0);
         setIsUploading(false);
@@ -301,15 +278,12 @@ export default function ProfileForm() {
     }
   };
 
-  // ✅ UPDATED SKIP FUNCTION - Redirects to previous page for completed profiles
   const handleSkip = async () => {
-    // If user has completed profile, go back to previous page
     if (hasCompletedProfile) {
       router.back();
       return;
     }
 
-    // Wait for form data to fully load by checking if all fields are populated
     const allFieldsFilled =
       formData.name?.trim() &&
       formData.bio?.trim() &&
@@ -325,7 +299,6 @@ export default function ProfileForm() {
       return;
     }
 
-    // If all fields are filled, allow redirect
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -365,18 +338,17 @@ export default function ProfileForm() {
     }));
   };
 
-  // Show loading state for 5 seconds
   if (isLoadingProfile) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-8 text-center">
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Zap className="w-5 h-5" />Loading Your Profile
+            <Zap className="w-4 h-4 md:w-5 md:h-5" />Loading Your Profile
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
             Preparing Your Profile
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm md:text-base">
             Loading your profile data, please wait...
           </p>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600 mx-auto"></div>
@@ -387,17 +359,17 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-8 text-center">
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Crown className="w-5 h-5" />Thank You!
+            <Crown className="w-4 h-4 md:w-5 md:h-5" />Thank You!
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
             {success === "stay"
               ? "Happy Reading! 🎉"
               : "Welcome to the Community!"}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm md:text-base">
             {success === "stay"
               ? "Your profile is saved. Taking you back to continue reading..."
               : "Your profile has been saved successfully. Redirecting to your dashboard..."}
@@ -409,26 +381,29 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="relative overflow-x-hidden max-w-2xl mx-auto">
-      <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Zap className="w-5 h-5" />Complete Your Profile
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-6">
+      <div className="max-w-2xl mx-auto">
+        {/* Mobile Header */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-3 md:mb-4 w-fit mx-auto">
+            <Zap className="w-4 h-4 md:w-5 md:h-5" />
+            <span>Complete Your Profile</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
             Tell Us About Yourself
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 text-center text-sm md:text-base">
             Complete your author profile to start writing articles
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* ALL YOUR EXISTING FORM FIELDS REMAIN EXACTLY THE SAME */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-                Display Name <span className="text-red-500">*</span>
+        <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            {/* Display Name */}
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <User className="w-4 h-4" />
+                <span>Display Name <span className="text-red-500">*</span></span>
               </label>
               <input
                 type="text"
@@ -436,215 +411,226 @@ export default function ProfileForm() {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                 placeholder="Your Name - eg. John Doe"
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-                Professional Information <span className="text-red-500">*</span>
+            {/* Professional Information */}
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <Briefcase className="w-4 h-4" />
+                <span>Professional Information <span className="text-red-500">*</span></span>
               </label>
-              <div className="flex flex-col md:flex-row gap-4 items-start md:items-end">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 gap-3 md:flex md:gap-4 md:items-end">
+                <div className="md:flex-1">
                   <input
                     type="text"
                     name="job_title"
                     value={formData.job_title}
                     onChange={handleInputChange}
                     required
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                     placeholder="Job title"
                   />
                 </div>
-                <div className="flex items-center h-12 text-gray-500 dark:text-gray-400 font-medium">
+                <div className="hidden md:flex items-center h-12 text-gray-500 dark:text-gray-400 font-medium px-2">
                   at
                 </div>
-                <div className="flex-1">
+                <div className="md:flex-1">
                   <input
                     type="text"
                     name="company"
                     value={formData.company}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                     placeholder="Company name (optional)"
                   />
                 </div>
               </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-              Bio <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              required
-              placeholder="Tell us about yourself, your expertise, and experience..."
-            />
-          </div>
+            {/* Bio */}
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <FileText className="w-4 h-4" />
+                <span>Bio <span className="text-red-500">*</span></span>
+              </label>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base resize-none"
+                required
+                placeholder="Tell us about yourself, your expertise, and experience..."
+              />
+            </div>
 
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-              LinkedIn URL <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="url"
-              name="linkedin"
-              value={formData.linkedin}
-              onChange={handleInputChange}
-              required
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="https://linkedin.com/in/your-profile"
-            />
-          </div>
+            {/* LinkedIn URL */}
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <LinkIcon className="w-4 h-4" />
+                <span>LinkedIn URL <span className="text-red-500">*</span></span>
+              </label>
+              <input
+                type="url"
+                name="linkedin"
+                value={formData.linkedin}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+                placeholder="https://linkedin.com/in/your-profile"
+              />
+            </div>
 
-          {/* Avatar Section */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-              Profile Photo <span className="text-red-500">*</span>
-            </label>
+            {/* Avatar Section */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <Upload className="w-4 h-4" />
+                <span>Profile Photo <span className="text-red-500">*</span></span>
+              </label>
 
-            {formData.avatar && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Avatar:</p>
-                <img
-                  src={formData.avatar}
-                  alt="Current avatar"
-                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
-                />
+              {formData.avatar && (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={formData.avatar}
+                    alt="Current avatar"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                  />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Current photo</span>
+                </div>
+              )}
+
+              <div className="mb-2">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 md:p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Click to upload photo
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        JPEG, PNG, GIF, WebP (max 5MB)
+                      </span>
+                    </div>
+                  </div>
+                </label>
               </div>
-            )}
 
-            <div className="mb-4">
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
-                  <div className="flex flex-col items-center gap-2">
-                    <svg
-                      className="w-8 h-8 text-gray-400 dark:text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Click to upload photo
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      JPEG, PNG, GIF, WebP (max 5MB)
-                    </span>
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="mt-2">
+                  <div className="flex justify-between text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <span>Uploading...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
+                    <div
+                      className="bg-sky-600 h-1.5 md:h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
                   </div>
                 </div>
+              )}
+
+              {uploadError && (
+                <p className="text-red-600 dark:text-red-400 text-xs md:text-sm mt-1">{uploadError}</p>
+              )}
+
+              {hasExistingAvatar && (
+                <div className="mt-3">
+                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Or use custom URL:
+                  </label>
+                  <input
+                    type="url"
+                    name="avatar"
+                    value={formData.avatar}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 md:py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                    placeholder="https://example.com/avatar.jpg"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Keep your existing avatar URL or change it
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Slug */}
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                <Hash className="w-4 h-4" />
+                <span>Profile Slug <span className="text-red-500">*</span></span>
               </label>
+              <input
+                type="text"
+                name="slug"
+                value={formData.slug}
+                onChange={handleInputChange}
+                required
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+                placeholder="your-unique-profile-slug"
+              />
+              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Don't change auto-generated slug. This will be used in your
+                profile URL (e.g., /authors/your-slug)
+              </p>
             </div>
 
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="mt-3">
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  <span>Uploading...</span>
-                  <span>{uploadProgress}%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-sky-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
+            {error && (
+              <div className="p-3 md:p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-xl text-sm border border-red-200 dark:border-red-800">
+                {error}
               </div>
             )}
 
-            {uploadError && (
-              <p className="text-red-600 dark:text-red-400 text-sm mt-2">{uploadError}</p>
-            )}
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-4">
+              {/* Button 1: Complete Profile & Go to Dashboard */}
+              <button
+                type="submit"
+                disabled={loading || isUploading}
+                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+              >
+                {loading
+                  ? "Saving Profile..."
+                  : "Save Profile & Go to Admin Dashboard"}
+              </button>
 
-            {hasExistingAvatar && (
-              <div className="mt-4">
-                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Or use custom URL:
-                </label>
-                <input
-                  type="url"
-                  name="avatar"
-                  value={formData.avatar}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-                  placeholder="https://example.com/avatar.jpg"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Keep your existing avatar URL or change it
-                </p>
-              </div>
-            )}
-          </div>
+              {/* Button 2: Save Profile & Continue Reading */}
+              <button
+                type="button"
+                onClick={handleSaveAndStay}
+                disabled={loading || isUploading}
+                className="w-full border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+              >
+                {loading
+                  ? "Saving Profile..."
+                  : "Save Profile & Back to Previous Page"}
+              </button>
 
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">
-              Profile Slug <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="slug"
-              value={formData.slug}
-              onChange={handleInputChange}
-              required
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="your-unique-profile-slug"
-            />
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Don't change auto-generated slug. This will be used in your
-              profile URL (e.g., /authors/your-slug)
-            </p>
-          </div>
-
-          {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-xl text-sm border border-red-200 dark:border-red-800">
-              {error}
+              {/* Skip Button - Hidden on mobile, shown only if needed */}
+              {!hasCompletedProfile && (
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  className="w-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2 text-sm md:text-base transition-colors"
+                >
+                  Skip for now →
+                </button>
+              )}
             </div>
-          )}
+          </form>
+        </div>
 
-          {/* ✅ POLISHED BUTTONS SECTION */}
-          <div className="space-y-3">
-            {/* Button 1: Complete Profile & Go to Dashboard */}
-            <button
-              type="submit"
-              disabled={loading || isUploading}
-              className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading
-                ? "Saving Profile..."
-                : "Save Profile & Go to Admin Dashboard"}
-            </button>
-
-            {/* Button 2: Save Profile & Continue Reading */}
-            <button
-              type="button"
-              onClick={handleSaveAndStay}
-              disabled={loading || isUploading}
-              className="w-full border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading
-                ? "Saving Profile..."
-                : "Save Profile & Back to Previous Page"}
-            </button>
-          </div>
-        </form>
+        {/* Mobile Bottom Spacing */}
+        <div className="h-6 md:h-0"></div>
       </div>
     </div>
   );
