@@ -338,7 +338,7 @@ export function MinimalHeader() {
     );
   };
 
-  // User Dropdown Component
+  // User Dropdown Component for Desktop
   const UserDropdown = () => {
     const openDeleteConfirmation = () => {
       setIsUserDropdownOpen(false);
@@ -408,6 +408,99 @@ export function MinimalHeader() {
     );
   };
 
+  // User Dropdown for Mobile Menu
+  const MobileUserDropdown = () => {
+    const openDeleteConfirmation = () => {
+      setIsMobileMenuOpen(false);
+      setShowDeleteConfirm(true);
+    };
+
+    return (
+      <div className="space-y-2 px-6 mt-4">
+        {/* User Info Section */}
+        <div className="px-3 py-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 mb-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center">
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.username}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <User className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              )}
+            </div>
+            <div>
+              <p className="font-medium text-gray-900 dark:text-gray-100">
+                {user?.username}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {user?.email}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* User Menu Items */}
+        <Link
+          href="/author-profile-form"
+          className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
+            pathname === "/author-profile-form"
+              ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <Settings className="w-6 h-6 mr-3" />
+          Edit Your Profile
+        </Link>
+
+        <Link
+          href={`/admin/author/${user?.username}`}
+          className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
+            pathname.includes("/admin/author")
+              ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <LayoutDashboard className="w-6 h-6 mr-3" />
+          Dashboard
+        </Link>
+
+        <Link
+          href={`/authors/${user?.slug}`}
+          className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
+            pathname.includes(`/authors/${user?.slug}`)
+              ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <Crown className="w-6 h-6 mr-3" />
+          Public Profile View
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
+        >
+          <LogOut className="w-6 h-6 mr-3" />
+          Sign Out
+        </button>
+
+        <button
+          onClick={openDeleteConfirmation}
+          className="flex items-center w-full px-4 py-4 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium text-lg mt-2"
+        >
+          <Trash2 className="w-6 h-6 mr-3" />
+          Delete Account
+        </button>
+      </div>
+    );
+  };
+
   // Auth Modal Component
   const AuthModalOverlay = () => {
     if (!mounted || !showAuthModal) return null;
@@ -433,10 +526,10 @@ export function MinimalHeader() {
   return (
     <>
       <header className="sticky top-0 z-50 bg-white dark:bg-[#0A0A0A] backdrop-blur-sm">
-        {/* MOBILE HEADER - Updated to px-6 */}
+        {/* MOBILE HEADER - Simple: Logo, Search, Menu */}
         <div className="md:hidden">
           <div className="flex items-center justify-between py-4 px-6 gap-3">
-            {/* Logo */}
+            {/* Logo - KEEP ORIGINAL SIZE */}
             <Link
               href="/"
               className="flex items-center justify-start group flex-shrink-0"
@@ -449,8 +542,8 @@ export function MinimalHeader() {
               />
             </Link>
 
-            {/* IMPROVED Search Bar - Better Width and Design */}
-            <div className="flex-1 relative max-w-[220px]">
+            {/* Search Bar - WIDER */}
+            <div className="flex-1 relative max-w-[200px] ml-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
                 <Input
@@ -458,14 +551,14 @@ export function MinimalHeader() {
                   placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-full text-xs md:text-sm pl-10 pr-8 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 font-medium h-11 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                  className="w-full rounded-xl text-sm pl-10 pr-8 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 font-medium h-10 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                   autoComplete="off"
                   spellCheck={false}
                 />
                 {searchQuery && (
                   <button
                     onClick={handleClear}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 w-4 h-4 flex items-center justify-center"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 w-4 h-4 flex items-center justify-center"
                     aria-label="Clear"
                   >
                     <X className="w-3 h-3" />
@@ -473,9 +566,9 @@ export function MinimalHeader() {
                 )}
               </div>
 
-              {/* Search Results Dropdown - Improved Design */}
+              {/* Search Results Dropdown */}
               {searchQuery && searchResults.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#0A0A0A] border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
@@ -493,45 +586,21 @@ export function MinimalHeader() {
               )}
             </div>
 
-            {/* Right Side - Avatar/Burger Menu */}
-            <div className="flex items-center gap-2">
-              {/* Show Avatar when logged in */}
-              {!isLoading && isAuthenticated && (
-                <div className="relative">
-                  <button
-                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 hover:shadow-inner transition-all"
-                  >
-                    {user?.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.username}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                    )}
-                  </button>
-                  {isUserDropdownOpen && <UserDropdown />}
-                </div>
+            {/* Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex-shrink-0 font-medium rounded-xl ml-1"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
               )}
-
-              {/* Burger Menu */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex-shrink-0 font-medium dark:border-gray-700"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+            </button>
           </div>
         </div>
 
-        {/* DESKTOP HEADER - Updated to use px-6 md:px-11 */}
+        {/* DESKTOP HEADER - No changes */}
         <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-11">
           {/* Logo Section */}
           <Link href="/" className="flex items-center space-x-3 group">
@@ -895,44 +964,11 @@ export function MinimalHeader() {
 
           {/* Menu Content */}
           <div className="flex-1 overflow-y-auto py-6">
-            {/* User Info Section - Show when logged in */}
-            {isAuthenticated && user && (
-              <div className="px-6 mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 flex items-center justify-center">
-                    {user?.avatar ? (
-                      <img
-                        src={user.avatar}
-                        alt={user.username}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
-                      {user.username}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Write Article Button in Menu */}
-                <button
-                  onClick={handleSignInClick}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg font-medium flex items-center justify-center gap-2"
-                >
-                  <PenSquare className="w-5 h-5" />
-                  Write Article
-                </button>
-              </div>
-            )}
-
-            {/* Write Article Button for Non-logged in users */}
-            {!isAuthenticated && (
+            {/* Show User Dropdown when logged in */}
+            {isAuthenticated ? (
+              <MobileUserDropdown />
+            ) : (
+              /* Show Write Article Button for Non-logged in users */
               <div className="px-6 mb-6">
                 <button
                   onClick={handleSignInClick}
@@ -945,7 +981,7 @@ export function MinimalHeader() {
             )}
 
             {/* Main Navigation */}
-            <div className="space-y-2 px-6">
+            <div className="space-y-2 px-6 mt-6">
               {mobileNavItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -1073,20 +1109,43 @@ export function MinimalHeader() {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Menu Footer - Sign out for logged in users */}
-          {isAuthenticated && (
-            <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+            {/* Others Dropdown */}
+            <div className="mt-2 px-6">
               <button
-                onClick={handleLogout}
-                className="w-full py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all font-medium flex items-center justify-center gap-2"
+                onClick={() => toggleMobileDropdown("others")}
+                className="flex items-center justify-between w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
               >
-                <LogOut className="w-5 h-5" />
-                Sign Out
+                <div className="flex items-center">
+                  <HelpCircle className="w-6 h-6 mr-3" />
+                  Others
+                </div>
+                <ChevronDown
+                  className={`w-5 h-5 transition-transform ${
+                    activeMobileDropdown === "others" ? "rotate-180" : ""
+                  }`}
+                />
               </button>
+
+              {activeMobileDropdown === "others" && (
+                <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                  {mobileOthersItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setActiveMobileDropdown(null);
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

@@ -2,7 +2,17 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { Award, Crown, Zap, Upload, User, Briefcase, LinkIcon, FileText, Hash } from "lucide-react";
+import {
+  Award,
+  Crown,
+  Zap,
+  Upload,
+  User,
+  Briefcase,
+  LinkIcon,
+  FileText,
+  Hash,
+} from "lucide-react";
 
 export default function ProfileForm() {
   const [formData, setFormData] = useState({
@@ -340,10 +350,11 @@ export default function ProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8 text-center">
+      <div className="max-w-2xl mx-auto px-6 md:px-11 py-4 md:py-16">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 md:p-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Zap className="w-4 h-4 md:w-5 md:h-5" />Loading Your Profile
+            <Zap className="w-4 h-4 md:w-5 md:h-5" />
+            Loading Your Profile
           </div>
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
             Preparing Your Profile
@@ -359,10 +370,11 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8 text-center">
+      <div className="max-w-2xl mx-auto px-6 md:px-11 py-4 md:py-16">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 md:p-8 text-center">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Crown className="w-4 h-4 md:w-5 md:h-5" />Thank You!
+            <Crown className="w-4 h-4 md:w-5 md:h-5" />
+            Thank You!
           </div>
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
             {success === "stay"
@@ -381,15 +393,15 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 px-4 py-6">
-      <div className="max-w-2xl mx-auto">
+    <div className="px-4 md:px-11 md:py-10 mx-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
         {/* Mobile Header */}
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-3 md:mb-4 w-fit mx-auto">
             <Zap className="w-4 h-4 md:w-5 md:h-5" />
-            <span>Complete Your Profile</span>
+            <span className="text-sm md:text-base">Complete Your Profile</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
             Tell Us About Yourself
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-center text-sm md:text-base">
@@ -397,240 +409,238 @@ export default function ProfileForm() {
           </p>
         </div>
 
-        <div className="bg-white/95 dark:bg-gray-800/95 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-            {/* Display Name */}
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <User className="w-4 h-4" />
-                <span>Display Name <span className="text-red-500">*</span></span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                placeholder="Your Name - eg. John Doe"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          {/* Display Name */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              Display Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+              placeholder="Your Name - eg. John Doe"
+            />
+          </div>
 
-            {/* Professional Information */}
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <Briefcase className="w-4 h-4" />
-                <span>Professional Information <span className="text-red-500">*</span></span>
-              </label>
-              <div className="grid grid-cols-1 gap-3 md:flex md:gap-4 md:items-end">
-                <div className="md:flex-1">
-                  <input
-                    type="text"
-                    name="job_title"
-                    value={formData.job_title}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                    placeholder="Job title"
-                  />
-                </div>
-                <div className="hidden md:flex items-center h-12 text-gray-500 dark:text-gray-400 font-medium px-2">
-                  at
-                </div>
-                <div className="md:flex-1">
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                    placeholder="Company name (optional)"
-                  />
-                </div>
+          {/* Professional Information - Stack on mobile */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              Professional Information <span className="text-red-500">*</span>
+            </label>
+            <div className="space-y-3 md:space-y-0 md:flex md:gap-4 md:items-end">
+              <div className="md:flex-1">
+                <input
+                  type="text"
+                  name="job_title"
+                  value={formData.job_title}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+                  placeholder="Job title"
+                />
+              </div>
+              <div className="hidden md:flex items-center h-12 text-gray-500 dark:text-gray-400 font-medium px-2">
+                at
+              </div>
+              <div className="md:flex-1">
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+                  placeholder="Company name (optional)"
+                />
               </div>
             </div>
+          </div>
 
-            {/* Bio */}
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <FileText className="w-4 h-4" />
-                <span>Bio <span className="text-red-500">*</span></span>
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base resize-none"
-                required
-                placeholder="Tell us about yourself, your expertise, and experience..."
-              />
-            </div>
+          {/* Bio */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              Bio <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              rows={4}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base resize-none"
+              required
+              placeholder="Tell us about yourself, your expertise, and experience..."
+            />
+          </div>
 
-            {/* LinkedIn URL */}
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <LinkIcon className="w-4 h-4" />
-                <span>LinkedIn URL <span className="text-red-500">*</span></span>
-              </label>
-              <input
-                type="url"
-                name="linkedin"
-                value={formData.linkedin}
-                onChange={handleInputChange}
-                required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                placeholder="https://linkedin.com/in/your-profile"
-              />
-            </div>
+          {/* LinkedIn URL */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              LinkedIn URL <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="url"
+              name="linkedin"
+              value={formData.linkedin}
+              onChange={handleInputChange}
+              required
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+              placeholder="https://linkedin.com/in/your-profile"
+            />
+          </div>
 
-            {/* Avatar Section */}
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <Upload className="w-4 h-4" />
-                <span>Profile Photo <span className="text-red-500">*</span></span>
-              </label>
+          {/* Avatar Section - Mobile optimized */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              Profile Photo <span className="text-red-500">*</span>
+            </label>
 
-              {formData.avatar && (
+            {formData.avatar && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  Current Avatar:
+                </p>
                 <div className="flex items-center gap-3">
                   <img
                     src={formData.avatar}
                     alt="Current avatar"
                     className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
                   />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Current photo</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    Current photo
+                  </span>
                 </div>
-              )}
-
-              <div className="mb-2">
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/gif,image/webp"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 md:p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
-                    <div className="flex flex-col items-center gap-2">
-                      <Upload className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Click to upload photo
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        JPEG, PNG, GIF, WebP (max 5MB)
-                      </span>
-                    </div>
-                  </div>
-                </label>
-              </div>
-
-              {uploadProgress > 0 && uploadProgress < 100 && (
-                <div className="mt-2">
-                  <div className="flex justify-between text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    <span>Uploading...</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
-                    <div
-                      className="bg-sky-600 h-1.5 md:h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-
-              {uploadError && (
-                <p className="text-red-600 dark:text-red-400 text-xs md:text-sm mt-1">{uploadError}</p>
-              )}
-
-              {hasExistingAvatar && (
-                <div className="mt-3">
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Or use custom URL:
-                  </label>
-                  <input
-                    type="url"
-                    name="avatar"
-                    value={formData.avatar}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 md:py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-                    placeholder="https://example.com/avatar.jpg"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Keep your existing avatar URL or change it
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Profile Slug */}
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 mb-1 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                <Hash className="w-4 h-4" />
-                <span>Profile Slug <span className="text-red-500">*</span></span>
-              </label>
-              <input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleInputChange}
-                required
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                placeholder="your-unique-profile-slug"
-              />
-              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Don't change auto-generated slug. This will be used in your
-                profile URL (e.g., /authors/your-slug)
-              </p>
-            </div>
-
-            {error && (
-              <div className="p-3 md:p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-xl text-sm border border-red-200 dark:border-red-800">
-                {error}
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-3 pt-4">
-              {/* Button 1: Complete Profile & Go to Dashboard */}
-              <button
-                type="submit"
-                disabled={loading || isUploading}
-                className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-              >
-                {loading
-                  ? "Saving Profile..."
-                  : "Save Profile & Go to Admin Dashboard"}
-              </button>
+            <div className="mb-4">
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 md:p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Click to upload photo
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      JPEG, PNG, GIF, WebP (max 5MB)
+                    </span>
+                  </div>
+                </div>
+              </label>
+            </div>
 
-              {/* Button 2: Save Profile & Continue Reading */}
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="mt-3">
+                <div className="flex justify-between text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  <span>Uploading...</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
+                  <div
+                    className="bg-sky-600 h-1.5 md:h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {uploadError && (
+              <p className="text-red-600 dark:text-red-400 text-xs md:text-sm mt-2">
+                {uploadError}
+              </p>
+            )}
+
+            {hasExistingAvatar && (
+              <div className="mt-4">
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Or use custom URL:
+                </label>
+                <input
+                  type="url"
+                  name="avatar"
+                  value={formData.avatar}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 md:py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                  placeholder="https://example.com/avatar.jpg"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Keep your existing avatar URL or change it
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Profile Slug */}
+          <div>
+            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+              Profile Slug <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="slug"
+              value={formData.slug}
+              onChange={handleInputChange}
+              required
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+              placeholder="your-unique-profile-slug"
+            />
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Don't change auto-generated slug. This will be used in your
+              profile URL (e.g., /authors/your-slug)
+            </p>
+          </div>
+
+          {error && (
+            <div className="p-3 md:p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-xl text-sm border border-red-200 dark:border-red-800">
+              {error}
+            </div>
+          )}
+
+          {/* Action Buttons - Mobile optimized */}
+          <div className="space-y-3 pt-4">
+            {/* Button 1: Complete Profile & Go to Dashboard */}
+            <button
+              type="submit"
+              disabled={loading || isUploading}
+              className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+            >
+              {loading
+                ? "Saving Profile..."
+                : "Save Profile & Go to Admin Dashboard"}
+            </button>
+
+            {/* Button 2: Save Profile & Continue Reading */}
+            <button
+              type="button"
+              onClick={handleSaveAndStay}
+              disabled={loading || isUploading}
+              className="w-full border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+            >
+              {loading
+                ? "Saving Profile..."
+                : "Save Profile & Back to Previous Page"}
+            </button>
+
+            {/* Skip Button */}
+            {!hasCompletedProfile && (
               <button
                 type="button"
-                onClick={handleSaveAndStay}
-                disabled={loading || isUploading}
-                className="w-full border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+                onClick={handleSkip}
+                className="w-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2 text-sm md:text-base transition-colors"
               >
-                {loading
-                  ? "Saving Profile..."
-                  : "Save Profile & Back to Previous Page"}
+                Skip for now →
               </button>
-
-              {/* Skip Button - Hidden on mobile, shown only if needed */}
-              {!hasCompletedProfile && (
-                <button
-                  type="button"
-                  onClick={handleSkip}
-                  className="w-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2 text-sm md:text-base transition-colors"
-                >
-                  Skip for now →
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-
-        {/* Mobile Bottom Spacing */}
-        <div className="h-6 md:h-0"></div>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
