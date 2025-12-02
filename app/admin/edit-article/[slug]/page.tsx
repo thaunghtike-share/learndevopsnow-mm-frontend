@@ -4,6 +4,23 @@ import { useRouter, useParams } from "next/navigation";
 import MDEditor from "@uiw/react-md-editor";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
+import {
+  Save,
+  Image,
+  Calendar,
+  Tag,
+  Folder,
+  Link,
+  Eye,
+  X,
+  Plus,
+  Check,
+  Upload,
+  Trash2,
+  Maximize2,
+  Minimize2,
+  Paperclip,
+} from "lucide-react";
 
 interface Article {
   slug: string;
@@ -67,6 +84,13 @@ export default function EditArticlePage() {
   const [coverImageProgress, setCoverImageProgress] = useState(0);
   const [coverImageError, setCoverImageError] = useState<string | null>(null);
 
+  // NEW: Article content image upload states
+  const [contentImageUploading, setContentImageUploading] = useState(false);
+  const [contentImageProgress, setContentImageProgress] = useState(0);
+  const [contentImageError, setContentImageError] = useState<string | null>(
+    null
+  );
+
   // New state for creating tags/categories
   const [newTagName, setNewTagName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -81,26 +105,26 @@ export default function EditArticlePage() {
       const savedToken = localStorage.getItem("token");
       setToken(savedToken);
       setLoading(false);
-      
+
       // Check for dark mode
-      const isDark = document.documentElement.classList.contains('dark');
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
-      
+
       // Observe for dark mode changes
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.attributeName === 'class') {
-            const isDark = document.documentElement.classList.contains('dark');
+          if (mutation.attributeName === "class") {
+            const isDark = document.documentElement.classList.contains("dark");
             setIsDarkMode(isDark);
           }
         });
       });
-      
+
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ['class']
+        attributeFilter: ["class"],
       });
-      
+
       return () => observer.disconnect();
     }
   }, []);
@@ -226,51 +250,131 @@ export default function EditArticlePage() {
     fetchData();
   }, []);
 
-  // Show redirect message if not authenticated
-  if (!token) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
-        <MinimalHeader />
-        <main className="flex-grow flex items-center justify-center py-20 px-4">
-          <div className="text-center max-w-md">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
-            <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">
-              You need to be logged in to edit articles.
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              Redirecting to home page in {redirectCountdown} seconds...
-            </p>
-          </div>
-        </main>
-        <MinimalFooter />
-      </div>
-    );
-  }
+  // NEW: Handle article content image upload
+  const handleContentImageUpload = async () => {
+    // Create a hidden file input
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept =
+      "image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml";
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
-        <MinimalHeader />
-        <main className="flex-grow flex items-center justify-center px-4">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Loading...</p>
-          </div>
-        </main>
-        <MinimalFooter />
-      </div>
-    );
-  }
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/svg+xml",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        setMessage({
+          text: "Please select a valid image file (JPEG, PNG, GIF, WebP, or SVG)",
+          type: "error",
+        });
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        setMessage({
+          text: "File size must be less than 10MB",
+          type: "error",
+        });
+        return;
+      }
+
+      setContentImageUploading(true);
+      setContentImageError(null);
+      setContentImageProgress(10);
+
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
+
+        setContentImageProgress(30);
+
+        // NEW ENDPOINT: Upload article content image
+        const response = await fetch(`${API_BASE_URL}/upload-article-image/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+          body: formData,
+        });
+
+        setContentImageProgress(70);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Image upload failed");
+        }
+
+        const data = await response.json();
+
+        setContentImageProgress(100);
+
+        // Insert the Markdown image syntax at cursor position
+        const markdownImage = data.markdown || `![${file.name}](${data.url})`;
+
+        // Insert at current cursor position or at the end
+        const currentContent = form.content;
+
+        // For simplicity, insert at the end with line breaks
+        const newContent =
+          currentContent +
+          (currentContent ? "\n\n" : "") +
+          markdownImage +
+          "\n";
+
+        setForm((prev) => ({
+          ...prev,
+          content: newContent,
+        }));
+
+        setMessage({
+          text: "✅ Image uploaded and inserted into editor!",
+          type: "success",
+        });
+
+        setTimeout(() => {
+          setContentImageProgress(0);
+          setContentImageUploading(false);
+        }, 1000);
+      } catch (error: any) {
+        setContentImageError(error.message);
+        setMessage({
+          text: `Upload failed: ${error.message}`,
+          type: "error",
+        });
+        setContentImageProgress(0);
+        setContentImageUploading(false);
+      }
+    };
+
+    input.click();
+  };
 
   // Handle cover image upload
-  const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
-      setCoverImageError("Please select a valid image file (JPEG, PNG, GIF, or WebP)");
+      setCoverImageError(
+        "Please select a valid image file (JPEG, PNG, GIF, or WebP)"
+      );
       return;
     }
 
@@ -317,6 +421,11 @@ export default function EditArticlePage() {
         ...prev,
         cover_image: data.cover_image_url || data.url,
       }));
+
+      setMessage({
+        text: "✅ Cover image uploaded successfully!",
+        type: "success",
+      });
 
       setTimeout(() => {
         setCoverImageProgress(0);
@@ -476,13 +585,70 @@ export default function EditArticlePage() {
     }
   }
 
+  // Show redirect message if not authenticated
+  if (!token) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+        <MinimalHeader />
+        <main className="flex-grow flex items-center justify-center py-20 px-4">
+          <div className="text-center max-w-md">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-2">
+              You need to be logged in to edit articles.
+            </p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              Redirecting to home page in {redirectCountdown} seconds...
+            </p>
+          </div>
+        </main>
+        <MinimalFooter />
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+        <MinimalHeader />
+        <main className="flex-grow flex items-center justify-center px-4 md:py-20">
+          <div className="text-center mt-24 mb-24">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          </div>
+        </main>
+        <MinimalFooter />
+      </div>
+    );
+  }
+
   return (
-    <div className={`min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors relative overflow-x-hidden duration-300 ${fullscreen ? "overflow-hidden" : ""}`}>
+    <div
+      className={`min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors relative overflow-x-hidden duration-300 ${
+        fullscreen ? "overflow-hidden" : ""
+      }`}
+    >
       {!fullscreen && <MinimalHeader />}
 
-      <main className={`${fullscreen ? "fixed inset-0 z-50 bg-white dark:bg-[#0A0A0A]" : "flex-grow w-full"}`}>
-        <div className={`${fullscreen ? "h-full" : "max-w-7xl mx-auto px-6 md:px-11 md:py-10"}`}>
-          <div className={`${fullscreen ? "h-full" : "bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8"}`}>
+      <main
+        className={`${
+          fullscreen
+            ? "fixed inset-0 z-50 bg-white dark:bg-[#0A0A0A]"
+            : "flex-grow w-full"
+        }`}
+      >
+        <div
+          className={`${
+            fullscreen ? "h-full" : "max-w-7xl mx-auto px-6 md:px-11 md:py-10"
+          }`}
+        >
+          <div
+            className={`${
+              fullscreen
+                ? "h-full"
+                : "bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8"
+            }`}
+          >
             {!fullscreen && (
               <div className="mb-6 md:mb-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -491,9 +657,7 @@ export default function EditArticlePage() {
                       Edit Article
                     </h1>
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+                      <Save className="w-4 h-4" />
                       {lastSaved ? (
                         <span>Draft auto-saved at {lastSaved}</span>
                       ) : (
@@ -508,18 +672,19 @@ export default function EditArticlePage() {
                     onClick={clearDraft}
                     className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:shadow-lg hover:from-orange-600 hover:to-red-600 transition-all duration-300 font-medium text-sm md:text-base"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <Trash2 className="w-4 h-4" />
                     Clear Draft
                   </button>
                 </div>
 
                 {message && (
-                  <div className={`p-3 md:p-4 rounded-lg border mb-4 text-sm ${message.type === "success"
-                      ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800"
-                      : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800"
-                    }`}>
+                  <div
+                    className={`p-3 md:p-4 rounded-lg border mb-4 text-sm ${
+                      message.type === "success"
+                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800"
+                        : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800"
+                    }`}
+                  >
                     {message.text}
                   </div>
                 )}
@@ -529,19 +694,25 @@ export default function EditArticlePage() {
             {articleLoading ? (
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Loading Article</h2>
-                <p className="text-gray-600 dark:text-gray-300">Preparing your content for editing...</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Loading Article
+                </h2>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Preparing your content for editing...
+                </p>
               </div>
             ) : !article ? (
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 md:p-8 text-center">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Article Not Found</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Article Not Found
+                </h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {message?.type === "error" ? message.text : "The article you're looking for doesn't exist."}
+                  {message?.type === "error"
+                    ? message.text
+                    : "The article you're looking for doesn't exist."}
                 </p>
                 {message?.type === "error" && (
                   <button
@@ -553,19 +724,33 @@ export default function EditArticlePage() {
                 )}
               </div>
             ) : (
-              <form onSubmit={handleArticleSubmit} className={`${fullscreen ? "h-full" : "space-y-4 md:space-y-6"}`}>
-                <div className={`${fullscreen ? "h-full flex flex-col" : "space-y-4 md:space-y-6"}`}>
+              <form
+                onSubmit={handleArticleSubmit}
+                className={`${
+                  fullscreen ? "h-full" : "space-y-4 md:space-y-6"
+                }`}
+              >
+                <div
+                  className={`${
+                    fullscreen
+                      ? "h-full flex flex-col"
+                      : "space-y-4 md:space-y-6"
+                  }`}
+                >
                   {!fullscreen && (
                     <>
                       {/* Article Title */}
                       <div className="space-y-2">
-                        <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                          Title <span className="text-red-500">*</span>
+                        <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                          <span>Title</span>
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={form.title}
-                          onChange={(e) => handleChange("title", e.target.value)}
+                          onChange={(e) =>
+                            handleChange("title", e.target.value)
+                          }
                           required
                           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm md:text-base"
                           placeholder="Enter your article title"
@@ -574,8 +759,10 @@ export default function EditArticlePage() {
 
                       {/* Slug Field */}
                       <div className="space-y-2">
-                        <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                          URL Slug <span className="text-red-500">*</span>
+                        <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                          <Link className="w-4 h-4" />
+                          <span>URL Slug</span>
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -601,13 +788,17 @@ export default function EditArticlePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {/* Category */}
                         <div className="space-y-2">
-                          <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                            Category <span className="text-red-500">*</span>
+                          <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                            <Folder className="w-4 h-4" />
+                            <span>Category</span>
+                            <span className="text-red-500">*</span>
                           </label>
                           <div className="space-y-2">
                             <select
                               value={form.category}
-                              onChange={(e) => handleChange("category", e.target.value)}
+                              onChange={(e) =>
+                                handleChange("category", e.target.value)
+                              }
                               required
                               className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                             >
@@ -625,9 +816,7 @@ export default function EditArticlePage() {
                                 onClick={() => setShowNewCategoryInput(true)}
                                 className="w-full px-4 py-2 text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-lg border border-dashed border-sky-300 dark:border-sky-600 transition-all duration-300 flex items-center justify-center gap-2"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
+                                <Plus className="w-4 h-4" />
                                 Create New Category
                               </button>
                             ) : (
@@ -635,7 +824,9 @@ export default function EditArticlePage() {
                                 <input
                                   type="text"
                                   value={newCategoryName}
-                                  onChange={(e) => setNewCategoryName(e.target.value)}
+                                  onChange={(e) =>
+                                    setNewCategoryName(e.target.value)
+                                  }
                                   placeholder="Enter new category name"
                                   className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                                 />
@@ -648,9 +839,7 @@ export default function EditArticlePage() {
                                   {creatingCategory ? (
                                     <>Creating...</>
                                   ) : (
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
+                                    <Check className="w-4 h-4" />
                                   )}
                                 </button>
                                 <button
@@ -658,9 +847,7 @@ export default function EditArticlePage() {
                                   onClick={() => setShowNewCategoryInput(false)}
                                   className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-sm flex items-center"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
+                                  <X className="w-4 h-4" />
                                 </button>
                               </div>
                             )}
@@ -669,13 +856,17 @@ export default function EditArticlePage() {
 
                         {/* Published Date */}
                         <div className="space-y-2">
-                          <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                            Published Date <span className="text-red-500">*</span>
+                          <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                            <Calendar className="w-4 h-4" />
+                            <span>Published Date</span>
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="date"
                             value={form.published_at}
-                            onChange={(e) => handleChange("published_at", e.target.value)}
+                            onChange={(e) =>
+                              handleChange("published_at", e.target.value)
+                            }
                             required
                             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
                           />
@@ -687,14 +878,17 @@ export default function EditArticlePage() {
 
                       {/* Tags Dropdown */}
                       <div className="space-y-2">
-                        <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                          Tags
+                        <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                          <Tag className="w-4 h-4" />
+                          <span>Tags</span>
                         </label>
                         <div className="space-y-2">
                           <div className="relative">
                             <button
                               type="button"
-                              onClick={() => setShowTagDropdown(!showTagDropdown)}
+                              onClick={() =>
+                                setShowTagDropdown(!showTagDropdown)
+                              }
                               className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-left focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base flex items-center justify-between"
                             >
                               <span>
@@ -703,13 +897,19 @@ export default function EditArticlePage() {
                                   : "Select tags"}
                               </span>
                               <svg
-                                className={`w-5 h-5 text-gray-400 transition-transform ${showTagDropdown ? "rotate-180" : ""
-                                  }`}
+                                className={`w-5 h-5 text-gray-400 transition-transform ${
+                                  showTagDropdown ? "rotate-180" : ""
+                                }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
                               >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
                               </svg>
                             </button>
 
@@ -741,9 +941,7 @@ export default function EditArticlePage() {
                               onClick={() => setShowNewTagInput(true)}
                               className="w-full px-4 py-2 text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-lg border border-dashed border-sky-300 dark:border-sky-600 transition-all duration-300 flex items-center justify-center gap-2"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                              </svg>
+                              <Plus className="w-4 h-4" />
                               Create New Tag
                             </button>
                           ) : (
@@ -764,9 +962,7 @@ export default function EditArticlePage() {
                                 {creatingTag ? (
                                   <>Creating...</>
                                 ) : (
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
+                                  <Check className="w-4 h-4" />
                                 )}
                               </button>
                               <button
@@ -774,9 +970,7 @@ export default function EditArticlePage() {
                                 onClick={() => setShowNewTagInput(false)}
                                 className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg text-sm flex items-center"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-4 h-4" />
                               </button>
                             </div>
                           )}
@@ -797,9 +991,7 @@ export default function EditArticlePage() {
                                     onClick={() => toggleTag(tag.id)}
                                     className="hover:text-sky-900 dark:hover:text-sky-200"
                                   >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X className="w-3 h-3" />
                                   </button>
                                 </span>
                               ) : null;
@@ -810,8 +1002,9 @@ export default function EditArticlePage() {
 
                       {/* Cover Image Upload */}
                       <div className="space-y-3">
-                        <label className="block font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-                          Cover Image
+                        <label className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
+                          <Image className="w-4 h-4" />
+                          <span>Cover Image</span>
                         </label>
 
                         {form.cover_image && (
@@ -830,9 +1023,7 @@ export default function EditArticlePage() {
                                 onClick={() => handleChange("cover_image", "")}
                                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                               >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-3 h-3" />
                               </button>
                             </div>
                           </div>
@@ -848,9 +1039,7 @@ export default function EditArticlePage() {
                             />
                             <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 md:p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
                               <div className="flex flex-col items-center gap-2">
-                                <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                                <Upload className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                   Click to upload cover image
                                 </span>
@@ -890,7 +1079,9 @@ export default function EditArticlePage() {
                           <input
                             type="url"
                             value={form.cover_image}
-                            onChange={(e) => handleChange("cover_image", e.target.value)}
+                            onChange={(e) =>
+                              handleChange("cover_image", e.target.value)
+                            }
                             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 md:py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                             placeholder="https://example.com/cover-image.jpg"
                           />
@@ -903,7 +1094,9 @@ export default function EditArticlePage() {
                           id="featured"
                           type="checkbox"
                           checked={form.featured}
-                          onChange={(e) => handleChange("featured", e.target.checked)}
+                          onChange={(e) =>
+                            handleChange("featured", e.target.checked)
+                          }
                           className="h-5 w-5 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                         />
                         <label
@@ -917,49 +1110,92 @@ export default function EditArticlePage() {
                   )}
 
                   {/* Content Editor */}
-                  <div className={`${fullscreen ? "flex-grow flex flex-col" : ""}`}>
+                  <div
+                    className={`${fullscreen ? "flex-grow flex flex-col" : ""}`}
+                  >
                     {!fullscreen && (
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                          <span>Content (Markdown)</span>
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setShowPreview(!showPreview)}
-                            className="px-3 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            {showPreview ? "Hide Preview" : "Show Preview"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleEditorFullscreen}
-                            className="px-3 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
-                          >
-                            {fullscreen ? (
-                              <>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
-                                </svg>
-                                Exit Fullscreen
-                              </>
-                            ) : (
-                              <>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                </svg>
-                                Fullscreen
-                              </>
+                      <>
+                        {/* NEW: Content Image Upload Progress */}
+                        {contentImageUploading && (
+                          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                            <div className="flex justify-between text-sm text-green-700 dark:text-green-300 mb-1">
+                              <span className="flex items-center gap-2">
+                                <div className="animate-spin h-3 w-3 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                                Uploading article image...
+                              </span>
+                              <span>{contentImageProgress}%</span>
+                            </div>
+                            <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2">
+                              <div
+                                className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${contentImageProgress}%` }}
+                              ></div>
+                            </div>
+                            {contentImageError && (
+                              <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+                                {contentImageError}
+                              </p>
                             )}
-                          </button>
+                          </div>
+                        )}
+
+                        {/* Editor Header with Upload Button */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <span>Content (Markdown)</span>
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            {/* NEW: Upload Article Image Button */}
+                            <button
+                              type="button"
+                              onClick={handleContentImageUpload}
+                              disabled={contentImageUploading}
+                              className="px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                            >
+                              {contentImageUploading ? (
+                                <>
+                                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                  Uploading...
+                                </>
+                              ) : (
+                                <>
+                                  <Image className="w-4 h-4" />
+                                  Upload Image
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setShowPreview(!showPreview)}
+                              className="px-3 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2"
+                            >
+                              <Eye className="w-4 h-4" />
+                              {showPreview ? "Hide Preview" : "Show Preview"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleEditorFullscreen}
+                              className="px-3 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
+                            >
+                              {fullscreen ? (
+                                <>
+                                  <Minimize2 className="w-4 h-4" />
+                                  Exit Fullscreen
+                                </>
+                              ) : (
+                                <>
+                                  <Maximize2 className="w-4 h-4" />
+                                  Fullscreen
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      </>
                     )}
+
                     <div
                       ref={editorRef}
                       data-color-mode={isDarkMode ? "dark" : "light"}
@@ -974,50 +1210,59 @@ export default function EditArticlePage() {
                         }
                         hideToolbar={false}
                         style={{
-                          backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                          color: isDarkMode ? '#f9fafb' : '#000000',
+                          backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                          color: isDarkMode ? "#f9fafb" : "#000000",
                         }}
                         textareaProps={{
                           placeholder: "Write your article content here...",
                           style: {
-                            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                            color: isDarkMode ? '#f9fafb' : '#000000',
+                            backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                            color: isDarkMode ? "#f9fafb" : "#000000",
                           },
                         }}
                         previewOptions={{
                           style: {
-                            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                            color: isDarkMode ? '#f9fafb' : '#000000',
+                            backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                            color: isDarkMode ? "#f9fafb" : "#000000",
                           },
                         }}
-                        className={`${fullscreen
+                        className={`${
+                          fullscreen
                             ? "h-full rounded-none"
                             : "rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
-                          }`}
+                        }`}
                         extraCommands={[
                           {
                             name: "fullscreen",
                             keyCommand: "fullscreen",
                             buttonProps: { "aria-label": "Toggle fullscreen" },
                             icon: fullscreen ? (
-                              <svg width="14" height="14" viewBox="0 0 512 512">
-                                <path
-                                  fill="currentColor"
-                                  d="M396.795 396.8H320V448h128V320h-51.205zm-281.59 0H192V448H64V320h51.205zm0-281.595H64V192h128V64H192zm281.595 0H320V64h128v128h-51.205z"
-                                />
-                              </svg>
+                              <Minimize2 className="w-4 h-4" />
                             ) : (
-                              <svg width="14" height="14" viewBox="0 0 512 512">
-                                <path
-                                  fill="currentColor"
-                                  d="M396.795 396.8H320V448h128V320h-51.205zm-281.59 0H192V448H64V320h51.205zm0-281.595H64V192h128V64H192zm281.595 0H320V64h128v128h-51.205z"
-                                />
-                              </svg>
+                              <Maximize2 className="w-4 h-4" />
                             ),
                             execute: (state, api) => {
                               handleEditorFullscreen({
-                                preventDefault: () => { },
+                                preventDefault: () => {},
                               } as React.MouseEvent);
+                            },
+                          },
+                          // NEW: Upload image command in toolbar
+                          {
+                            name: "upload-image",
+                            keyCommand: "uploadImage",
+                            buttonProps: {
+                              "aria-label": "Upload image",
+                              title: "Upload image from computer",
+                              disabled: contentImageUploading,
+                            },
+                            icon: contentImageUploading ? (
+                              <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                            ) : (
+                              <Paperclip className="w-4 h-4" />
+                            ),
+                            execute: () => {
+                              handleContentImageUpload();
                             },
                           },
                         ]}
@@ -1029,7 +1274,11 @@ export default function EditArticlePage() {
                     <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                       <button
                         type="submit"
-                        disabled={loading || coverImageUploading}
+                        disabled={
+                          loading ||
+                          coverImageUploading ||
+                          contentImageUploading
+                        }
                         className="w-full px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base flex items-center justify-center gap-2"
                       >
                         {loading ? (
@@ -1039,9 +1288,7 @@ export default function EditArticlePage() {
                           </>
                         ) : (
                           <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                            <Save className="w-4 h-4" />
                             <span>Update Article</span>
                           </>
                         )}

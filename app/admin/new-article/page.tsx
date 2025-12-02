@@ -4,7 +4,6 @@ import MDEditor from "@uiw/react-md-editor";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import { useRouter } from "next/navigation";
-import { relative } from "path";
 import {
   Save,
   Image,
@@ -19,7 +18,8 @@ import {
   Upload,
   Trash2,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Paperclip
 } from "lucide-react";
 
 interface Category {
@@ -67,6 +67,11 @@ export default function NewArticlePage() {
   const [coverImageUploading, setCoverImageUploading] = useState(false);
   const [coverImageProgress, setCoverImageProgress] = useState(0);
   const [coverImageError, setCoverImageError] = useState<string | null>(null);
+
+  // NEW: Article content image upload states
+  const [contentImageUploading, setContentImageUploading] = useState(false);
+  const [contentImageProgress, setContentImageProgress] = useState(0);
+  const [contentImageError, setContentImageError] = useState<string | null>(null);
 
   const [newTagName, setNewTagName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -245,6 +250,111 @@ export default function NewArticlePage() {
     }
   };
 
+  // NEW: Handle article content image upload
+  const handleContentImageUpload = async () => {
+    // Create a hidden file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml';
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const allowedTypes = [
+        'image/jpeg', 'image/jpg', 'image/png', 
+        'image/gif', 'image/webp', 'image/svg+xml'
+      ];
+      
+      if (!allowedTypes.includes(file.type)) {
+        setMessage({ 
+          text: "Please select a valid image file (JPEG, PNG, GIF, WebP, or SVG)", 
+          type: "error" 
+        });
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        setMessage({ 
+          text: "File size must be less than 10MB", 
+          type: "error" 
+        });
+        return;
+      }
+
+      setContentImageUploading(true);
+      setContentImageError(null);
+      setContentImageProgress(10);
+
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        setContentImageProgress(30);
+
+        // NEW ENDPOINT: Upload article content image
+        const response = await fetch(`${API_BASE_URL}/upload-article-image/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+          body: formData,
+        });
+
+        setContentImageProgress(70);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Image upload failed');
+        }
+
+        const data = await response.json();
+
+        setContentImageProgress(100);
+
+        // Insert the Markdown image syntax at cursor position
+        const markdownImage = data.markdown || `![${file.name}](${data.url})`;
+        
+        // Insert at current cursor position or at the end
+        const currentContent = form.content;
+        
+        // For simplicity, insert at the end with line breaks
+        const newContent = currentContent + (currentContent ? '\n\n' : '') + markdownImage + '\n';
+        
+        setForm(prev => ({
+          ...prev,
+          content: newContent
+        }));
+
+        setMessage({ 
+          text: "✅ Image uploaded and inserted into editor!", 
+          type: "success" 
+        });
+
+        setTimeout(() => {
+          setContentImageProgress(0);
+          setContentImageUploading(false);
+        }, 1000);
+
+      } catch (error: any) {
+        setContentImageError(error.message);
+        setMessage({ 
+          text: `Upload failed: ${error.message}`, 
+          type: "error" 
+        });
+        setContentImageProgress(0);
+        setContentImageUploading(false);
+      }
+    };
+
+    input.click();
+  };
+
   const handleCoverImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -302,6 +412,11 @@ export default function NewArticlePage() {
         ...prev,
         cover_image: data.cover_image_url || data.url,
       }));
+
+      setMessage({ 
+        text: "✅ Cover image uploaded successfully!", 
+        type: "success" 
+      });
 
       setTimeout(() => {
         setCoverImageProgress(0);
@@ -508,10 +623,10 @@ export default function NewArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
         <MinimalHeader />
-        <main className="flex-grow flex items-center justify-center px-4">
-          <div className="text-center">
+        <main className="flex-grow flex items-center justify-center px-4 md:py-20">
+          <div className="text-center mt-24 mb-24">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600 dark:text-gray-300">Loading...</p>
           </div>
@@ -989,40 +1104,88 @@ export default function NewArticlePage() {
                 {/* Content Editor */}
                 <div className={`${fullscreen ? "flex-grow flex flex-col" : ""}`}>
                   {!fullscreen && (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <span>Content (Markdown)</span>
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setShowPreview(!showPreview)}
-                          className="px-3 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                          {showPreview ? "Hide Preview" : "Show Preview"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleEditorFullscreen}
-                          className="px-3 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
-                        >
-                          {fullscreen ? (
-                            <>
-                              <Minimize2 className="w-4 h-4" />
-                              Exit Fullscreen
-                            </>
-                          ) : (
-                            <>
-                              <Maximize2 className="w-4 h-4" />
-                              Fullscreen
-                            </>
+                    <>
+                      {/* NEW: Content Image Upload Progress */}
+                      {contentImageUploading && (
+                        <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                          <div className="flex justify-between text-sm text-green-700 dark:text-green-300 mb-1">
+                            <span className="flex items-center gap-2">
+                              <div className="animate-spin h-3 w-3 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                              Uploading article image...
+                            </span>
+                            <span>{contentImageProgress}%</span>
+                          </div>
+                          <div className="w-full bg-green-200 dark:bg-green-700 rounded-full h-2">
+                            <div
+                              className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${contentImageProgress}%` }}
+                            ></div>
+                          </div>
+                          {contentImageError && (
+                            <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+                              {contentImageError}
+                            </p>
                           )}
-                        </button>
+                        </div>
+                      )}
+
+                      {/* Editor Header with Upload Button */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <span>Content (Markdown)</span>
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {/* NEW: Upload Article Image Button */}
+                          <button
+                            type="button"
+                            onClick={handleContentImageUpload}
+                            disabled={contentImageUploading}
+                            className="px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                          >
+                            {contentImageUploading ? (
+                              <>
+                                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <Image className="w-4 h-4" />
+                                Upload Image
+                              </>
+                            )}
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={() => setShowPreview(!showPreview)}
+                            className="px-3 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-sm font-medium flex items-center gap-2"
+                          >
+                            <Eye className="w-4 h-4" />
+                            {showPreview ? "Hide Preview" : "Show Preview"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleEditorFullscreen}
+                            className="px-3 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
+                          >
+                            {fullscreen ? (
+                              <>
+                                <Minimize2 className="w-4 h-4" />
+                                Exit Fullscreen
+                              </>
+                            ) : (
+                              <>
+                                <Maximize2 className="w-4 h-4" />
+                                Fullscreen
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
+                  
                   <div
                     ref={editorRef}
                     data-color-mode={isDarkMode ? "dark" : "light"}
@@ -1074,6 +1237,24 @@ export default function NewArticlePage() {
                             } as React.MouseEvent);
                           },
                         },
+                        // NEW: Upload image command in toolbar
+                        {
+                          name: "upload-image",
+                          keyCommand: "uploadImage",
+                          buttonProps: { 
+                            "aria-label": "Upload image",
+                            title: "Upload image from computer",
+                            disabled: contentImageUploading
+                          },
+                          icon: contentImageUploading ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                          ) : (
+                            <Paperclip className="w-4 h-4" />
+                          ),
+                          execute: () => {
+                            handleContentImageUpload();
+                          },
+                        },
                       ]}
                     />
                   </div>
@@ -1083,7 +1264,7 @@ export default function NewArticlePage() {
                   <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                       type="submit"
-                      disabled={loading || coverImageUploading}
+                      disabled={loading || coverImageUploading || contentImageUploading}
                       className="w-full px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base flex items-center justify-center gap-2"
                     >
                       {loading ? (

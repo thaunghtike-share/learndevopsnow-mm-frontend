@@ -6,7 +6,7 @@ export const metadata = {
   description:
     "Learn DevOps Now with free tutorials, CI/CD guides, DevOps tools, and practice labs for beginners and professionals.",
   alternates: {
-    canonical: "https://www.learndevopsnow.it.com/",
+    canonical: "https://www.learndevopsnow-mm.blog/",
   },
   robots: {
     index: true,
@@ -16,11 +16,11 @@ export const metadata = {
     title: "Learn DevOps Now | Free DevOps Tutorials, Tools & Labs",
     description:
       "Learn DevOps Now with free tutorials, CI/CD guides, DevOps tools, and practice labs for beginners and professionals.",
-    url: "https://www.learndevopsnow.it.com/",
+    url: "https://www.learndevopsnow-mm.blog/",
     siteName: "Learn DevOps Now",
     images: [
       {
-        url: "https://www.learndevopsnow.it.com/images/mylogo.jpg",
+        url: "https://www.learndevopsnow-mm.blog/images/mylogo.jpg",
         width: 1200,
         height: 630,
         alt: "Learn DevOps Now - Preview",
@@ -34,7 +34,7 @@ export const metadata = {
     title: "Learn DevOps Now | Free DevOps Tutorials, Tools & Labs",
     description:
       "Learn DevOps Now with free tutorials, CI/CD guides, DevOps tools, and practice labs for beginners and professionals.",
-    images: ["https://www.learndevopsnow.it.com/images/mylogo.jpg"],
+    images: ["https://www.learndevopsnow-mm.blog/images/mylogo.jpg"],
   },
 };
 
