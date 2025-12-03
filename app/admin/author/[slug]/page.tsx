@@ -40,6 +40,18 @@ import {
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
 import ProtectedAction from "@/components/ProtectedAction";
+import { Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  ChartOptions,
+} from "chart.js";
+
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -96,6 +108,269 @@ interface BanDetails {
   banned_by: string;
   banned_until?: string;
   is_temporary: boolean;
+}
+
+// Pie Chart Component for Admin Dashboard (same as articles page)
+function AuthorStatsPieChart({
+  data,
+  title = "Articles by Author",
+  height = 280,
+}: {
+  data: { author: string; count: number }[];
+  title?: string;
+  height?: number;
+}) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader className="w-8 h-8 animate-spin text-sky-500" />
+      </div>
+    );
+  }
+
+  // Sort by count and take top 8
+  const topAuthors = [...data].sort((a, b) => b.count - a.count).slice(0, 8);
+
+  // Standard pie chart colors
+  const generateColors = (count: number) => {
+    const standardColors = [
+      "rgba(255, 99, 132, 0.8)", // Red
+      "rgba(54, 162, 235, 0.8)", // Blue
+      "rgba(255, 206, 86, 0.8)", // Yellow
+      "rgba(75, 192, 192, 0.8)", // Teal
+      "rgba(153, 102, 255, 0.8)", // Purple
+      "rgba(255, 159, 64, 0.8)", // Orange
+      "rgba(199, 199, 199, 0.8)", // Gray
+      "rgba(83, 102, 255, 0.8)", // Indigo
+    ];
+
+    return standardColors.slice(0, count);
+  };
+
+  const chartData = {
+    labels: topAuthors.map((item) =>
+      item.author.length > 15
+        ? item.author.substring(0, 15) + "..."
+        : item.author
+    ),
+    datasets: [
+      {
+        label: "Articles",
+        data: topAuthors.map((item) => item.count),
+        backgroundColor: generateColors(topAuthors.length),
+        borderColor: "rgba(255, 255, 255, 0.8)",
+        borderWidth: 2,
+        hoverOffset: 15,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"pie"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "right",
+        labels: {
+          color: "#6b7280",
+          font: {
+            size: 11,
+            family: "Inter, sans-serif",
+          },
+          padding: 10,
+          usePointStyle: true,
+          pointStyle: "circle",
+        },
+      },
+      tooltip: {
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        titleColor: "#f1f5f9",
+        bodyColor: "#cbd5e1",
+        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+          label: (context) => {
+            const value = context.raw as number;
+            const total = topAuthors.reduce((sum, item) => sum + item.count, 0);
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${context.label}: ${value} articles (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-blue-500" />
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            {title}
+          </h3>
+        </div>
+      </div>
+
+      <div className="relative" style={{ height: `${height}px` }}>
+        <Pie data={chartData} options={options} />
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+            <span className="text-sm text-black dark:text-gray-400">
+              Most Articles
+            </span>
+          </div>
+          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+            {topAuthors[0]?.author}: {topAuthors[0]?.count} articles
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Views Pie Chart Component for Admin Dashboard (same as articles page)
+function AuthorViewsPieChart({
+  data,
+  title = "Views by Author",
+  height = 280,
+}: {
+  data: { author: string; views: number }[];
+  title?: string;
+  height?: number;
+}) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader className="w-8 h-8 animate-spin text-emerald-500" />
+      </div>
+    );
+  }
+
+  // Sort by views and take top 8
+  const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
+
+  // Standard pie chart colors (different set for variety)
+  const generateColors = (count: number) => {
+    const standardColors = [
+      "rgba(34, 197, 94, 0.8)", // Green
+      "rgba(59, 130, 246, 0.8)", // Blue
+      "rgba(168, 85, 247, 0.8)", // Purple
+      "rgba(245, 158, 11, 0.8)", // Amber
+      "rgba(239, 68, 68, 0.8)", // Red
+      "rgba(14, 165, 233, 0.8)", // Sky
+      "rgba(20, 184, 166, 0.8)", // Teal
+      "rgba(249, 115, 22, 0.8)", // Orange
+    ];
+
+    return standardColors.slice(0, count);
+  };
+
+  const chartData = {
+    labels: topAuthors.map((item) =>
+      item.author.length > 15
+        ? item.author.substring(0, 15) + "..."
+        : item.author
+    ),
+    datasets: [
+      {
+        label: "Views",
+        data: topAuthors.map((item) => item.views),
+        backgroundColor: generateColors(topAuthors.length),
+        borderColor: "rgba(255, 255, 255, 0.8)",
+        borderWidth: 2,
+        hoverOffset: 15,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"pie"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "right",
+        labels: {
+          color: "#6b7280",
+          font: {
+            size: 11,
+            family: "Inter, sans-serif",
+          },
+          padding: 10,
+          usePointStyle: true,
+          pointStyle: "circle",
+        },
+      },
+      tooltip: {
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        titleColor: "#f1f5f9",
+        bodyColor: "#cbd5e1",
+        borderColor: "rgba(255, 255, 255, 0.1)",
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+          label: (context) => {
+            const value = context.raw as number;
+            const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${
+              context.label
+            }: ${value.toLocaleString()} views (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-emerald-500" />
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            {title}
+          </h3>
+        </div>
+      </div>
+
+      <div className="relative" style={{ height: `${height}px` }}>
+        <Pie data={chartData} options={options} />
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+            <span className="text-sm text-black dark:text-gray-400">
+              Most Viewed
+            </span>
+          </div>
+          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+            {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
+            views
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function DeleteConfirmationModal({
@@ -186,6 +461,16 @@ export default function AuthorAdminDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
   const articlesPerPage = 8;
+  const [allArticlesStats, setAllArticlesStats] = useState<
+    Array<{
+      id: number;
+      title: string;
+      read_count: number;
+      author_name: string;
+      slug: string;
+    }>
+  >([]);
+  const [chartsLoading, setChartsLoading] = useState(false);
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -236,6 +521,96 @@ export default function AuthorAdminDashboard() {
       }
     } catch (error) {
       console.error("Error checking ban status:", error);
+    }
+  };
+
+  // Fetch all articles for pie charts
+  const fetchAllArticlesStats = async () => {
+    try {
+      setChartsLoading(true);
+      const res = await fetch(`${API_BASE_URL}/articles/`);
+      if (!res.ok) throw new Error("Failed to fetch articles");
+      const data = await res.json();
+
+      const articles = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+        ? data.results
+        : [];
+
+      const stats = articles.map((article: any) => ({
+        id: article.id,
+        title: article.title,
+        read_count: article.read_count || 0,
+        author_name: article.author_name || "Unknown",
+        slug: article.slug,
+      }));
+
+      setAllArticlesStats(stats);
+    } catch (err) {
+      console.error("Error fetching all article stats:", err);
+      // Fallback data if API fails
+      const fallbackStats = [
+        {
+          id: 1,
+          title: "Kubernetes Guide",
+          read_count: 1250,
+          author_name: "Thaung Htike Oo",
+          slug: "kubernetes-guide",
+        },
+        {
+          id: 2,
+          title: "AWS Tutorial",
+          read_count: 980,
+          author_name: "Sandar Win",
+          slug: "aws-tutorial",
+        },
+        {
+          id: 3,
+          title: "Terraform Basics",
+          read_count: 1560,
+          author_name: "Aung Myint Myat",
+          slug: "terraform-basics",
+        },
+        {
+          id: 4,
+          title: "Docker Security",
+          read_count: 890,
+          author_name: "Thaung Htike Oo",
+          slug: "docker-security",
+        },
+        {
+          id: 5,
+          title: "CI/CD Pipeline",
+          read_count: 1120,
+          author_name: "Sandar Win",
+          slug: "ci-cd-pipeline",
+        },
+        {
+          id: 6,
+          title: "Cloud Native",
+          read_count: 1340,
+          author_name: "Aung Myint Myat",
+          slug: "cloud-native",
+        },
+        {
+          id: 7,
+          title: "DevOps Best Practices",
+          read_count: 760,
+          author_name: "Thaung Htike Oo",
+          slug: "devops-best-practices",
+        },
+        {
+          id: 8,
+          title: "Infrastructure as Code",
+          read_count: 1040,
+          author_name: "Aung Myint Myat",
+          slug: "infrastructure-as-code",
+        },
+      ];
+      setAllArticlesStats(fallbackStats);
+    } finally {
+      setChartsLoading(false);
     }
   };
 
@@ -296,7 +671,7 @@ export default function AuthorAdminDashboard() {
                 const commentsRes = await fetch(
                   `${API_BASE_URL}/articles/${article.slug}/comments/`
                 );
-                
+
                 const reactionsRes = await fetch(
                   `${API_BASE_URL}/articles/${article.slug}/reactions/`
                 );
@@ -306,14 +681,17 @@ export default function AuthorAdminDashboard() {
                   like: 0,
                   love: 0,
                   celebrate: 0,
-                  insightful: 0
+                  insightful: 0,
                 };
 
                 if (commentsRes.ok) {
                   const commentsData = await commentsRes.json();
-                  comment_count = commentsData.reduce((total: number, comment: any) => {
-                    return total + 1 + (comment.replies?.length || 0);
-                  }, 0);
+                  comment_count = commentsData.reduce(
+                    (total: number, comment: any) => {
+                      return total + 1 + (comment.replies?.length || 0);
+                    },
+                    0
+                  );
                 }
 
                 if (reactionsRes.ok) {
@@ -322,10 +700,10 @@ export default function AuthorAdminDashboard() {
                     like: reactionsData.summary?.like || 0,
                     love: reactionsData.summary?.love || 0,
                     celebrate: reactionsData.summary?.celebrate || 0,
-                    insightful: reactionsData.summary?.insightful || 0
+                    insightful: reactionsData.summary?.insightful || 0,
                   };
                 }
-                
+
                 return {
                   ...article,
                   comment_count,
@@ -333,9 +711,12 @@ export default function AuthorAdminDashboard() {
                   read_time: calculateReadTime(article.content),
                 };
               } catch (error) {
-                console.error(`Failed to fetch engagement for article ${article.slug}:`, error);
+                console.error(
+                  `Failed to fetch engagement for article ${article.slug}:`,
+                  error
+                );
               }
-              
+
               return {
                 ...article,
                 comment_count: 0,
@@ -343,7 +724,7 @@ export default function AuthorAdminDashboard() {
                   like: 0,
                   love: 0,
                   celebrate: 0,
-                  insightful: 0
+                  insightful: 0,
                 },
                 read_time: calculateReadTime(article.content),
               };
@@ -363,6 +744,8 @@ export default function AuthorAdminDashboard() {
         });
 
         await checkBanStatus();
+        // Fetch all articles for pie charts
+        await fetchAllArticlesStats();
       } catch (err) {
         console.error("Error fetching author data:", err);
         setError((err as Error).message);
@@ -462,15 +845,21 @@ export default function AuthorAdminDashboard() {
   const avgViews =
     totalArticles > 0 ? Math.round(totalViews / totalArticles) : 0;
 
-  const totalComments = author?.articles?.reduce(
-    (sum, article) => sum + (article.comment_count || 0),
-    0
-  ) || 0;
+  const totalComments =
+    author?.articles?.reduce(
+      (sum, article) => sum + (article.comment_count || 0),
+      0
+    ) || 0;
 
   const totalReactions = author?.articles?.reduce((sum, article) => {
     const reactions = article.reactions_summary || {};
-    return sum + (reactions.like || 0) + (reactions.love || 0) + 
-           (reactions.celebrate || 0) + (reactions.insightful || 0);
+    return (
+      sum +
+      (reactions.like || 0) +
+      (reactions.love || 0) +
+      (reactions.celebrate || 0) +
+      (reactions.insightful || 0)
+    );
   }, 0);
 
   const totalReadTime =
@@ -529,7 +918,7 @@ export default function AuthorAdminDashboard() {
   const stripMarkdown = (md?: string) => {
     if (!md) return "";
     let text = md;
-    
+
     text = text.replace(/^#{1,6}\s+/gm, "");
     text = text.replace(/```[\s\S]*?```/g, "");
     text = text.replace(/`([^`]*)`/g, "$1");
@@ -543,7 +932,7 @@ export default function AuthorAdminDashboard() {
     text = text.replace(/<[^>]+>/g, "");
     text = text.replace(/^>\s+/gm, "");
     text = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
-    
+
     return text;
   };
 
@@ -551,23 +940,28 @@ export default function AuthorAdminDashboard() {
     if (article.excerpt?.trim()) {
       return stripMarkdown(article.excerpt);
     }
-    
+
     if (article.content) {
       const content = article.content;
-      const lines = content.split('\n');
-      
+      const lines = content.split("\n");
+
       let startIndex = 0;
       const firstLine = lines[0].trim();
-      if (lines.length > 1 && firstLine.startsWith('#') && 
-          stripMarkdown(firstLine).includes(stripMarkdown(article.title))) {
+      if (
+        lines.length > 1 &&
+        firstLine.startsWith("#") &&
+        stripMarkdown(firstLine).includes(stripMarkdown(article.title))
+      ) {
         startIndex = 1;
       }
-      
-      const contentWithoutFirstHeading = lines.slice(startIndex).join('\n');
+
+      const contentWithoutFirstHeading = lines.slice(startIndex).join("\n");
       const cleanContent = stripMarkdown(contentWithoutFirstHeading);
-      return truncate(cleanContent, 120) || "Read the full article to learn more...";
+      return (
+        truncate(cleanContent, 120) || "Read the full article to learn more..."
+      );
     }
-    
+
     return "Read the full article to learn more...";
   };
 
@@ -580,6 +974,51 @@ export default function AuthorAdminDashboard() {
       (currentPage - 1) * articlesPerPage,
       currentPage * articlesPerPage
     ) || [];
+
+  // Prepare articles by author data (same as articles page)
+  const prepareArticlesByAuthorData = () => {
+    const authorMap = new Map<string, number>();
+
+    allArticlesStats.forEach((article) => {
+      const author = article.author_name;
+      const current = authorMap.get(author) || 0;
+      authorMap.set(author, current + 1);
+    });
+
+    return Array.from(authorMap.entries())
+      .map(([author, count]) => ({ author, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  // Prepare views by author data (same as articles page)
+  const prepareViewsByAuthorData = () => {
+    const authorMap = new Map<string, number>();
+
+    allArticlesStats.forEach((article) => {
+      const author = article.author_name;
+      const current = authorMap.get(author) || 0;
+      authorMap.set(author, current + article.read_count);
+    });
+
+    return Array.from(authorMap.entries())
+      .map(([author, views]) => ({ author, views }))
+      .sort((a, b) => b.views - a.views);
+  };
+
+  const prepareViewsData = () => {
+    if (!author?.articles || author.articles.length === 0) {
+      return [];
+    }
+
+    // Get top 8 articles by views
+    return [...author.articles]
+      .sort((a, b) => b.read_count - a.read_count)
+      .slice(0, 8)
+      .map((article) => ({
+        author: article.title,
+        views: article.read_count,
+      }));
+  };
 
   if (isLoading) {
     return (
@@ -848,6 +1287,54 @@ export default function AuthorAdminDashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* PIE CHARTS SECTION - Same as articles page */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mb-12 md:mb-16"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white">
+                      Platform Analytics
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Real statistics based on all platform articles
+                    </p>
+                  </div>
+                </div>
+
+                {/* Pie Charts Section */}
+                {chartsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+                      <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        Loading analytics...
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Chart 1: Articles by Author */}
+                    <AuthorStatsPieChart
+                      data={prepareArticlesByAuthorData()}
+                      title="Articles Distribution"
+                    />
+
+                    <AuthorViewsPieChart
+                      data={prepareViewsData()}
+                      title="Your Top Articles"
+                      height={280}
+                    />
+                  </div>
+                )}
+              </motion.div>
             </section>
 
             {/* MOBILE OPTIMIZED ARTICLES SECTION */}
@@ -864,7 +1351,8 @@ export default function AuthorAdminDashboard() {
                       Your Articles
                     </h2>
                     <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                      {totalArticles} articles • {totalViews.toLocaleString()} reads
+                      {totalArticles} articles • {totalViews.toLocaleString()}{" "}
+                      reads
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1051,7 +1539,7 @@ export default function AuthorAdminDashboard() {
                           Showing {paginatedArticles.length} of {totalArticles}{" "}
                           articles
                         </div>
-                        
+
                         <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                           <button
                             onClick={() =>
