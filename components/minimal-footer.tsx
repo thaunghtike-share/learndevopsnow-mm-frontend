@@ -25,38 +25,29 @@ export function MinimalFooter() {
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
+    // First, check if user has a saved theme preference
     const savedTheme = localStorage.getItem("theme") as
       | "light"
       | "dark"
       | "system"
       | null;
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
 
-    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
-      setTheme("dark");
-      document.documentElement.classList.add("dark");
-    } else if (savedTheme === "system") {
-      setTheme("system");
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    // If there's a saved theme, use it
+    if (savedTheme) {
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
     } else {
+      // No saved theme, default to "light"
       setTheme("light");
       document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
   }, []);
 
-  const setThemeMode = (newTheme: "light" | "dark" | "system") => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-
-    if (newTheme === "dark") {
+  const applyTheme = (theme: "light" | "dark" | "system") => {
+    if (theme === "dark") {
       document.documentElement.classList.add("dark");
-    } else if (newTheme === "light") {
+    } else if (theme === "light") {
       document.documentElement.classList.remove("dark");
     } else {
       const prefersDark = window.matchMedia(
@@ -68,6 +59,12 @@ export function MinimalFooter() {
         document.documentElement.classList.remove("dark");
       }
     }
+  };
+
+  const setThemeMode = (newTheme: "light" | "dark" | "system") => {
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    applyTheme(newTheme);
   };
 
   const handleSubscribe = (e: React.FormEvent) => {
@@ -160,7 +157,10 @@ export function MinimalFooter() {
                     </p>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubscribe} className="space-y-2 md:space-y-3">
+                  <form
+                    onSubmit={handleSubscribe}
+                    className="space-y-2 md:space-y-3"
+                  >
                     <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 md:space-y-3 sm:space-y-0">
                       <input
                         type="email"
@@ -369,7 +369,9 @@ export function MinimalFooter() {
                   }`}
                 >
                   <Icon className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs md:text-sm font-medium">{label}</span>
+                  <span className="text-xs md:text-sm font-medium">
+                    {label}
+                  </span>
                 </button>
               ))}
             </div>
