@@ -205,7 +205,6 @@ export function MinimalHeader() {
 
   const mobileResourcesItems = [
     { href: "/learn-devops-on-youtube", label: "Learn DevOps on YouTube" },
-    { href: "/free-courses", label: "Learn Free Courses" },
     { href: "/devops-playgrounds", label: "Explore DevOps Playgrounds" },
   ];
 
