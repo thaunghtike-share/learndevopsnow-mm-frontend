@@ -588,7 +588,7 @@ export default function EditArticlePage() {
   // Show redirect message if not authenticated
   if (!token) {
     return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="flex-grow flex items-center justify-center py-20 px-4">
           <div className="text-center max-w-md">
@@ -609,7 +609,7 @@ export default function EditArticlePage() {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="flex-grow flex items-center justify-center px-4 md:py-20">
           <div className="text-center mt-24 mb-24">
@@ -624,7 +624,7 @@ export default function EditArticlePage() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors relative overflow-x-hidden duration-300 ${
+      className={`min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors relative overflow-x-hidden duration-300 ${
         fullscreen ? "overflow-hidden" : ""
       }`}
     >
@@ -633,7 +633,7 @@ export default function EditArticlePage() {
       <main
         className={`${
           fullscreen
-            ? "fixed inset-0 z-50 bg-white dark:bg-[#0A0A0A]"
+            ? "fixed inset-0 z-50 bg-white dark:bg-[#000000]"
             : "flex-grow w-full"
         }`}
       >

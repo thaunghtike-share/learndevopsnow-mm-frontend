@@ -304,7 +304,7 @@ export function CertificationRoadmap() {
   };
 
   return (
-    <section className="relative min-h-screen bg-white/95 dark:bg-[#0A0A0A] overflow-hidden">
+    <section className="relative min-h-screen bg-white/95 dark:bg-[#000000] overflow-hidden">
       {/* Subtle background pattern */}
       <div className="px-4 md:px-11 font-open-sans">
         {/* Left Aligned Header */}

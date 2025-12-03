@@ -95,14 +95,18 @@ export function ProgrammingLanguagesRoadmap() {
   };
 
   const prevLanguage = () => {
-    const prev = (currentIndex - 1 + programmingLanguages.length) % programmingLanguages.length;
+    const prev =
+      (currentIndex - 1 + programmingLanguages.length) %
+      programmingLanguages.length;
     setCurrentIndex(prev);
     setSelectedLanguage(prev);
   };
 
   const currentLanguage = programmingLanguages[currentIndex];
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
     const target = e.currentTarget;
     target.src = "/new.png";
   };
@@ -120,7 +124,7 @@ export function ProgrammingLanguagesRoadmap() {
   };
 
   return (
-    <section className="relative bg-white dark:bg-[#0A0A0A] py-12 md:py-16">
+    <section className="relative bg-white dark:bg-[#000000] py-12 md:py-16">
       <div className="px-4 md:px-11">
         {/* Header Section */}
         <div className="mb-12 md:mb-16">
@@ -133,10 +137,10 @@ export function ProgrammingLanguagesRoadmap() {
               </span>
             </h2>
             <p className="text-base md:text-lg text-black-400 dark:text-gray-300 leading-relaxed">
-              Before diving into DevOps tools and automation, it's important
-              to have a solid understanding of programming. Coding skills help
-              you write scripts, automate tasks, and understand how software
-              is built and deployed.
+              Before diving into DevOps tools and automation, it's important to
+              have a solid understanding of programming. Coding skills help you
+              write scripts, automate tasks, and understand how software is
+              built and deployed.
             </p>
           </div>
         </div>
@@ -149,14 +153,16 @@ export function ProgrammingLanguagesRoadmap() {
                 key={language.name}
                 onClick={() => handleLanguageSelect(index)}
                 className={`group relative flex flex-col items-center transition-all duration-300 ${
-                  selectedLanguage === index ? 'scale-110' : 'scale-100 hover:scale-105'
+                  selectedLanguage === index
+                    ? "scale-110"
+                    : "scale-100 hover:scale-105"
                 }`}
               >
                 <div
                   className={`w-16 h-16 md:w-20 md:h-20 rounded-full p-3 md:p-4 border-4 transition-all duration-300 ${
                     selectedLanguage === index
                       ? `border-transparent bg-gradient-to-r ${language.color} shadow-lg`
-                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                      : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600"
                   }`}
                 >
                   <img
@@ -170,13 +176,15 @@ export function ProgrammingLanguagesRoadmap() {
                   className={`mt-2 md:mt-3 text-sm md:text-base font-semibold transition-all duration-300 ${
                     selectedLanguage === index
                       ? `bg-gradient-to-r ${language.color} bg-clip-text text-transparent`
-                      : 'text-gray-600 dark:text-gray-400'
+                      : "text-gray-600 dark:text-gray-400"
                   }`}
                 >
                   {language.name}
                 </span>
                 {selectedLanguage === index && (
-                  <div className={`absolute -bottom-1 md:-bottom-2 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-gradient-to-r ${language.color}`} />
+                  <div
+                    className={`absolute -bottom-1 md:-bottom-2 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-gradient-to-r ${language.color}`}
+                  />
                 )}
               </button>
             ))}
@@ -200,7 +208,9 @@ export function ProgrammingLanguagesRoadmap() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
-                    <h3 className={`text-xl md:text-3xl font-bold bg-gradient-to-r ${currentLanguage.color} bg-clip-text text-black-600 dark:text-gray-300`}>
+                    <h3
+                      className={`text-xl md:text-3xl font-bold bg-gradient-to-r ${currentLanguage.color} bg-clip-text text-black-600 dark:text-gray-300`}
+                    >
                       {currentLanguage.name}
                     </h3>
                     <a

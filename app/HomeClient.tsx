@@ -129,7 +129,7 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       {/* Remove the fixed background div - it's causing the issue */}
 
       <div className="relative z-10">
@@ -137,36 +137,45 @@ export default function HomeClient() {
 
         <main className="relative z-10">
           {/* Add explicit background to each section */}
-          <section className="bg-white dark:bg-[#0A0A0A]">
+          <section className="bg-white dark:bg-[#000000]">
             <DevOpsCyclingHero />
           </section>
 
-          <section id="roadmap" className="bg-white dark:bg-[#0A0A0A]">
+          <section id="roadmap" className="bg-white dark:bg-[#000000]">
             <MinimalDevopsRoadmap />
           </section>
 
-          <section id="" className="bg-white dark:bg-[#0A0A0A]">
+          <section id="" className="bg-white dark:bg-[#000000]">
             <ProgrammingLanguagesRoadmap />
           </section>
 
-          <section id="youtube" className="bg-white dark:bg-[#0A0A0A] -mt-10 md:-mt-10">
+          <section
+            id="youtube"
+            className="bg-white dark:bg-[#000000] -mt-10 md:-mt-10"
+          >
             <YouTubePlaylists />
           </section>
 
-          <section id="playgrounds" className="bg-white dark:bg-[#0A0A0A] md:-mt-18 hidden md:block">
+          <section
+            id="playgrounds"
+            className="bg-white dark:bg-[#000000] md:-mt-18 hidden md:block"
+          >
             <FreeLabs />
           </section>
 
-          <div id="cert" className="bg-white dark:bg-[#0A0A0A] -mt-18 md:-mt-18">
+          <div
+            id="cert"
+            className="bg-white dark:bg-[#000000] -mt-18 md:-mt-18"
+          >
             <CertificationRoadmap />
           </div>
 
-          <div className="bg-white dark:bg-[#0A0A0A] md:-mt-30">
+          <div className="bg-white dark:bg-[#000000] md:-mt-30">
             <SuccessStoriesSection />
           </div>
         </main>
 
-        <div id="faqs" className="bg-white dark:bg-[#0A0A0A] ">
+        <div id="faqs" className="bg-white dark:bg-[#000000] ">
           <MinimalFooter />
         </div>
       </div>
@@ -192,19 +201,23 @@ export default function HomeClient() {
         }
 
         /* Force background colors to prevent white flash */
-        html, body {
+        html,
+        body {
           background: white;
           margin: 0;
           padding: 0;
           overflow-x: hidden;
         }
 
-        .dark html, .dark body {
-          background: #0A0A0A;
+        .dark html,
+        .dark body {
+          background: #0a0a0a;
         }
 
         /* Ensure all sections have proper backgrounds */
-        section, main, div[class*="section"] {
+        section,
+        main,
+        div[class*="section"] {
           background-color: inherit !important;
         }
 

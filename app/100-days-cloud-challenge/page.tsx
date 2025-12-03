@@ -389,7 +389,7 @@ export default function HundredDaysCloudChallenge() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
@@ -418,7 +418,7 @@ export default function HundredDaysCloudChallenge() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
           {/* Simple Elegant Loading */}
@@ -450,7 +450,7 @@ export default function HundredDaysCloudChallenge() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-10 pb-8 relative z-10">
@@ -558,7 +558,8 @@ export default function HundredDaysCloudChallenge() {
                   Challenge Days
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {totalArticles} days published • {totalViews.toLocaleString()} total reads
+                  {totalArticles} days published • {totalViews.toLocaleString()}{" "}
+                  total reads
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -633,7 +634,8 @@ export default function HundredDaysCloudChallenge() {
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <Eye className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" />
-                              {article.read_count?.toLocaleString() || "0"} views
+                              {article.read_count?.toLocaleString() || "0"}{" "}
+                              views
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
@@ -732,7 +734,7 @@ export default function HundredDaysCloudChallenge() {
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
                       Showing {paginatedArticles.length} of {totalArticles} days
                     </div>
-                    
+
                     {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button

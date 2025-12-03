@@ -93,7 +93,7 @@ export default function MonolithicToCloudNativePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       {/* Messenger Button - Hidden on mobile */}
       <a
         href="https://m.me/learndevopsnowbytho"
@@ -224,7 +224,7 @@ export default function MonolithicToCloudNativePage() {
           {/* Architecture Diagram - Smaller on mobile */}
           <Card className="mb-6 md:mb-8 border-0 shadow-xl md:shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden">
             <CardContent className="p-0">
-              <div className="h-[250px] md:h-[700px] w-full relative bg-gradient-to-br from-slate-50 to-blue-50">
+              <div className="h-[250px] md:h-[700px] w-full relative bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-50 dark:to-blue-50">
                 <Image
                   src="/dinger.png"
                   alt="Complete DevOps Architecture"
@@ -774,7 +774,10 @@ export default function MonolithicToCloudNativePage() {
                       color: "purple",
                     },
                   ].map((item, index) => (
-                    <div key={index} className="flex items-start gap-2 md:gap-3">
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 md:gap-3"
+                    >
                       <div
                         className={`p-1 md:p-2 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded md:rounded-lg flex-shrink-0 mt-1`}
                       >

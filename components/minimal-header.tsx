@@ -264,7 +264,7 @@ export function MinimalHeader() {
 
     return createPortal(
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-        <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-200 dark:border-red-800">
+        <div className="bg-white dark:bg-[#000000] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-200 dark:border-red-800">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -346,7 +346,7 @@ export function MinimalHeader() {
 
     return (
       <>
-        <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2">
+        <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <p className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">
               Hello, {user?.username}!
@@ -505,7 +505,7 @@ export function MinimalHeader() {
     if (!mounted || !showAuthModal) return null;
 
     return createPortal(
-      <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 bg-white/80 dark:bg-[#0A0A0A]/80 overflow-y-auto pt-20">
+      <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 bg-white/80 dark:bg-[#000000]/80 overflow-y-auto pt-20">
         <div className="relative w-full max-w-md mx-auto my-8">
           <button
             onClick={() => setShowAuthModal(false)}
@@ -513,7 +513,7 @@ export function MinimalHeader() {
           >
             <X className="w-6 h-6" />
           </button>
-          <div className="bg-white dark:bg-[#0A0A0A] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-[#000000] rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
             <AuthModal onSuccess={handleAuthSuccess} />
           </div>
         </div>
@@ -524,7 +524,7 @@ export function MinimalHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white dark:bg-[#0A0A0A] backdrop-blur-sm">
+      <header className="sticky top-0 z-50 bg-white dark:bg-[#000000] backdrop-blur-sm">
         {/* MOBILE HEADER - Simple: Logo, Search, Menu */}
         <div className="md:hidden">
           <div className="flex items-center justify-between py-4 px-6 gap-3">
@@ -567,7 +567,7 @@ export function MinimalHeader() {
 
               {/* Search Results Dropdown */}
               {searchQuery && searchResults.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
@@ -615,7 +615,7 @@ export function MinimalHeader() {
           </Link>
 
           {/* Navigation - Centered */}
-          <nav className="flex items-center space-x-1 bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-md rounded-2xl border border-gray-400/50 dark:border-gray-700/50 px-2 py-1 shadow-sm">
+          <nav className="flex items-center space-x-1 bg-white/80 dark:bg-[#000000]/80 backdrop-blur-md rounded-2xl border border-gray-400/50 dark:border-gray-700/50 px-2 py-1 shadow-sm">
             <Link
               href="/"
               className={`px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
@@ -650,7 +650,7 @@ export function MinimalHeader() {
               </button>
               {isArticlesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
                   onMouseEnter={() =>
                     handleMouseEnter(setIsArticlesOpen, articlesTimeout)
                   }
@@ -704,7 +704,7 @@ export function MinimalHeader() {
               </button>
               {isResourcesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
                   onMouseEnter={() =>
                     handleMouseEnter(setIsResourcesOpen, resourcesTimeout)
                   }
@@ -756,7 +756,7 @@ export function MinimalHeader() {
               </button>
               {isServicesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
                   onMouseEnter={() =>
                     handleMouseEnter(setIsServicesOpen, servicesTimeout)
                   }
@@ -810,7 +810,7 @@ export function MinimalHeader() {
               </button>
               {isOthersOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
                   onMouseEnter={() =>
                     handleMouseEnter(setIsOthersOpen, othersTimeout)
                   }
@@ -868,7 +868,7 @@ export function MinimalHeader() {
               </div>
 
               {searchQuery && searchResults.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-72 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-72 overflow-y-auto">
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
@@ -943,7 +943,7 @@ export function MinimalHeader() {
 
       <div
         ref={mobileMenuRef}
-        className={`fixed top-0 right-0 z-50 h-full w-80 bg-white dark:bg-[#0A0A0A] transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-50 h-full w-80 bg-white dark:bg-[#000000] transform transition-transform duration-300 ease-in-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

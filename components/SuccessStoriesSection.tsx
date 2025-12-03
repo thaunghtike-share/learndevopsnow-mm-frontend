@@ -111,7 +111,10 @@ export function SuccessStoriesSection() {
   const testimonials = feedbacks.length > 0 ? feedbacks : mockTestimonials;
 
   return (
-    <section ref={sectionRef} className="relative bg-white dark:bg-[#0A0A0A] overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="relative bg-white dark:bg-[#000000] overflow-hidden"
+    >
       <div className="relative w-full">
         <div className="px-4 md:px-11 font-open-sans">
           {/* Header */}

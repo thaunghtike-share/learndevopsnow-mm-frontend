@@ -60,7 +60,7 @@ export default function TermsOfService() {
   ];
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 md:px-11 md:py-8">
@@ -164,8 +164,12 @@ export default function TermsOfService() {
                   <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white">Your Rights</h2>
-                  <p className="text-black dark:text-gray-400 text-sm md:text-base">What you can do on our platform</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white">
+                    Your Rights
+                  </h2>
+                  <p className="text-black dark:text-gray-400 text-sm md:text-base">
+                    What you can do on our platform
+                  </p>
                 </div>
               </div>
 
@@ -176,7 +180,9 @@ export default function TermsOfService() {
                     className="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-700"
                   >
                     <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-sky-600 dark:text-sky-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-black dark:text-gray-300 font-medium text-sm md:text-base">{right}</span>
+                    <span className="text-black dark:text-gray-300 font-medium text-sm md:text-base">
+                      {right}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -205,7 +211,9 @@ export default function TermsOfService() {
                     className="flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700"
                   >
                     <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-black dark:text-gray-300 font-medium text-sm md:text-base">{item}</span>
+                    <span className="text-black dark:text-gray-300 font-medium text-sm md:text-base">
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -359,7 +367,9 @@ export default function TermsOfService() {
                 className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 border border-white/30 hover:bg-white/30 transition-all duration-300"
               >
                 <Mail className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="font-semibold text-sm md:text-base">Contact Us</span>
+                <span className="font-semibold text-sm md:text-base">
+                  Contact Us
+                </span>
               </a>
             </div>
           </div>

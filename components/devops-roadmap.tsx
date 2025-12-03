@@ -386,7 +386,7 @@ export function MinimalDevopsRoadmap() {
   };
 
   return (
-    <section className="relative bg-white/95 dark:bg-[#0A0A0A] overflow-hidden">
+    <section className="relative bg-white/95 dark:bg-[#000000] overflow-hidden">
       <div className="relative z-10">
         <div className="px-4 md:px-11">
           {/* Header Section */}

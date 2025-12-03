@@ -72,11 +72,11 @@ interface PieChartData {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 // Pie Chart Component
-function AuthorStatsPieChart({ 
-  data, 
+function AuthorStatsPieChart({
+  data,
   title = "Articles by Author",
-  height = 280 
-}: { 
+  height = 280,
+}: {
   data: { author: string; count: number }[];
   title?: string;
   height?: number;
@@ -96,64 +96,64 @@ function AuthorStatsPieChart({
   }
 
   // Sort by count and take top 8
-  const topAuthors = [...data]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 8);
+  const topAuthors = [...data].sort((a, b) => b.count - a.count).slice(0, 8);
 
   // Standard pie chart colors
   const generateColors = (count: number) => {
     const standardColors = [
-      'rgba(255, 99, 132, 0.8)',    // Red
-      'rgba(54, 162, 235, 0.8)',    // Blue
-      'rgba(255, 206, 86, 0.8)',    // Yellow
-      'rgba(75, 192, 192, 0.8)',    // Teal
-      'rgba(153, 102, 255, 0.8)',   // Purple
-      'rgba(255, 159, 64, 0.8)',    // Orange
-      'rgba(199, 199, 199, 0.8)',   // Gray
-      'rgba(83, 102, 255, 0.8)',    // Indigo
+      "rgba(255, 99, 132, 0.8)", // Red
+      "rgba(54, 162, 235, 0.8)", // Blue
+      "rgba(255, 206, 86, 0.8)", // Yellow
+      "rgba(75, 192, 192, 0.8)", // Teal
+      "rgba(153, 102, 255, 0.8)", // Purple
+      "rgba(255, 159, 64, 0.8)", // Orange
+      "rgba(199, 199, 199, 0.8)", // Gray
+      "rgba(83, 102, 255, 0.8)", // Indigo
     ];
-    
+
     return standardColors.slice(0, count);
   };
 
   const chartData = {
-    labels: topAuthors.map(item => 
-      item.author.length > 15 ? item.author.substring(0, 15) + '...' : item.author
+    labels: topAuthors.map((item) =>
+      item.author.length > 15
+        ? item.author.substring(0, 15) + "..."
+        : item.author
     ),
     datasets: [
       {
-        label: 'Articles',
-        data: topAuthors.map(item => item.count),
+        label: "Articles",
+        data: topAuthors.map((item) => item.count),
         backgroundColor: generateColors(topAuthors.length),
-        borderColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: "rgba(255, 255, 255, 0.8)",
         borderWidth: 2,
         hoverOffset: 15,
       },
     ],
   };
 
-  const options: ChartOptions<'pie'> = {
+  const options: ChartOptions<"pie"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
+        position: "right",
         labels: {
-          color: '#6b7280',
+          color: "#6b7280",
           font: {
-            size: 11,
-            family: 'Inter, sans-serif',
+            size: 12,
+            family: "Inter, sans-serif",
           },
           padding: 10,
           usePointStyle: true,
-          pointStyle: 'circle',
+          pointStyle: "circle",
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        titleColor: "#f1f5f9",
+        bodyColor: "#cbd5e1",
+        borderColor: "rgba(255, 255, 255, 0.1)",
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -179,11 +179,11 @@ function AuthorStatsPieChart({
           </h3>
         </div>
       </div>
-      
+
       <div className="relative" style={{ height: `${height}px` }}>
         <Pie data={chartData} options={options} />
       </div>
-      
+
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
@@ -202,11 +202,11 @@ function AuthorStatsPieChart({
 }
 
 // Views Pie Chart Component
-function AuthorViewsPieChart({ 
-  data, 
+function AuthorViewsPieChart({
+  data,
   title = "Views by Author",
-  height = 280 
-}: { 
+  height = 280,
+}: {
   data: { author: string; views: number }[];
   title?: string;
   height?: number;
@@ -226,64 +226,64 @@ function AuthorViewsPieChart({
   }
 
   // Sort by views and take top 8
-  const topAuthors = [...data]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 8);
+  const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
 
   // Standard pie chart colors (different set for variety)
   const generateColors = (count: number) => {
     const standardColors = [
-      'rgba(34, 197, 94, 0.8)',    // Green
-      'rgba(59, 130, 246, 0.8)',   // Blue
-      'rgba(168, 85, 247, 0.8)',   // Purple
-      'rgba(245, 158, 11, 0.8)',   // Amber
-      'rgba(239, 68, 68, 0.8)',    // Red
-      'rgba(14, 165, 233, 0.8)',   // Sky
-      'rgba(20, 184, 166, 0.8)',   // Teal
-      'rgba(249, 115, 22, 0.8)',   // Orange
+      "rgba(34, 197, 94, 0.8)", // Green
+      "rgba(59, 130, 246, 0.8)", // Blue
+      "rgba(168, 85, 247, 0.8)", // Purple
+      "rgba(245, 158, 11, 0.8)", // Amber
+      "rgba(239, 68, 68, 0.8)", // Red
+      "rgba(14, 165, 233, 0.8)", // Sky
+      "rgba(20, 184, 166, 0.8)", // Teal
+      "rgba(249, 115, 22, 0.8)", // Orange
     ];
-    
+
     return standardColors.slice(0, count);
   };
 
   const chartData = {
-    labels: topAuthors.map(item => 
-      item.author.length > 15 ? item.author.substring(0, 15) + '...' : item.author
+    labels: topAuthors.map((item) =>
+      item.author.length > 15
+        ? item.author.substring(0, 15) + "..."
+        : item.author
     ),
     datasets: [
       {
-        label: 'Views',
-        data: topAuthors.map(item => item.views),
+        label: "Views",
+        data: topAuthors.map((item) => item.views),
         backgroundColor: generateColors(topAuthors.length),
-        borderColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: "rgba(255, 255, 255, 0.8)",
         borderWidth: 2,
         hoverOffset: 15,
       },
     ],
   };
 
-  const options: ChartOptions<'pie'> = {
+  const options: ChartOptions<"pie"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right',
+        position: "right",
         labels: {
-          color: '#6b7280',
+          color: "#6b7280",
           font: {
-            size: 11,
-            family: 'Inter, sans-serif',
+            size: 12,
+            family: "Inter, sans-serif",
           },
           padding: 10,
           usePointStyle: true,
-          pointStyle: 'circle',
+          pointStyle: "circle",
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        titleColor: "#f1f5f9",
+        bodyColor: "#cbd5e1",
+        borderColor: "rgba(255, 255, 255, 0.1)",
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -292,7 +292,9 @@ function AuthorViewsPieChart({
             const value = context.raw as number;
             const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${context.label}: ${value.toLocaleString()} views (${percentage}%)`;
+            return `${
+              context.label
+            }: ${value.toLocaleString()} views (${percentage}%)`;
           },
         },
       },
@@ -309,11 +311,11 @@ function AuthorViewsPieChart({
           </h3>
         </div>
       </div>
-      
+
       <div className="relative" style={{ height: `${height}px` }}>
         <Pie data={chartData} options={options} />
       </div>
-      
+
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
@@ -323,7 +325,8 @@ function AuthorViewsPieChart({
             </span>
           </div>
           <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
-            {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()} views
+            {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
+            views
           </div>
         </div>
       </div>
@@ -509,10 +512,11 @@ export default function ArticlesClient() {
       }));
 
       setArticlesStats(stats);
-      
+
       // Calculate total views and articles
-      const totalViews = stats.reduce((sum: number, article: ArticleStats) => 
-        sum + article.read_count, 0
+      const totalViews = stats.reduce(
+        (sum: number, article: ArticleStats) => sum + article.read_count,
+        0
       );
       setTotalViews(totalViews);
       setTotalArticles(stats.length);
@@ -520,14 +524,62 @@ export default function ArticlesClient() {
       console.error("Error fetching article stats:", err);
       // Fallback data
       const fallbackStats = [
-        { id: 1, title: "Kubernetes Guide", read_count: 1250, author_name: "Thaung Htike Oo", slug: "kubernetes-guide" },
-        { id: 2, title: "AWS Tutorial", read_count: 980, author_name: "Sandar Win", slug: "aws-tutorial" },
-        { id: 3, title: "Terraform Basics", read_count: 1560, author_name: "Aung Myint Myat", slug: "terraform-basics" },
-        { id: 4, title: "Docker Security", read_count: 890, author_name: "Thaung Htike Oo", slug: "docker-security" },
-        { id: 5, title: "CI/CD Pipeline", read_count: 1120, author_name: "Sandar Win", slug: "ci-cd-pipeline" },
-        { id: 6, title: "Cloud Native", read_count: 1340, author_name: "Aung Myint Myat", slug: "cloud-native" },
-        { id: 7, title: "DevOps Best Practices", read_count: 760, author_name: "Thaung Htike Oo", slug: "devops-best-practices" },
-        { id: 8, title: "Infrastructure as Code", read_count: 1040, author_name: "Aung Myint Myat", slug: "infrastructure-as-code" },
+        {
+          id: 1,
+          title: "Kubernetes Guide",
+          read_count: 1250,
+          author_name: "Thaung Htike Oo",
+          slug: "kubernetes-guide",
+        },
+        {
+          id: 2,
+          title: "AWS Tutorial",
+          read_count: 980,
+          author_name: "Sandar Win",
+          slug: "aws-tutorial",
+        },
+        {
+          id: 3,
+          title: "Terraform Basics",
+          read_count: 1560,
+          author_name: "Aung Myint Myat",
+          slug: "terraform-basics",
+        },
+        {
+          id: 4,
+          title: "Docker Security",
+          read_count: 890,
+          author_name: "Thaung Htike Oo",
+          slug: "docker-security",
+        },
+        {
+          id: 5,
+          title: "CI/CD Pipeline",
+          read_count: 1120,
+          author_name: "Sandar Win",
+          slug: "ci-cd-pipeline",
+        },
+        {
+          id: 6,
+          title: "Cloud Native",
+          read_count: 1340,
+          author_name: "Aung Myint Myat",
+          slug: "cloud-native",
+        },
+        {
+          id: 7,
+          title: "DevOps Best Practices",
+          read_count: 760,
+          author_name: "Thaung Htike Oo",
+          slug: "devops-best-practices",
+        },
+        {
+          id: 8,
+          title: "Infrastructure as Code",
+          read_count: 1040,
+          author_name: "Aung Myint Myat",
+          slug: "infrastructure-as-code",
+        },
       ];
       setArticlesStats(fallbackStats);
       setTotalViews(8940);
@@ -540,8 +592,8 @@ export default function ArticlesClient() {
   // Prepare articles by author data
   const prepareArticlesByAuthorData = () => {
     const authorMap = new Map<string, number>();
-    
-    articlesStats.forEach(article => {
+
+    articlesStats.forEach((article) => {
       const author = article.author_name;
       const current = authorMap.get(author) || 0;
       authorMap.set(author, current + 1);
@@ -555,8 +607,8 @@ export default function ArticlesClient() {
   // Prepare views by author data
   const prepareViewsByAuthorData = () => {
     const authorMap = new Map<string, number>();
-    
-    articlesStats.forEach(article => {
+
+    articlesStats.forEach((article) => {
       const author = article.author_name;
       const current = authorMap.get(author) || 0;
       authorMap.set(author, current + article.read_count);
@@ -570,7 +622,7 @@ export default function ArticlesClient() {
   // Loading state
   if (authorsLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
         <MinimalHeader />
         <main className="px-6 md:px-11 py-20">
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -598,7 +650,7 @@ export default function ArticlesClient() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <div className="relative z-10">
         <MinimalHeader />
 
@@ -722,19 +774,21 @@ export default function ArticlesClient() {
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading analytics...</p>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">
+                      Loading analytics...
+                    </p>
                   </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {/* Chart 1: Articles by Author */}
-                  <AuthorStatsPieChart 
+                  <AuthorStatsPieChart
                     data={prepareArticlesByAuthorData()}
                     title="Articles Distribution"
                   />
-                  
+
                   {/* Chart 2: Views by Author */}
-                  <AuthorViewsPieChart 
+                  <AuthorViewsPieChart
                     data={prepareViewsByAuthorData()}
                     title="Top Views"
                   />

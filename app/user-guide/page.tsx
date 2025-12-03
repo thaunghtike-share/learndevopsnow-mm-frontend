@@ -85,7 +85,7 @@ export default function DocsPage() {
   )?.content;
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 md:px-11 md:py-8">
@@ -115,21 +115,31 @@ export default function DocsPage() {
             <div className="flex items-center gap-3">
               <Menu className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <span className="font-medium text-black dark:text-white">
-                {sections.find(s => s.id === activeSection)?.title}
+                {sections.find((s) => s.id === activeSection)?.title}
               </span>
             </div>
-            <ChevronRight className={`w-5 h-5 text-blue-600 dark:text-blue-400 transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`} />
+            <ChevronRight
+              className={`w-5 h-5 text-blue-600 dark:text-blue-400 transition-transform ${
+                mobileMenuOpen ? "rotate-90" : ""
+              }`}
+            />
           </button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-12">
           {/* Sidebar Navigation */}
-          <div className={`lg:w-80 flex-shrink-0 ${mobileMenuOpen ? 'block' : 'hidden lg:block'}`}>
+          <div
+            className={`lg:w-80 flex-shrink-0 ${
+              mobileMenuOpen ? "block" : "hidden lg:block"
+            }`}
+          >
             <div className="sticky top-24">
               <nav className="space-y-2 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700 p-4 md:p-6">
                 <div className="flex items-center justify-between mb-4 lg:hidden">
-                  <h3 className="font-semibold text-black dark:text-white">Navigation</h3>
-                  <button 
+                  <h3 className="font-semibold text-black dark:text-white">
+                    Navigation
+                  </h3>
+                  <button
                     onClick={() => setMobileMenuOpen(false)}
                     className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
@@ -150,7 +160,9 @@ export default function DocsPage() {
                     }`}
                   >
                     <section.icon className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                    <span className="font-medium text-sm md:text-base">{section.title}</span>
+                    <span className="font-medium text-sm md:text-base">
+                      {section.title}
+                    </span>
                     {activeSection === section.id && (
                       <ChevronRight className="w-4 h-4 ml-auto text-blue-600 dark:text-blue-400" />
                     )}
@@ -195,7 +207,9 @@ function OverviewSection() {
           <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6">
             <Rocket className="w-6 h-6 md:w-8 md:h-8 text-white" />
           </div>
-          <h3 className="text-xl md:text-2xl font-light text-black dark:text-white mb-3 md:mb-4">Learn DevOps</h3>
+          <h3 className="text-xl md:text-2xl font-light text-black dark:text-white mb-3 md:mb-4">
+            Learn DevOps
+          </h3>
           <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
             Follow our structured learning path from basic Linux commands to
             advanced cloud technologies. All resources are curated for Burmese
@@ -278,7 +292,7 @@ function GettingStartedSection() {
                 "Watch YouTube course videos",
                 "Learn DevOps free courses",
                 "Use free DevOps playgrounds",
-                "Read articles and tutorials"
+                "Read articles and tutorials",
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2 md:gap-3">
                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
@@ -304,18 +318,26 @@ function GettingStartedSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="text-center p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <span className="text-white font-bold text-sm md:text-base">G</span>
+                  <span className="text-white font-bold text-sm md:text-base">
+                    G
+                  </span>
                 </div>
-                <p className="font-semibold text-black dark:text-white text-sm md:text-base">Google Sign Up</p>
+                <p className="font-semibold text-black dark:text-white text-sm md:text-base">
+                  Google Sign Up
+                </p>
                 <p className="text-black dark:text-gray-300 text-xs md:text-sm mt-1 md:mt-2">
                   Quick one-click registration
                 </p>
               </div>
               <div className="text-center p-4 md:p-6 bg-white dark:bg-gray-800 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <span className="text-white font-bold text-sm md:text-base">@</span>
+                  <span className="text-white font-bold text-sm md:text-base">
+                    @
+                  </span>
                 </div>
-                <p className="font-semibold text-black dark:text-white text-sm md:text-base">Sign Up</p>
+                <p className="font-semibold text-black dark:text-white text-sm md:text-base">
+                  Sign Up
+                </p>
                 <p className="text-black dark:text-gray-300 text-xs md:text-sm mt-1 md:mt-2">
                   Traditional registration
                 </p>
@@ -340,7 +362,7 @@ function GettingStartedSection() {
                 "Display name and professional bio",
                 "Job title and company information",
                 "LinkedIn profile URL",
-                "Profile picture"
+                "Profile picture",
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2 md:gap-3">
                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full flex-shrink-0"></div>
@@ -377,7 +399,9 @@ function LearningSection() {
               <Map className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-xl md:text-2xl font-light text-black dark:text-white">DevOps Roadmap</h3>
+              <h3 className="text-xl md:text-2xl font-light text-black dark:text-white">
+                DevOps Roadmap
+              </h3>
               <p className="text-black dark:text-gray-300 text-sm md:text-base">
                 Structured learning path from beginner to advanced
               </p>
@@ -393,13 +417,20 @@ function LearningSection() {
                   "Linux Fundamentals",
                   "Networking Basics",
                   "Git & Version Control",
-                  "Docker Essentials"
+                  "Docker Essentials",
                 ].map((topic, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 md:p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 md:p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+                  >
                     <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-xs md:text-sm font-bold">{index + 1}</span>
+                      <span className="text-white text-xs md:text-sm font-bold">
+                        {index + 1}
+                      </span>
                     </div>
-                    <span className="text-black dark:text-white font-medium text-sm md:text-base">{topic}</span>
+                    <span className="text-black dark:text-white font-medium text-sm md:text-base">
+                      {topic}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -413,13 +444,20 @@ function LearningSection() {
                   "Cloud Platforms",
                   "CI/CD Pipelines",
                   "Kubernetes",
-                  "GitOps"
+                  "GitOps",
                 ].map((topic, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 md:p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 md:p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+                  >
                     <div className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-xs md:text-sm font-bold">{index + 5}</span>
+                      <span className="text-white text-xs md:text-sm font-bold">
+                        {index + 5}
+                      </span>
                     </div>
-                    <span className="text-black dark:text-white font-medium text-sm md:text-base">{topic}</span>
+                    <span className="text-black dark:text-white font-medium text-sm md:text-base">
+                      {topic}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -461,7 +499,7 @@ function LearningSection() {
                   "TechWorld with Nana - Clear DevOps explanations",
                   "freeCodeCamp - Comprehensive project-based courses",
                   "KodeKloud - Hands-on labs and tutorials",
-                  "Simplilearn - Professional certification prep"
+                  "Simplilearn - Professional certification prep",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 md:gap-3">
                     <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full flex-shrink-0"></div>
@@ -479,7 +517,7 @@ function LearningSection() {
                   "Free access to expert content",
                   "Practical, real-world examples",
                   "Regular content updates",
-                  "Community support and discussions"
+                  "Community support and discussions",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 md:gap-3">
                     <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full flex-shrink-0"></div>
@@ -498,7 +536,9 @@ function LearningSection() {
               <GraduationCap className="w-6 h-6 md:w-8 md:h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-xl md:text-2xl font-light text-black dark:text-white">Free Courses</h3>
+              <h3 className="text-xl md:text-2xl font-light text-black dark:text-white">
+                Free Courses
+              </h3>
               <p className="text-black dark:text-gray-300 text-sm md:text-base">
                 Get started with free DevOps courses
               </p>
@@ -536,18 +576,34 @@ function LearningSection() {
               </h4>
               <div className="space-y-3 md:space-y-4">
                 {[
-                  { name: "Killer Coda", desc: "Interactive labs for Kubernetes, Docker, Linux" },
-                  { name: "Play with Kubernetes", desc: "Fully functional Kubernetes playground" },
-                  { name: "Play with Docker", desc: "Master containerization with Docker" }
+                  {
+                    name: "Killer Coda",
+                    desc: "Interactive labs for Kubernetes, Docker, Linux",
+                  },
+                  {
+                    name: "Play with Kubernetes",
+                    desc: "Fully functional Kubernetes playground",
+                  },
+                  {
+                    name: "Play with Docker",
+                    desc: "Master containerization with Docker",
+                  },
                 ].map((lab, index) => (
-                  <div key={index} className="p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div
+                    key={index}
+                    className="p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+                  >
                     <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
                       <div className="w-6 h-6 md:w-8 md:h-8 bg-sky-500 rounded-full flex items-center justify-center flex-shrink-0">
                         <Zap className="w-3 h-3 md:w-4 md:h-4 text-white" />
                       </div>
-                      <span className="font-semibold text-black dark:text-white text-sm md:text-base">{lab.name}</span>
+                      <span className="font-semibold text-black dark:text-white text-sm md:text-base">
+                        {lab.name}
+                      </span>
                     </div>
-                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">{lab.desc}</p>
+                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">
+                      {lab.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -558,18 +614,31 @@ function LearningSection() {
               </h4>
               <div className="space-y-3 md:space-y-4">
                 {[
-                  { name: "Terraform Labs", desc: "Learn Infrastructure as Code" },
-                  { name: "GitHub Learning Lab", desc: "Interactive Git tutorials" },
-                  { name: "Jenkins Labs", desc: "Build CI/CD pipelines" }
+                  {
+                    name: "Terraform Labs",
+                    desc: "Learn Infrastructure as Code",
+                  },
+                  {
+                    name: "GitHub Learning Lab",
+                    desc: "Interactive Git tutorials",
+                  },
+                  { name: "Jenkins Labs", desc: "Build CI/CD pipelines" },
                 ].map((lab, index) => (
-                  <div key={index} className="p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+                  <div
+                    key={index}
+                    className="p-3 md:p-4 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+                  >
                     <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
                       <div className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
                         <Layout className="w-3 h-3 md:w-4 md:h-4 text-white" />
                       </div>
-                      <span className="font-semibold text-black dark:text-white text-sm md:text-base">{lab.name}</span>
+                      <span className="font-semibold text-black dark:text-white text-sm md:text-base">
+                        {lab.name}
+                      </span>
                     </div>
-                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">{lab.desc}</p>
+                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">
+                      {lab.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -605,32 +674,37 @@ function WritingSection() {
               {
                 step: "1",
                 title: "Go to Your Dashboard",
-                desc: "Click your profile picture → Dashboard to access your author workspace"
+                desc: "Click your profile picture → Dashboard to access your author workspace",
               },
               {
                 step: "2",
                 title: "Click Write New Article",
-                desc: "Use the prominent button to start creating your content"
+                desc: "Use the prominent button to start creating your content",
               },
               {
                 step: "3",
                 title: "Use Markdown Editor",
-                desc: "Write with live preview, syntax highlighting, and easy formatting"
+                desc: "Write with live preview, syntax highlighting, and easy formatting",
               },
               {
                 step: "4",
                 title: "Add Article Details",
-                desc: "Set title, category, tags, cover image, and publication date"
+                desc: "Set title, category, tags, cover image, and publication date",
               },
               {
                 step: "5",
                 title: "Publish Your Article",
-                desc: "Save as draft or publish immediately to share with the community"
-              }
+                desc: "Save as draft or publish immediately to share with the community",
+              },
             ].map((item, index) => (
-              <div key={index} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+              <div
+                key={index}
+                className="flex items-start gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+              >
                 <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-white text-sm md:text-lg font-bold">{item.step}</span>
+                  <span className="text-white text-sm md:text-lg font-bold">
+                    {item.step}
+                  </span>
                 </div>
                 <div>
                   <p className="font-semibold text-black dark:text-white text-base md:text-lg mb-1 md:mb-2">
@@ -655,7 +729,7 @@ function WritingSection() {
                 "Share personal learning experiences",
                 "Include practical code examples",
                 "Use clear, beginner-friendly language",
-                "Create step-by-step tutorials"
+                "Create step-by-step tutorials",
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2 md:gap-3">
                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full flex-shrink-0"></div>
@@ -666,13 +740,15 @@ function WritingSection() {
           </div>
 
           <div className="p-4 md:p-8 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700">
-            <h4 className="font-semibold text-black dark:text-white mb-3 md:mb-4 text-sm md:text-base">What to Avoid</h4>
+            <h4 className="font-semibold text-black dark:text-white mb-3 md:mb-4 text-sm md:text-base">
+              What to Avoid
+            </h4>
             <ul className="text-black dark:text-gray-300 space-y-2 md:space-y-3 text-sm md:text-base">
               {[
                 "Copying content from other sites",
                 "Overly technical without explanations",
                 "Inappropriate language or content",
-                "Unrelated topics"
+                "Unrelated topics",
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2 md:gap-3">
                   <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-red-500 rounded-full flex-shrink-0"></div>
@@ -715,7 +791,7 @@ function DashboardSection() {
                   "Create new articles",
                   "Edit existing articles",
                   "View all published content",
-                  "Quick access to writing tools"
+                  "Quick access to writing tools",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 md:gap-3">
                     <Plus className="w-4 h-4 md:w-5 md:h-5 text-blue-600 dark:text-blue-400" />
@@ -733,7 +809,7 @@ function DashboardSection() {
                   "Track article views and reads",
                   "Monitor reader engagement",
                   "View author ranking",
-                  "Analyze content performance"
+                  "Analyze content performance",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 md:gap-3">
                     <Users className="w-4 h-4 md:w-5 md:h-5 text-purple-600 dark:text-purple-400" />
@@ -777,25 +853,28 @@ function AccountSection() {
               {
                 icon: Crown,
                 title: "Public Profile View",
-                desc: "See how other users view your profile and published articles"
+                desc: "See how other users view your profile and published articles",
               },
               {
                 icon: LayoutDashboard,
                 title: "Admin Dashboard",
-                desc: "Access your personal dashboard to manage articles and analytics"
+                desc: "Access your personal dashboard to manage articles and analytics",
               },
               {
                 icon: Settings,
                 title: "Edit Your Profile",
-                desc: "Update your author information, bio, and profile picture"
+                desc: "Update your author information, bio, and profile picture",
               },
               {
                 icon: Trash2,
                 title: "Delete Account",
-                desc: "Permanently delete your account and all associated data"
-              }
+                desc: "Permanently delete your account and all associated data",
+              },
             ].map((item, index) => (
-              <div key={index} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600">
+              <div
+                key={index}
+                className="flex items-start gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600"
+              >
                 <item.icon className="w-6 h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold text-black dark:text-white text-base md:text-lg mb-1">
@@ -825,7 +904,7 @@ function AccountSection() {
                   "Professional Bio - Your background and expertise",
                   "Job Title & Company - Your current role",
                   "LinkedIn Profile - Connect your professional profile",
-                  "Profile Picture - Add a professional photo"
+                  "Profile Picture - Add a professional photo",
                 ].map((item, index) => (
                   <li key={index} className="flex items-center gap-2 md:gap-3">
                     <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full flex-shrink-0"></div>

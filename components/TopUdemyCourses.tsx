@@ -374,19 +374,29 @@ export function TopUdemyCourses() {
   // Calculate pagination for Udemy courses
   const totalPagesUdemy = Math.ceil(courses.length / COURSES_PER_PAGE);
   const startIndexUdemy = currentPageUdemy * COURSES_PER_PAGE;
-  const currentCoursesUdemy = courses.slice(startIndexUdemy, startIndexUdemy + COURSES_PER_PAGE);
+  const currentCoursesUdemy = courses.slice(
+    startIndexUdemy,
+    startIndexUdemy + COURSES_PER_PAGE
+  );
 
   // Calculate pagination for Great Learning courses
-  const totalPagesGL = Math.ceil(greatLearningCourses.length / COURSES_PER_PAGE);
+  const totalPagesGL = Math.ceil(
+    greatLearningCourses.length / COURSES_PER_PAGE
+  );
   const startIndexGL = currentPageGL * COURSES_PER_PAGE;
-  const currentCoursesGL = greatLearningCourses.slice(startIndexGL, startIndexGL + COURSES_PER_PAGE);
+  const currentCoursesGL = greatLearningCourses.slice(
+    startIndexGL,
+    startIndexGL + COURSES_PER_PAGE
+  );
 
   const nextPageUdemy = () => {
     setCurrentPageUdemy((prev) => (prev + 1) % totalPagesUdemy);
   };
 
   const prevPageUdemy = () => {
-    setCurrentPageUdemy((prev) => (prev - 1 + totalPagesUdemy) % totalPagesUdemy);
+    setCurrentPageUdemy(
+      (prev) => (prev - 1 + totalPagesUdemy) % totalPagesUdemy
+    );
   };
 
   const nextPageGL = () => {
@@ -439,37 +449,39 @@ export function TopUdemyCourses() {
 
   if (loading) {
     return (
-      <section ref={sectionRef} className="w-full bg-white/95 dark:bg-[#0A0A0A] py-20 transition-colors duration-300">
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="mb-16">
-            <div className="h-1 w-24 bg-gray-200 dark:bg-gray-700 rounded-full mb-6 animate-pulse" />
-            <div className="h-12 w-96 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" />
-            <div className="h-6 w-full max-w-2xl bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-video bg-gray-200 dark:bg-gray-700 rounded-2xl mb-4" />
-                <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
-                <div className="flex justify-between items-center">
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
-                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+        <main className="max-w-7xl mx-auto px-4 py-20">
+          {/* Simple Elegant Loading */}
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            {/* Animated Logo Container */}
+            <div className="relative">
+              {/* Outer Ring Animation */}
+              <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+                {/* Logo Container */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
+                    <img
+                      src="/kodekloud.webp"
+                      alt="KodeKloud"
+                      className="w-16 h-16 object-contain animate-pulse"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/placeholder.svg";
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </main>
+      </div>
     );
   }
 
   return (
     <>
       {/* KodeKloud Section - Mobile Optimized */}
-      <section className="w-full bg-white/95 dark:bg-[#0A0A0A] py-13 md:py-16 transition-colors duration-300">
+      <section className="w-full bg-white/95 dark:bg-[#000000] py-13 md:py-16 transition-colors duration-300">
         <div className="px-6 md:px-11">
           {/* Header - Mobile Optimized */}
           <div className="max-w-3xl mb-16">
@@ -481,7 +493,8 @@ export function TopUdemyCourses() {
               </span>
             </h2>
             <p className="text-lg md:text-xl text-slate-700 dark:text-gray-300 leading-relaxed">
-              The leading platform for DevOps, Cloud, and Infrastructure learning.
+              The leading platform for DevOps, Cloud, and Infrastructure
+              learning.
             </p>
           </div>
 
@@ -495,10 +508,11 @@ export function TopUdemyCourses() {
                 Industry Courses
               </h3>
               <p className="text-slate-700 dark:text-gray-300 text-sm">
-                Docker, Kubernetes, AWS with real-world projects and hands-on labs.
+                Docker, Kubernetes, AWS with real-world projects and hands-on
+                labs.
               </p>
             </div>
-            
+
             <div className="flex-shrink-0 w-[280px] bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
               <div className="w-14 h-14 bg-sky-100 dark:bg-sky-900/30 rounded-xl flex items-center justify-center mb-4">
                 <Users className="w-7 h-7 text-sky-600 dark:text-sky-400" />
@@ -507,10 +521,11 @@ export function TopUdemyCourses() {
                 Expert Instructors
               </h3>
               <p className="text-slate-700 dark:text-gray-300 text-sm">
-                Learn from industry leaders like Mumshad Mannambeth and certified experts.
+                Learn from industry leaders like Mumshad Mannambeth and
+                certified experts.
               </p>
             </div>
-            
+
             <div className="flex-shrink-0 w-[280px] bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
               <div className="w-14 h-14 bg-sky-100 dark:bg-sky-900/30 rounded-xl flex items-center justify-center mb-4">
                 <Gift className="w-7 h-7 text-sky-600 dark:text-sky-400" />
@@ -519,7 +534,8 @@ export function TopUdemyCourses() {
                 Free Access
               </h3>
               <p className="text-slate-700 dark:text-gray-300 text-sm">
-                Start with free courses, hands-on labs, and interactive learning paths.
+                Start with free courses, hands-on labs, and interactive learning
+                paths.
               </p>
             </div>
           </div>
@@ -575,7 +591,8 @@ export function TopUdemyCourses() {
                 Ready to Start Your DevOps Journey?
               </h3>
               <p className="text-sky-100 dark:text-sky-200 text-sm md:text-lg mb-4 md:mb-6 max-w-2xl mx-auto">
-                Join thousands of successful engineers who transformed their careers.
+                Join thousands of successful engineers who transformed their
+                careers.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <a
@@ -599,7 +616,8 @@ export function TopUdemyCourses() {
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-              Trusted by engineers at Google, Amazon, Microsoft, and thousands of companies worldwide.
+              Trusted by engineers at Google, Amazon, Microsoft, and thousands
+              of companies worldwide.
             </p>
           </motion.div>
         </div>
@@ -608,7 +626,7 @@ export function TopUdemyCourses() {
       {/* Udemy Section - Mobile Optimized */}
       <section
         ref={sectionRef}
-        className="relative w-full bg-white/95 dark:bg-[#0A0A0A] md:py-10 overflow-hidden transition-colors duration-300"
+        className="relative w-full bg-white/95 dark:bg-[#000000] md:py-10 overflow-hidden transition-colors duration-300"
       >
         <div className="relative px-6 md:px-11">
           {/* Header Section - Mobile Optimized */}
@@ -644,7 +662,8 @@ export function TopUdemyCourses() {
                 transition={{ delay: 0.2 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed"
               >
-                Curated collection of online courses designed to help you master essential DevOps tools, practices, and methodologies
+                Curated collection of online courses designed to help you master
+                essential DevOps tools, practices, and methodologies
                 {usingFallback && (
                   <span className="block text-xs md:text-sm mt-2 text-yellow-600 dark:text-yellow-400">
                     • Showing demo data (API unavailable)
@@ -669,7 +688,10 @@ export function TopUdemyCourses() {
                       Unable to load live data
                     </p>
                     <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
-                      {error.length > 60 ? `${error.substring(0, 60)}...` : error} - Showing demo courses.
+                      {error.length > 60
+                        ? `${error.substring(0, 60)}...`
+                        : error}{" "}
+                      - Showing demo courses.
                     </p>
                   </div>
                   <button
@@ -718,7 +740,7 @@ export function TopUdemyCourses() {
                         className="block"
                       >
                         {/* Logo Container */}
-                        <div className="relative aspect-video bg-white dark:bg-white overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-sky-300 dark:group-hover:border-sky-600 group-hover:shadow-xl transition-all duration-300 flex items-center justify-center p-8">
+                        <div className="relative aspect-video bg-white dark:bg-gray-700 overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-gray-300 dark:group-hover:border-gray-600 group-hover:shadow-xl transition-all duration-300 flex items-center justify-center p-8">
                           {course.cover_image ? (
                             <img
                               src={course.cover_image || "/placeholder.svg"}
@@ -768,7 +790,9 @@ export function TopUdemyCourses() {
                                 {course.rating.toFixed(1)}
                               </span>
                             </div>
-                            <span className="text-gray-600 dark:text-gray-400 text-sm">rating</span>
+                            <span className="text-gray-600 dark:text-gray-400 text-sm">
+                              rating
+                            </span>
                           </div>
                         )}
                         {course.price && (
@@ -784,14 +808,14 @@ export function TopUdemyCourses() {
 
               {/* Mobile: Horizontal Scroll Layout - Optimized */}
               <div className="md:hidden">
-                <div 
+                <div
                   ref={scrollContainerRefUdemy}
                   className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 pb-2 -mx-6 px-6"
                   onScroll={handleScrollUdemy}
-                  style={{ 
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                    WebkitOverflowScrolling: 'touch'
+                  style={{
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                    WebkitOverflowScrolling: "touch",
                   }}
                 >
                   {courses.map((course, index) => (
@@ -883,7 +907,7 @@ export function TopUdemyCourses() {
                             const cardWidth = container.clientWidth * 0.85;
                             container.scrollTo({
                               left: i * cardWidth,
-                              behavior: 'smooth'
+                              behavior: "smooth",
                             });
                           }
                         }}
@@ -952,7 +976,7 @@ export function TopUdemyCourses() {
       </section>
 
       {/* Great Learning Section - Mobile Optimized */}
-      <section className="relative w-full bg-white dark:bg-[#0A0A0A] py-17 overflow-hidden transition-colors duration-300">
+      <section className="relative w-full bg-white dark:bg-[#000000] py-17 overflow-hidden transition-colors duration-300">
         <div className="relative px-6 md:px-11">
           {/* Header Section - Mobile Optimized */}
           <motion.div
@@ -987,7 +1011,8 @@ export function TopUdemyCourses() {
                 transition={{ delay: 0.2 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed"
               >
-                Comprehensive free courses covering Linux, AWS, Docker, Git, and CI/CD pipelines to boost your DevOps skills
+                Comprehensive free courses covering Linux, AWS, Docker, Git, and
+                CI/CD pipelines to boost your DevOps skills
               </motion.p>
             </div>
           </motion.div>
@@ -1013,7 +1038,7 @@ export function TopUdemyCourses() {
                       className="block"
                     >
                       {/* Logo Container */}
-                      <div className="relative aspect-video bg-white dark:bg-white overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-sky-300 dark:group-hover:border-sky-600 group-hover:shadow-xl transition-all duration-300 flex items-center justify-center p-8">
+                      <div className="relative aspect-video bg-white dark:bg-gray-700 overflow-hidden rounded-2xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-gray-300 dark:group-hover:border-gray-600 group-hover:shadow-xl transition-all duration-300 flex items-center justify-center p-8">
                         {course.cover_image ? (
                           <img
                             src={course.cover_image || "/placeholder.svg"}
@@ -1063,7 +1088,9 @@ export function TopUdemyCourses() {
                               {course.rating.toFixed(1)}
                             </span>
                           </div>
-                          <span className="text-gray-600 dark:text-gray-400 text-sm">rating</span>
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">
+                            rating
+                          </span>
                         </div>
                       )}
                       {course.price && (
@@ -1079,14 +1106,14 @@ export function TopUdemyCourses() {
 
             {/* Mobile: Horizontal Scroll Layout - Optimized */}
             <div className="md:hidden">
-              <div 
+              <div
                 ref={scrollContainerRefGL}
                 className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-4 pb-2 -mx-6 px-6"
                 onScroll={handleScrollGL}
-                style={{ 
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                  WebkitOverflowScrolling: "touch",
                 }}
               >
                 {greatLearningCourses.map((course, index) => (
@@ -1178,7 +1205,7 @@ export function TopUdemyCourses() {
                           const cardWidth = container.clientWidth * 0.85;
                           container.scrollTo({
                             left: i * cardWidth,
-                            behavior: 'smooth'
+                            behavior: "smooth",
                           });
                         }
                       }}

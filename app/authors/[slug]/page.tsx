@@ -300,7 +300,7 @@ export default function AuthorDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
@@ -330,7 +330,7 @@ export default function AuthorDetailPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
           {/* Simple Elegant Loading */}
@@ -362,7 +362,7 @@ export default function AuthorDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-8 relative z-10">
@@ -670,7 +670,7 @@ export default function AuthorDetailPage() {
                       Showing {paginatedArticles.length} of {totalArticles}{" "}
                       articles
                     </div>
-                    
+
                     {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button

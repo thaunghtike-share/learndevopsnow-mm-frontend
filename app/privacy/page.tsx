@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-6 md:px-11 md:py-8">
@@ -316,7 +316,9 @@ export default function PrivacyPolicy() {
               </p>
               <div className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 border border-white/30">
                 <Eye className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="font-semibold text-sm md:text-base">100% Transparent</span>
+                <span className="font-semibold text-sm md:text-base">
+                  100% Transparent
+                </span>
               </div>
             </div>
           </div>

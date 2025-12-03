@@ -112,21 +112,34 @@ export default function CategoriesPage() {
     setShowAll(!showAll);
   };
 
-  if (loading) {
+   if (loading) {
     return (
-      <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
         <MinimalHeader />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-2xl mb-4" />
-                <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+        <main className="max-w-7xl mx-auto px-4 py-20">
+          {/* Simple Elegant Loading */}
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            {/* Animated Logo Container */}
+            <div className="relative">
+              {/* Outer Ring Animation */}
+              <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+                {/* Logo Container */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
+                    <img
+                      src="/kodekloud.webp"
+                      alt="KodeKloud"
+                      className="w-16 h-16 object-contain animate-pulse"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/placeholder.svg";
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        </main>
         <MinimalFooter />
       </div>
     );
@@ -134,7 +147,7 @@ export default function CategoriesPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen bg-white/95 dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 text-center">
           <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-700 rounded-2xl p-8 max-w-2xl mx-auto">
@@ -150,7 +163,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <MinimalHeader />
       <main className="px-6 md:px-11 md:py-8">
         {/* Header Section */}

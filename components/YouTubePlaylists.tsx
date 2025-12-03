@@ -664,7 +664,7 @@ export function YouTubePlaylists() {
   const IconComponent = currentConfig.icon;
 
   return (
-    <section className="relative min-h-screen bg-white/95 dark:bg-[#0A0A0A] overflow-hidden">
+    <section className="relative min-h-screen bg-white/95 dark:bg-[#000000] overflow-hidden">
       <div className="py-8 md:py-12 px-4 md:px-11">
         {/* Header Section - Keep original design */}
         <div className="text-center mb-8 md:mb-12 relative">

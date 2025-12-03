@@ -19,7 +19,7 @@ import {
   Trash2,
   Maximize2,
   Minimize2,
-  Paperclip
+  Paperclip,
 } from "lucide-react";
 
 interface Category {
@@ -71,7 +71,9 @@ export default function NewArticlePage() {
   // NEW: Article content image upload states
   const [contentImageUploading, setContentImageUploading] = useState(false);
   const [contentImageProgress, setContentImageProgress] = useState(0);
-  const [contentImageError, setContentImageError] = useState<string | null>(null);
+  const [contentImageError, setContentImageError] = useState<string | null>(
+    null
+  );
 
   const [newTagName, setNewTagName] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -85,24 +87,24 @@ export default function NewArticlePage() {
       const savedToken = localStorage.getItem("token");
       setToken(savedToken);
       setLoading(false);
-      
-      const isDark = document.documentElement.classList.contains('dark');
+
+      const isDark = document.documentElement.classList.contains("dark");
       setIsDarkMode(isDark);
-      
+
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.attributeName === 'class') {
-            const isDark = document.documentElement.classList.contains('dark');
+          if (mutation.attributeName === "class") {
+            const isDark = document.documentElement.classList.contains("dark");
             setIsDarkMode(isDark);
           }
         });
       });
-      
+
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ['class']
+        attributeFilter: ["class"],
       });
-      
+
       return () => observer.disconnect();
     }
   }, []);
@@ -253,31 +255,36 @@ export default function NewArticlePage() {
   // NEW: Handle article content image upload
   const handleContentImageUpload = async () => {
     // Create a hidden file input
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml';
-    
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept =
+      "image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml";
+
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
       const allowedTypes = [
-        'image/jpeg', 'image/jpg', 'image/png', 
-        'image/gif', 'image/webp', 'image/svg+xml'
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+        "image/svg+xml",
       ];
-      
+
       if (!allowedTypes.includes(file.type)) {
-        setMessage({ 
-          text: "Please select a valid image file (JPEG, PNG, GIF, WebP, or SVG)", 
-          type: "error" 
+        setMessage({
+          text: "Please select a valid image file (JPEG, PNG, GIF, WebP, or SVG)",
+          type: "error",
         });
         return;
       }
 
       if (file.size > 10 * 1024 * 1024) {
-        setMessage({ 
-          text: "File size must be less than 10MB", 
-          type: "error" 
+        setMessage({
+          text: "File size must be less than 10MB",
+          type: "error",
         });
         return;
       }
@@ -288,18 +295,18 @@ export default function NewArticlePage() {
 
       try {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append("image", file);
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error('No authentication token found');
+          throw new Error("No authentication token found");
         }
 
         setContentImageProgress(30);
 
         // NEW ENDPOINT: Upload article content image
         const response = await fetch(`${API_BASE_URL}/upload-article-image/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
             Authorization: `Token ${token}`,
           },
@@ -310,7 +317,7 @@ export default function NewArticlePage() {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Image upload failed');
+          throw new Error(errorData.error || "Image upload failed");
         }
 
         const data = await response.json();
@@ -319,33 +326,36 @@ export default function NewArticlePage() {
 
         // Insert the Markdown image syntax at cursor position
         const markdownImage = data.markdown || `![${file.name}](${data.url})`;
-        
+
         // Insert at current cursor position or at the end
         const currentContent = form.content;
-        
+
         // For simplicity, insert at the end with line breaks
-        const newContent = currentContent + (currentContent ? '\n\n' : '') + markdownImage + '\n';
-        
-        setForm(prev => ({
+        const newContent =
+          currentContent +
+          (currentContent ? "\n\n" : "") +
+          markdownImage +
+          "\n";
+
+        setForm((prev) => ({
           ...prev,
-          content: newContent
+          content: newContent,
         }));
 
-        setMessage({ 
-          text: "✅ Image uploaded and inserted into editor!", 
-          type: "success" 
+        setMessage({
+          text: "✅ Image uploaded and inserted into editor!",
+          type: "success",
         });
 
         setTimeout(() => {
           setContentImageProgress(0);
           setContentImageUploading(false);
         }, 1000);
-
       } catch (error: any) {
         setContentImageError(error.message);
-        setMessage({ 
-          text: `Upload failed: ${error.message}`, 
-          type: "error" 
+        setMessage({
+          text: `Upload failed: ${error.message}`,
+          type: "error",
         });
         setContentImageProgress(0);
         setContentImageUploading(false);
@@ -413,9 +423,9 @@ export default function NewArticlePage() {
         cover_image: data.cover_image_url || data.url,
       }));
 
-      setMessage({ 
-        text: "✅ Cover image uploaded successfully!", 
-        type: "success" 
+      setMessage({
+        text: "✅ Cover image uploaded successfully!",
+        type: "success",
       });
 
       setTimeout(() => {
@@ -623,7 +633,7 @@ export default function NewArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen flex flex-col py-10 bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="flex-grow flex items-center justify-center px-4 md:py-20">
           <div className="text-center mt-24 mb-24">
@@ -638,7 +648,7 @@ export default function NewArticlePage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="flex-grow flex items-center justify-center py-20 px-4">
           <div className="text-center max-w-md">
@@ -658,7 +668,7 @@ export default function NewArticlePage() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-white dark:bg-[#0A0A0A] transition-colors relative overflow-x-hidden duration-300 ${
+      className={`min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors relative overflow-x-hidden duration-300 ${
         fullscreen ? "overflow-hidden" : ""
       }`}
     >
@@ -667,7 +677,7 @@ export default function NewArticlePage() {
       <main
         className={`${
           fullscreen
-            ? "fixed inset-0 z-50 bg-white dark:bg-[#0A0A0A]"
+            ? "fixed inset-0 z-50 bg-white dark:bg-[#000000]"
             : "flex-grow w-full"
         }`}
       >
@@ -731,7 +741,9 @@ export default function NewArticlePage() {
               className={`${fullscreen ? "h-full" : "space-y-6"}`}
             >
               <div
-                className={`${fullscreen ? "h-full flex flex-col" : "space-y-6"}`}
+                className={`${
+                  fullscreen ? "h-full flex flex-col" : "space-y-6"
+                }`}
               >
                 {!fullscreen && (
                   <>
@@ -1102,7 +1114,9 @@ export default function NewArticlePage() {
                 )}
 
                 {/* Content Editor */}
-                <div className={`${fullscreen ? "flex-grow flex flex-col" : ""}`}>
+                <div
+                  className={`${fullscreen ? "flex-grow flex flex-col" : ""}`}
+                >
                   {!fullscreen && (
                     <>
                       {/* NEW: Content Image Upload Progress */}
@@ -1155,7 +1169,7 @@ export default function NewArticlePage() {
                               </>
                             )}
                           </button>
-                          
+
                           <button
                             type="button"
                             onClick={() => setShowPreview(!showPreview)}
@@ -1185,7 +1199,7 @@ export default function NewArticlePage() {
                       </div>
                     </>
                   )}
-                  
+
                   <div
                     ref={editorRef}
                     data-color-mode={isDarkMode ? "dark" : "light"}
@@ -1200,20 +1214,20 @@ export default function NewArticlePage() {
                       }
                       hideToolbar={false}
                       style={{
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        color: isDarkMode ? '#f9fafb' : '#000000',
+                        backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                        color: isDarkMode ? "#f9fafb" : "#000000",
                       }}
                       textareaProps={{
                         placeholder: "Write your article content here...",
                         style: {
-                          backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                          color: isDarkMode ? '#f9fafb' : '#000000',
+                          backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                          color: isDarkMode ? "#f9fafb" : "#000000",
                         },
                       }}
                       previewOptions={{
                         style: {
-                          backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                          color: isDarkMode ? '#f9fafb' : '#000000',
+                          backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
+                          color: isDarkMode ? "#f9fafb" : "#000000",
                         },
                       }}
                       className={`${
@@ -1241,10 +1255,10 @@ export default function NewArticlePage() {
                         {
                           name: "upload-image",
                           keyCommand: "uploadImage",
-                          buttonProps: { 
+                          buttonProps: {
                             "aria-label": "Upload image",
                             title: "Upload image from computer",
-                            disabled: contentImageUploading
+                            disabled: contentImageUploading,
                           },
                           icon: contentImageUploading ? (
                             <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
@@ -1264,7 +1278,9 @@ export default function NewArticlePage() {
                   <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                       type="submit"
-                      disabled={loading || coverImageUploading || contentImageUploading}
+                      disabled={
+                        loading || coverImageUploading || contentImageUploading
+                      }
                       className="w-full px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base flex items-center justify-center gap-2"
                     >
                       {loading ? (

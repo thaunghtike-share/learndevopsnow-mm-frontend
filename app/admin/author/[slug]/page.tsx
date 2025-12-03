@@ -180,7 +180,7 @@ function AuthorStatsPieChart({
         labels: {
           color: "#6b7280",
           font: {
-            size: 11,
+            size: 12,
             family: "Inter, sans-serif",
           },
           padding: 10,
@@ -310,7 +310,7 @@ function AuthorViewsPieChart({
         labels: {
           color: "#6b7280",
           font: {
-            size: 11,
+            size: 12,
             family: "Inter, sans-serif",
           },
           padding: 10,
@@ -389,7 +389,7 @@ function DeleteConfirmationModal({
   if (!isOpen || !article) return null;
 
   return (
-    <div className="fixed inset-0 bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-white/80 dark:bg-[#000000]/80 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -1022,7 +1022,7 @@ export default function AuthorAdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -1040,7 +1040,7 @@ export default function AuthorAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <MinimalHeader />
 
       <BanNotification />

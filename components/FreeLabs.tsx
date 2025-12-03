@@ -150,7 +150,7 @@ export function FreeLabs() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen bg-white/95 dark:bg-[#0A0A0A] overflow-hidden"
+      className="relative min-h-screen bg-white/95 dark:bg-[#000000] overflow-hidden"
     >
       <div className="relative w-full max-w-4xl mx-auto px-4 py-11 md:py-8 font-open-sans">
         {/* Centered Header */}

@@ -78,7 +78,7 @@ export default function SuperUserDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A]">
+      <div className="min-h-screen bg-white dark:bg-[#000000]">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -95,7 +95,7 @@ export default function SuperUserDashboard() {
 
   if (!isSuperUser) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#0A0A0A]">
+      <div className="min-h-screen bg-white dark:bg-[#000000]">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center py-20">
@@ -116,7 +116,7 @@ export default function SuperUserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] relative overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden">
       <MinimalHeader />
 
       <ImpersonationBanner />
@@ -153,7 +153,7 @@ export default function SuperUserDashboard() {
               <div className="lg:col-span-2">
                 <PlatformAnalytics />
               </div>
-              
+
               {/* User Management */}
               <div className="lg:col-span-1">
                 <UserManagement />

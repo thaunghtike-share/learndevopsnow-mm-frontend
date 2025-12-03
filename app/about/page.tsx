@@ -265,17 +265,21 @@ const stats = [
 
 export default function AboutPage() {
   const handleEmailClick = () => {
-    window.location.href = "mailto:thaunghtikeoo.tho1234@gmail.com?subject=Consultation - DevOps Services&body=Hi Thaung, I'm interested in learning more about your DevOps services.";
+    window.location.href =
+      "mailto:thaunghtikeoo.tho1234@gmail.com?subject=Consultation - DevOps Services&body=Hi Thaung, I'm interested in learning more about your DevOps services.";
   };
 
   const handleCaseStudiesClick = () => {
-    window.open("https://github.com/thaunghtike-share/DevOps-Projects", "_blank");
+    window.open(
+      "https://github.com/thaunghtike-share/DevOps-Projects",
+      "_blank"
+    );
   };
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#0A0A0A] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
       <MinimalHeader />
-      
+
       <main className="px-6 md:px-11 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Personal Info & Summary */}
@@ -400,7 +404,7 @@ export default function AboutPage() {
                   Worked long-term as a Kubernetes Engineer providing reliable
                   support and infrastructure automation to global clients.
                 </p>
-                
+
                 <div className="mt-4 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
                   <Image
                     src="/earnings.png"

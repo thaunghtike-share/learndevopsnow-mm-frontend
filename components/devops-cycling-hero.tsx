@@ -15,7 +15,12 @@ const DevOpsCyclingHero = () => {
       description:
         "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle and provide continuous delivery with high software quality.",
       iconGradient: "from-orange-600 to-yellow-600",
-      tags: ["Automation", "Collaboration", "Monitoring","Continuous Delivery"],
+      tags: [
+        "Automation",
+        "Collaboration",
+        "Monitoring",
+        "Continuous Delivery",
+      ],
     },
     {
       id: "linux",
@@ -79,7 +84,7 @@ const DevOpsCyclingHero = () => {
       description:
         "Understand the importance of monitoring and logging in DevOps - how to track application performance, detect issues, and gain insights through tools like Prometheus, Grafana, and ELK Stack.",
       iconGradient: "from-pink-600 to-purple-600",
-      tags: ["Prometheus","Loki", "Kibana", "Logs", "Alerts", "Grafana"],
+      tags: ["Prometheus", "Loki", "Kibana", "Logs", "Alerts", "Grafana"],
     },
     {
       id: "iac",
@@ -115,7 +120,7 @@ const DevOpsCyclingHero = () => {
   };
 
   return (
-    <section className="relative bg-white overflow-hidden dark:bg-[#0A0A0A]/95">
+    <section className="relative bg-white overflow-hidden dark:bg-[#000000]/95">
       {/* Updated container with balanced left and right spacing */}
       <div className="relative px-4 md:px-11">
         <div className="flex flex-col lg:flex-row items-center justify-between md:py-10 gap-4 md:gap-8">
@@ -228,7 +233,7 @@ const DevOpsCyclingHero = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + index * 0.05 }}
-                        className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-full text-xs font-medium bg-white dark:from-gray-800 dark:to-gray-900 border border-black-200 dark:border-gray-700 text-orange-500 dark:text-orange-400 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
+                        className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-full text-xs font-medium bg-white dark:from-gray-300 dark:to-gray-400 border border-black-200 dark:border-orange-700 text-orange-500 dark:text-orange-400 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
                       >
                         {tag}
                       </motion.span>

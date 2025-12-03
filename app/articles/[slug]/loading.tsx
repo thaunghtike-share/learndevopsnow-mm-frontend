@@ -3,7 +3,7 @@ import { MinimalFooter } from "@/components/minimal-footer";
 
 export default function ArticleLoading() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0A0A0A] transition-colors duration-300 relative overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
       {/* Use actual header */}
       <MinimalHeader />
 
@@ -30,12 +30,16 @@ export default function ArticleLoading() {
           {/* Main content area skeleton */}
           <div className="lg:col-span-3 space-y-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" style={{ 
-                width: `${Math.random() * 40 + 60}%` 
-              }}></div>
+              <div
+                key={i}
+                className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
+                style={{
+                  width: `${Math.random() * 40 + 60}%`,
+                }}
+              ></div>
             ))}
           </div>
-          
+
           {/* Sidebar skeleton */}
           <div className="lg:col-span-1 space-y-6">
             <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse"></div>
