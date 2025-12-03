@@ -281,55 +281,110 @@ export function ArticleContent({
     <main className="px-6 md:px-11 py-20 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
       <article className="lg:col-span-3 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-500 p-6 md:p-8 lg:p-10">
         <div className="mb-10 md:mb-12">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <Link href={`/categories/${slugify(categoryName)}`}>
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-full text-sm font-semibold shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transition-all duration-300 hover:scale-105">
-                <Folder className="w-4 h-4" />
-                {categoryName}
-              </span>
+          {/* Breadcrumb Navigation - Larger font, black color */}
+          <div className="flex items-center gap-2 text-base font-semibold text-black dark:text-white mb-6">
+            <Link
+              href="/"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+            >
+              Home
             </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link
+              href="/articles"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+            >
+              Articles
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link
+              href={`/categories/${slugify(categoryName)}`}
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+            >
+              {categoryName}
+            </Link>
+          </div>
 
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-1 text-black dark:text-white">
-                <CalendarDays className="w-3 h-3" />
-                <span>
-                  {new Date(article.published_at).toLocaleDateString()}
-                </span>
-              </div>
-              <div className="w-1 h-1 bg-black/30 dark:bg-gray-600 rounded-full"></div>
-              <div className="flex items-center gap-1 text-black dark:text-white">
-                <Eye className="w-3 h-3" />
-                <span>
-                  <CountUp
-                    end={article.read_count || 0}
-                    duration={2}
-                    separator=","
-                  />{" "}
-                  views
-                </span>
+          {/* Main Title - Using Geist with larger font and black color */}
+          <h1 className="text-3xl md:text-4xl lg:text-5xl text-black dark:text-white mb-6 leading-[1.15] tracking-tight">
+            {article.title}
+          </h1>
+
+          {/* Author Info and Date - Single line layout */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              {/* Author Avatar */}
+              <Link href={`/authors/${authorSlug}`} className="group">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                  <img
+                    src={effectiveAuthor?.avatar || "/placeholder.svg"}
+                    alt={effectiveAuthor?.name || "Author"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </Link>
+
+              {/* Author Name and Date */}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/authors/${authorSlug}`}
+                    className="text-black dark:text-white text-lg hover:text-sky-600 dark:hover:text-sky-400 transition-colors tracking-tight"
+                  >
+                    {effectiveAuthor?.name || "Unknown Author"}
+                  </Link>
+                  <span className="text-gray-500 dark:text-gray-400">|</span>
+                  <div className="flex items-center gap-1.5 text-black dark:text-gray-300 font-base">
+                    <span className="text-lg">
+                      {new Date(article.published_at).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Views count with BarChart icon */}
+                <div className="flex items-center gap-1.5 mt-1">
+                  <BarChart3 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <span className="text-black dark:text-gray-400 font-base">
+                    <CountUp
+                      end={article.read_count || 0}
+                      duration={2}
+                      separator=","
+                    />
+                    {article.read_count === 1 ? " view" : " views"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black dark:text-white mb-6 leading-tight tracking-tight">
-            {article.title}
-          </h1>
-
+          {/* Tags with # format */}
           {tagNames.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {tagNames.map((tag, index) => (
-                <Link
-                  href={`/articles?tag=${slugify(tag)}`}
-                  key={index}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-black dark:text-white text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-                >
-                  <TagIcon className="w-4 h-4 text-orange" />
-                  {tag}
-                </Link>
-              ))}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="flex flex-wrap gap-2">
+                {tagNames.map((tag, index) => (
+                  <Link
+                    href={`/articles?tag=${slugify(tag)}`}
+                    key={index}
+                    className="inline-flex items-center px-4 py-2 text-black dark:text-white transition-all duration-200 text-base font-medium group"
+                  >
+                    <span className="text-orange-600 dark:text-sky-400 mr-1">
+                      #
+                    </span>
+                    {tag}
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
         </div>
+
         {article.cover_image && (
           <div className="mb-8 md:mb-10 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-all duration-500">
             <img
@@ -684,7 +739,6 @@ export function ArticleContent({
             url={typeof window !== "undefined" ? window.location.href : ""}
           />
         </div>
-
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -750,7 +804,6 @@ export function ArticleContent({
             </div>
           </div>
         </motion.section>
-
         <div className="mt-12 flex items-center justify-between gap-4">
           {prevArticle && (
             <Link
