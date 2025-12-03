@@ -353,7 +353,21 @@ export function MinimalBlogList({
       </div>
 
       {/* Empty State */}
-      {articles.length === 0 ? (
+      {loading ? (
+        // Loading State
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center bg-sky-50 dark:bg-sky-900/20 rounded-full p-6 mb-6 border border-sky-200 dark:border-sky-800">
+            <div className="w-12 h-12 border-4 border-sky-200 dark:border-sky-700 border-t-sky-600 dark:border-t-sky-400 rounded-full animate-spin"></div>
+          </div>
+          <h3 className="text-2xl font-bold text-black dark:text-gray-100 mb-3">
+            Loading Articles...
+          </h3>
+          <p className="text-black dark:text-gray-300 mb-6 max-w-md mx-auto">
+            Fetching the latest DevOps content for you
+          </p>
+        </div>
+      ) : articles.length === 0 ? (
+        // Empty State (only show when loading is false)
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center bg-amber-50 dark:bg-amber-900/20 rounded-full p-6 mb-6 border border-amber-200 dark:border-amber-800">
             <AlertTriangle className="w-12 h-12 text-amber-600 dark:text-amber-400" />
@@ -488,36 +502,63 @@ export function MinimalBlogList({
             })}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
-            <nav className="mt-12 flex flex-col sm:flex-row justify-between items-center gap-6">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-black dark:text-gray-100"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
+            <nav className="mt-12">
+              <div className="flex flex-col items-center gap-4">
+                {/* Simple 3-Page Test Design */}
+                <div className="flex items-center gap-2">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-black dark:text-gray-100"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </button>
+
+                  {/* Always show 3 pages (or less if fewer pages exist) */}
+                  {(() => {
+                    // For testing: Let's see how many pages we have
+                    console.log("Total pages:", totalPages);
+                    console.log("Current page:", currentPage);
+
+                    // Create an array of page numbers to show
+                    let pagesToShow: number[] = [];
+
+                    if (totalPages <= 3) {
+                      // If 3 or fewer pages, show all
+                      pagesToShow = Array.from(
+                        { length: totalPages },
+                        (_, i) => i + 1
+                      );
                     } else {
-                      pageNum = currentPage - 2 + i;
+                      // Always show 3 pages with current page in the middle if possible
+                      if (currentPage === 1) {
+                        // At start: show 1, 2, 3
+                        pagesToShow = [1, 2, 3];
+                      } else if (currentPage === totalPages) {
+                        // At end: show last 3 pages
+                        pagesToShow = [
+                          totalPages - 2,
+                          totalPages - 1,
+                          totalPages,
+                        ];
+                      } else {
+                        // In middle: show current-1, current, current+1
+                        pagesToShow = [
+                          currentPage - 1,
+                          currentPage,
+                          currentPage + 1,
+                        ];
+                      }
                     }
 
-                    return (
+                    return pagesToShow.map((pageNum) => (
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium ${
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium ${
                           currentPage === pageNum
                             ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white"
                             : "border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -525,19 +566,26 @@ export function MinimalBlogList({
                       >
                         {pageNum}
                       </button>
-                    );
-                  })}
+                    ));
+                  })()}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-black dark:text-gray-100"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 text-black dark:text-gray-100"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+
+                {/* Page Info */}
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Page {currentPage} of {totalPages}
+                </div>
               </div>
             </nav>
           )}
