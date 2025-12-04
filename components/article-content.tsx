@@ -22,6 +22,7 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { visit } from "unist-util-visit";
 import { CommentsReactions } from "./comment-reactions";
 import {
   ArrowRight,
@@ -142,6 +143,30 @@ function excerpt(content: string) {
   return plainText.length === 120 ? plainText + "..." : plainText;
 }
 
+const isYouTubeParagraph = (
+  children: any
+): { isYouTube: boolean; url?: string; title?: string } => {
+  const text = flattenChildren(children);
+
+  // Check for markdown link pattern [text](url)
+  const markdownLinkMatch = text.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
+  if (markdownLinkMatch) {
+    const [, title, url] = markdownLinkMatch;
+    if (extractYouTubeId(url)) {
+      return { isYouTube: true, url, title };
+    }
+  }
+
+  // Check for plain URL
+  const urlRegex = /(https?:\/\/[^\s]+)/;
+  const urlMatch = text.match(urlRegex);
+  if (urlMatch && extractYouTubeId(urlMatch[0])) {
+    return { isYouTube: true, url: urlMatch[0] };
+  }
+
+  return { isYouTube: false };
+};
+
 const CopyButton = ({ code }: { code: string }) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
@@ -177,6 +202,90 @@ const InlineCode = ({ children, ...props }: any) => (
     {children}
   </code>
 );
+
+// YouTube embed function
+const extractYouTubeId = (url: string): string | null => {
+  const patterns = [
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  return null;
+};
+
+// YouTube Embed Component
+const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
+  const videoId = extractYouTubeId(url);
+
+  if (!videoId) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sky-600 hover:underline"
+      >
+        {title || url}
+      </a>
+    );
+  }
+
+  return (
+    <div className="my-8 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="relative pt-[56.25%] bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&color=white`}
+          title={title || "YouTube video"}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="absolute top-0 left-0 w-full h-full"
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+      </div>
+
+      <div className="p-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg
+              className="w-6 h-6 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+            </svg>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2">
+              {title || "YouTube Video"}
+            </h4>
+
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors font-medium"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              Watch on YouTube
+              <ArrowRight className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function ArticleContent({
   article,
@@ -276,6 +385,120 @@ export function ArticleContent({
 
     return isValidHeading;
   });
+
+  const remarkYouTube = () => {
+    return (tree: any) => {
+      visit(tree, "paragraph", (node) => {
+        // Check if paragraph has only one child that's a link
+        if (node.children.length === 1 && node.children[0].type === "link") {
+          const link = node.children[0];
+          const url = link.url || "";
+          const youtubeId = extractYouTubeId(url);
+
+          if (youtubeId) {
+            // Transform this node
+            node.type = "html";
+            node.value = `<div data-youtube-id="${youtubeId}" data-youtube-title="${
+              link.children[0]?.value || ""
+            }"></div>`;
+            node.children = [];
+          }
+        }
+      });
+    };
+  };
+
+  // Custom paragraph component to handle YouTube embeds
+  const ParagraphComponent = ({ children, ...props }: any) => {
+    // Get the text content
+    const text = flattenChildren(children);
+
+    // Check if it's a markdown link to YouTube
+    const markdownLinkMatch = text.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
+
+    if (markdownLinkMatch) {
+      const [, linkText, linkUrl] = markdownLinkMatch;
+      const youtubeId = extractYouTubeId(linkUrl);
+
+      // If it's a YouTube link and the entire paragraph is just this link
+      if (youtubeId && text.trim() === markdownLinkMatch[0]) {
+        return <YouTubeEmbed url={linkUrl} title={linkText} />;
+      }
+    }
+
+    // Check if it's a plain YouTube URL
+    const youtubeId = extractYouTubeId(text.trim());
+    if (youtubeId && text.trim() === text) {
+      return <YouTubeEmbed url={text.trim()} />;
+    }
+
+    // Check if paragraph contains a YouTube URL (for mixed content)
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = text.match(urlRegex);
+
+    if (urls && urls.some((url) => extractYouTubeId(url))) {
+      // Split content by URLs
+      const parts = text.split(urlRegex);
+
+      return (
+        <p className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300">
+          {parts.map((part, i) => {
+            const youtubeId = extractYouTubeId(part.trim());
+            if (youtubeId) {
+              // Return a span that will be replaced by the embed
+              return (
+                <span key={i} className="block my-4">
+                  <YouTubeEmbed url={part.trim()} />
+                </span>
+              );
+            }
+            return <span key={i}>{part}</span>;
+          })}
+        </p>
+      );
+    }
+
+    // Default paragraph
+    return (
+      <p
+        className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
+        {...props}
+      >
+        {children}
+      </p>
+    );
+  };
+
+  // Custom link component
+  const LinkComponent = ({ href, children, ...props }: any) => {
+    const isYouTube = href && extractYouTubeId(href);
+
+    if (isYouTube) {
+      // Return a special wrapper that indicates this is a YouTube link
+      const linkText = flattenChildren(children);
+      return (
+        <span
+          className="youtube-link-wrapper"
+          data-youtube-url={href}
+          data-title={linkText}
+        >
+          [YouTube: {linkText}]
+        </span>
+      );
+    }
+
+    return (
+      <a
+        href={href}
+        className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline decoration-2 underline-offset-2 break-words text-base md:text-lg transition-all duration-200 font-medium"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  };
 
   return (
     <main className="px-6 md:px-11 py-20 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -394,9 +617,10 @@ export function ArticleContent({
             />
           </div>
         )}
+
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkYouTube]} // ← ADDED remarkYouTube
             rehypePlugins={[rehypeHighlight, rehypeRaw]}
             components={{
               // Use separate component for inline code
@@ -582,6 +806,21 @@ export function ArticleContent({
                 );
               },
 
+              div: ({ ...props }: any) => {
+                if (props["data-youtube-id"]) {
+                  const youtubeId = props["data-youtube-id"];
+                  const title = props["data-youtube-title"];
+                  return (
+                    <YouTubeEmbed
+                      url={`https://www.youtube.com/watch?v=${youtubeId}`}
+                      title={title}
+                    />
+                  );
+                }
+                return <div {...props} />;
+              },
+
+              // Keep p and a components simple
               p: ({ children, ...props }) => (
                 <p
                   className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
@@ -722,6 +961,12 @@ export function ArticleContent({
             {fixMarkdownSpacing(article.content)}
           </ReactMarkdown>
         </div>
+
+        {/* Post-process the content to replace YouTube placeholders with actual embeds */}
+        <div className="youtube-content-processor">
+          {/* This will be processed by useEffect below */}
+        </div>
+
         <div className="mt-12 mb-6">
           <CommentsReactions
             articleSlug={article.slug}
@@ -731,7 +976,7 @@ export function ArticleContent({
             }}
           />
         </div>
-        {/* ADD SHARE BUTTONS HERE */}
+
         <div className="mb-2 hidden md:block">
           <ShareButtons
             articleId={article.id}
@@ -739,6 +984,7 @@ export function ArticleContent({
             url={typeof window !== "undefined" ? window.location.href : ""}
           />
         </div>
+
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -804,6 +1050,7 @@ export function ArticleContent({
             </div>
           </div>
         </motion.section>
+
         <div className="mt-12 flex items-center justify-between gap-4">
           {prevArticle && (
             <Link
