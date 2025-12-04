@@ -754,7 +754,7 @@ export default function ArticlesClient() {
             )}
 
             {/* ===== ANALYTICS DASHBOARD SECTION ===== */}
-            <div className="-mt-10 mb-17">
+            <div className="mb-20">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
                   <TrendingUpIcon className="w-6 h-6 text-white" />
