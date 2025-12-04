@@ -180,7 +180,7 @@ const CopyButton = ({ code }: { code: string }) => {
       onClick={handleCopy}
       variant="ghost"
       size="sm"
-      className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-sky-300 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-white dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-sky-500 px-3 py-2 text-xs transition-all duration-200 shadow-sm hover:shadow-md"
+      className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-sky-300 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-white dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-sky-500 px-3 py-2 text-xs transition-all duration-200 shadow-sm hover:shadow-md"
     >
       {copied ? (
         <Check className="w-3 h-3 mr-1" />
@@ -265,7 +265,7 @@ const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-gray-900 dark:text-white text-lg mb-2 line-clamp-2">
+            <h4 className="font-semibold text-gray-900 dark:text-white test-sm md:text-sm mb-2 line-clamp-2">
               {title || "YouTube Video"}
             </h4>
 
@@ -306,6 +306,12 @@ export function ArticleContent({
   const articleUrl = typeof window !== "undefined" ? window.location.href : "";
   const [topReadArticles, setTopReadArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Add fullscreen image state
+  const [fullscreenImage, setFullscreenImage] = useState<{
+    src: string;
+    alt: string;
+  } | null>(null);
 
   // Add loading state at the component level
   useEffect(() => {
@@ -413,45 +419,72 @@ export function ArticleContent({
   };
 
   return (
-    <main className="px-6 md:px-11 py-20 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <main className="px-6 md:px-11 py-15 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
       <article className="lg:col-span-3">
         {/* REMOVED: bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl p-6 md:p-8 lg:p-10 */}
         <div className="mb-10 md:mb-12">
-          {/* Breadcrumb Navigation - Larger font, black color */}
-          <div className="flex items-center gap-2 text-base font-semibold text-black dark:text-white mb-6">
+          {/* Breadcrumb Navigation - Mobile responsive - SIMPLE FIX */}
+          <div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base font-medium text-black dark:text-white mb-4 sm:mb-6">
             <Link
               href="/"
-              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
             >
               Home
             </Link>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 text-black dark:text-white mx-0.5" />
             <Link
               href="/articles"
-              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
             >
               Articles
             </Link>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 text-black dark:text-white mx-0.5" />
             <Link
               href={`/categories/${slugify(categoryName)}`}
-              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200"
+              className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
             >
-              {categoryName}
+              <span className="hidden sm:inline">{categoryName}</span>
+              <span className="sm:hidden truncate max-w-[80px]">
+                {categoryName.length > 10
+                  ? `${categoryName.substring(0, 10)}...`
+                  : categoryName}
+              </span>
             </Link>
           </div>
 
-          {/* Main Title - Using Geist with larger font and black color */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl text-black dark:text-white mb-6 leading-[1.15] tracking-tight">
+          {/* Main Title - Mobile responsive */}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl text-black dark:text-white mb-4 sm:mb-6 leading-[1.2] sm:leading-[1.15] tracking-tight">
             {article.title}
           </h1>
 
-          {/* Author Info and Date - Single line layout */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          {article.cover_image && (
+            <div className="mb-6 sm:mb-8 md:mb-10 overflow-hidden">
+              <div
+                className="relative group cursor-pointer"
+                onClick={() =>
+                  setFullscreenImage({
+                    src: article.cover_image || "",
+                    alt: article.title,
+                  })
+                }
+              >
+                <img
+                  src={article.cover_image || "/placeholder.svg"}
+                  alt={article.title}
+                  className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Author Info and Date - Mobile responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div className="flex items-center gap-3">
               {/* Author Avatar */}
               <Link href={`/authors/${authorSlug}`} className="group">
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-white dark:border-gray-800 shadow-md group-hover:scale-105 transition-transform duration-300">
                   <img
                     src={effectiveAuthor?.avatar || "/placeholder.svg"}
                     alt={effectiveAuthor?.name || "Author"}
@@ -462,16 +495,18 @@ export function ArticleContent({
 
               {/* Author Name and Date */}
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <Link
                     href={`/authors/${authorSlug}`}
-                    className="text-black dark:text-white text-lg hover:text-sky-600 dark:hover:text-sky-400 transition-colors tracking-tight"
+                    className="text-black dark:text-white text-base sm:text-lg hover:text-sky-600 dark:hover:text-sky-400 transition-colors tracking-tight truncate"
                   >
                     {effectiveAuthor?.name || "Unknown Author"}
                   </Link>
-                  <span className="text-gray-500 dark:text-gray-400">|</span>
-                  <div className="flex items-center gap-1.5 text-black dark:text-gray-300 font-base">
-                    <span className="text-lg">
+                  <div className="hidden sm:block text-gray-500 dark:text-gray-400">
+                    |
+                  </div>
+                  <div className="flex items-center gap-1 text-black dark:text-gray-400 text-sm sm:text-base">
+                    <span>
                       {new Date(article.published_at).toLocaleDateString(
                         "en-US",
                         {
@@ -486,8 +521,8 @@ export function ArticleContent({
 
                 {/* Views count with BarChart icon */}
                 <div className="flex items-center gap-1.5 mt-1">
-                  <BarChart3 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  <span className="text-black dark:text-gray-400 font-base">
+                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 text-black dark:text-gray-400" />
+                  <span className="text-black dark:text-gray-400 text-sm sm:text-base">
                     <CountUp
                       end={article.read_count || 0}
                       duration={2}
@@ -500,36 +535,26 @@ export function ArticleContent({
             </div>
           </div>
 
-          {/* Tags with # format - MOVED TO TOP AS REQUESTED */}
+          {/* Tags with reduced gap for mobile */}
           {tagNames.length > 0 && (
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <div className="flex flex-wrap gap-2">
-                {tagNames.map((tag, index) => (
-                  <Link
-                    href={`/articles?tag=${slugify(tag)}`}
-                    key={index}
-                    className="inline-flex items-center px-4 py-2 text-black dark:text-white transition-all duration-200 text-base font-medium group"
-                  >
-                    <span className="text-orange-600 dark:text-sky-400 mr-1">
-                      #
-                    </span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
+              {tagNames.map((tag, index) => (
+                <Link
+                  href={`/articles?tag=${slugify(tag)}`}
+                  key={index}
+                  className="inline-flex items-center px-2.5 sm:px-3 py-1 sm:py-1.5 text-black dark:text-white transition-all duration-200 text-sm sm:text-base font-medium group hover:text-sky-600 dark:hover:text-sky-400"
+                >
+                  <span className="text-orange-600 dark:text-sky-400 mr-0.5 sm:mr-1">
+                    #
+                  </span>
+                  <span className="truncate max-w-[120px] sm:max-w-none">
                     {tag}
-                  </Link>
-                ))}
-              </div>
+                  </span>
+                </Link>
+              ))}
             </div>
           )}
         </div>
-
-        {article.cover_image && (
-          <div className="mb-8 md:mb-10 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-all duration-500">
-            <img
-              src={article.cover_image || "/placeholder.svg"}
-              alt={article.title}
-              className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700"
-            />
-          </div>
-        )}
 
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <ReactMarkdown
@@ -628,7 +653,7 @@ export function ArticleContent({
                 };
 
                 return (
-                  <div className="relative mb-8 bg-gradient-to-br from-sky-50 dark:from-gray-800 to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <div className="relative mb-8 bg-gradient-to-br from-sky-50 dark:from-gray-800 rounded-xl to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
                     {language && (
                       <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white px-4 py-2 text-xs font-semibold flex justify-between items-center">
                         <span>{getLanguageName(language)}</span>
@@ -942,7 +967,7 @@ export function ArticleContent({
         </div>
       </article>
 
-      <aside className="lg:col-span-1 space-y-6 hidden md:block">
+      <aside className="lg:col-span-1 space-y-6">
         {/* Table of Contents - KEPT YOUR ORIGINAL STYLING */}
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl bg-white dark:bg-gray-900">
           <CardContent className="">
