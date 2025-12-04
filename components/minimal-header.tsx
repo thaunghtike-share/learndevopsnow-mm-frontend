@@ -599,7 +599,7 @@ export function MinimalHeader() {
           </div>
         </div>
 
-        {/* DESKTOP HEADER - No changes */}
+        {/* DESKTOP HEADER - Only removed the border/frame around navigation */}
         <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-11">
           {/* Logo Section */}
           <Link href="/" className="flex items-center space-x-3 group">
@@ -614,14 +614,14 @@ export function MinimalHeader() {
             <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
           </Link>
 
-          {/* Navigation - Centered */}
-          <nav className="flex items-center space-x-1 bg-white/80 dark:bg-[#000000]/80 backdrop-blur-md rounded-2xl border border-gray-400/50 dark:border-gray-700/50 px-2 py-1 shadow-sm">
+          {/* Navigation - Removed border/frame (the bg-white/80 dark:bg-[#000000]/80 backdrop-blur-md rounded-2xl border border-gray-400/50 dark:border-gray-700/50 px-2 py-1 shadow-sm) */}
+          <nav className="flex items-center space-x-1 -ml-12">
             <Link
               href="/"
               className={`px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
                 pathname === "/"
-                  ? "text-black dark:text-gray-100 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 shadow-md"
-                  : "text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-blue-600 dark:bg-blue-700 text-white"
+                  : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
               }`}
             >
               <span className="relative z-10">Home</span>
@@ -641,8 +641,8 @@ export function MinimalHeader() {
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
                   pathname.includes("/articles") ||
                   pathname.includes("/100-days-cloud-challenge")
-                    ? "text-black dark:text-gray-100 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 shadow-md"
-                    : "text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-blue-600 dark:bg-blue-700 text-white"
+                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">Articles</span>
@@ -695,8 +695,8 @@ export function MinimalHeader() {
                   pathname.includes("/learn-devops-on-youtube") ||
                   pathname.includes("/free-courses") ||
                   pathname.includes("/devops-playgrounds")
-                    ? "text-black dark:text-gray-100 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 shadow-md"
-                    : "text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-blue-600 dark:bg-blue-700 text-white"
+                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">Resources</span>
@@ -747,8 +747,8 @@ export function MinimalHeader() {
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
                   pathname.includes("/services")
-                    ? "text-black dark:text-gray-100 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 shadow-md"
-                    : "text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-blue-600 dark:bg-blue-700 text-white"
+                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">Services</span>
@@ -801,8 +801,8 @@ export function MinimalHeader() {
                   pathname.includes("/about") ||
                   pathname.includes("/faqs") ||
                   pathname.includes("/user-guide")
-                    ? "text-black dark:text-gray-100 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 shadow-md"
-                    : "text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-blue-600 dark:bg-blue-700 text-white"
+                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">Others</span>
@@ -920,7 +920,7 @@ export function MinimalHeader() {
                 ) : (
                   <button
                     onClick={handleSignInClick}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-700 text-white rounded-full hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
                   >
                     Write Article
                   </button>
