@@ -350,19 +350,15 @@ export default function ProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="max-w-2xl mx-auto px-6 md:px-11 py-4 md:py-16">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 md:p-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Zap className="w-4 h-4 md:w-5 md:h-5" />
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             Loading Your Profile
-          </div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-            Preparing Your Profile
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm md:text-base">
-            Loading your profile data, please wait...
+          <p className="text-gray-600 dark:text-gray-300">
+            Please wait while we load your profile data...
           </p>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600 mx-auto"></div>
         </div>
       </div>
     );
@@ -370,30 +366,26 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto px-6 md:px-11 py-4 md:py-16">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-6 md:p-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Crown className="w-4 h-4 md:w-5 md:h-5" />
-            Thank You!
-          </div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             {success === "stay"
               ? "Happy Reading! 🎉"
               : "Welcome to the Community!"}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm md:text-base">
+          <p className="text-gray-600 dark:text-gray-300">
             {success === "stay"
               ? "Your profile is saved. Taking you back to continue reading..."
               : "Your profile has been saved successfully. Redirecting to your dashboard..."}
           </p>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-600 mx-auto"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 md:px-11 md:py-10 mx-auto">
+    <div className="px-4 md:px-11 md:py-7 mx-auto">
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
         {/* Mobile Header */}
         <div className="mb-6 md:mb-8">
@@ -426,7 +418,7 @@ export default function ProfileForm() {
             />
           </div>
 
-          {/* Professional Information - Stack on mobile */}
+          {/* Professional Information */}
           <div>
             <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
               Professional Information <span className="text-red-500">*</span>
@@ -491,7 +483,7 @@ export default function ProfileForm() {
             />
           </div>
 
-          {/* Avatar Section - Mobile optimized */}
+          {/* Avatar Section */}
           <div>
             <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
               Profile Photo <span className="text-red-500">*</span>
@@ -604,9 +596,8 @@ export default function ProfileForm() {
             </div>
           )}
 
-          {/* Action Buttons - Mobile optimized */}
+          {/* Action Buttons */}
           <div className="space-y-3 pt-4">
-            {/* Button 1: Complete Profile & Go to Dashboard */}
             <button
               type="submit"
               disabled={loading || isUploading}
@@ -617,7 +608,6 @@ export default function ProfileForm() {
                 : "Save Profile & Go to Admin Dashboard"}
             </button>
 
-            {/* Button 2: Save Profile & Continue Reading */}
             <button
               type="button"
               onClick={handleSaveAndStay}
@@ -629,7 +619,6 @@ export default function ProfileForm() {
                 : "Save Profile & Back to Previous Page"}
             </button>
 
-            {/* Skip Button */}
             {!hasCompletedProfile && (
               <button
                 type="button"
