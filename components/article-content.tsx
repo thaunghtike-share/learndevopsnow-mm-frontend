@@ -20,6 +20,7 @@ import {
   Container,
   GitBranch,
   PlusCircle,
+  User,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { visit } from "unist-util-visit";
@@ -375,13 +376,16 @@ export function ArticleContent({
   const validHeadings = headings.filter(({ text, level }) => {
     const cleanText = text.trim();
 
-    // Instead of blacklisting, look for legitimate heading patterns
+    // Only include H1, H2, H3
+    const isLevelValid = level <= 3; // <-- Add this line
+
     const isValidHeading =
       cleanText.length > 0 &&
+      isLevelValid && // <-- Add this condition
       level >= 1 &&
       level <= 6 &&
-      !cleanText.startsWith("```") && // Basic code block exclusion
-      !cleanText.match(/^[#`\s]*$/); // Only special chars
+      !cleanText.startsWith("```") &&
+      !cleanText.match(/^[#`\s]*$/);
 
     return isValidHeading;
   });
@@ -1119,27 +1123,40 @@ export function ArticleContent({
                     let mainCounter = 0;
                     let subCounter = 0;
                     let subSubCounter = 0;
+                    let subSubSubCounter = 0; // Added for H4
 
                     return validHeadings.map(({ id, text, level }) => {
                       // Update counters based on heading level
                       if (level === 1 || level === 2) {
                         subCounter = 0;
                         subSubCounter = 0;
+                        subSubSubCounter = 0; // Reset for H4
                       }
                       if (level === 3) {
                         subSubCounter = 0;
+                        subSubSubCounter = 0; // Reset for H4
+                      }
+                      if (level === 4) {
+                        subSubSubCounter = 0; // Reset for deeper levels
                       }
 
-                      // Generate numbers for H1, H2, H3
+                      // Generate numbers for H1, H2, H3, H4
                       let number = "";
                       if (level === 1 || level === 2) {
                         mainCounter++;
+                        subCounter = 0; // Reset sub-counter for H2
                         number = mainCounter.toString();
                       } else if (level === 3) {
                         subCounter++;
                         number = `${mainCounter}.${subCounter}`;
+                      } else if (level === 4) {
+                        subSubCounter++;
+                        number = `${mainCounter}.${subCounter}.${subSubCounter}`;
+                      } else if (level === 5) {
+                        subSubSubCounter++;
+                        number = `${mainCounter}.${subCounter}.${subSubCounter}.${subSubSubCounter}`;
                       }
-                      // H4+ gets no number
+                      // H6 gets no structured number
 
                       // Indentation
                       const indent =
@@ -1148,17 +1165,21 @@ export function ArticleContent({
                           : level === 2
                           ? "pl-4"
                           : level === 3
-                          ? "pl-8"
-                          : "pl-12"; // H4+
+                          ? "pl-6" // Changed from pl-8 to pl-6
+                          : level === 4
+                          ? "pl-8" // Changed from pl-12 to pl-8
+                          : level === 5
+                          ? "pl-10" // Changed from pl-16 to pl-10
+                          : "pl-12"; // Ch
 
-                      // Show number only for H1, H2, H3
-                      const showNumber = level <= 3;
+                      // Show number for H1, H2, H3, H4, H5
+                      const showNumber = level <= 5;
 
                       return (
                         <a
                           key={id}
                           href={`#${id}`}
-                          className={`flex items-center ${indent} py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group`}
+                          className={`flex items-center ${indent} py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group`}
                           onClick={(e) => {
                             e.preventDefault();
                             const target = document.getElementById(id);
@@ -1180,18 +1201,23 @@ export function ArticleContent({
                             }
                           }}
                         >
-                          {/* Show number for H1/H2/H3 */}
                           {showNumber ? (
-                            <span className="font-mono text-xs text-sky-600 dark:text-gray-100 font-semibold w-6 mr-3">
+                            <span
+                              className={`text-xs font-medium text-gray-800 dark:text-gray-100 flex-shrink-0 ${
+                                number.length <= 3
+                                  ? "w-6"
+                                  : number.length <= 5
+                                  ? "w-8"
+                                  : "w-10"
+                              } mr-1`}
+                            >
                               {number}
                             </span>
                           ) : (
-                            // For H4+, show a small dot instead
-                            <span className="w-6 mr-3 flex justify-center">
-                              <span className="w-1.5 h-1.5 bg-sky-400 dark:bg-gray-500 rounded-full"></span>
+                            <span className="w-5 mr-1 flex justify-center flex-shrink-0">
+                              <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full"></span>
                             </span>
                           )}
-
                           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                             {text}
                           </span>
@@ -1341,7 +1367,7 @@ export function ArticleContent({
           <CardContent className="">
             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
               <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <TrendingUp className="w-4 h-4 text-white" />
+                <BarChart3 className="w-4 h-4 text-white" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Popular Reads
