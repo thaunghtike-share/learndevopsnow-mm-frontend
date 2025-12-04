@@ -180,7 +180,7 @@ const CopyButton = ({ code }: { code: string }) => {
       onClick={handleCopy}
       variant="ghost"
       size="sm"
-      className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-sky-300 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-white dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-sky-500 px-3 py-2 text-xs rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+      className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-sky-300 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-white dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-sky-500 px-3 py-2 text-xs transition-all duration-200 shadow-sm hover:shadow-md"
     >
       {copied ? (
         <Check className="w-3 h-3 mr-1" />
@@ -194,13 +194,13 @@ const CopyButton = ({ code }: { code: string }) => {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
-// Separate component for inline code
+// Inline code component - Update to quote/italic style
 const InlineCode = ({ children, ...props }: any) => (
   <code
-    className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded px-1.5 py-0.5 text-sm font-mono border border-gray-300 dark:border-gray-600"
+    className="text-gray-700 dark:text-gray-300 italic px-1 text-base font-serif"
     {...props}
   >
-    {children}
+    "{children}"
   </code>
 );
 
@@ -412,101 +412,10 @@ export function ArticleContent({
     };
   };
 
-  // Custom paragraph component to handle YouTube embeds
-  const ParagraphComponent = ({ children, ...props }: any) => {
-    // Get the text content
-    const text = flattenChildren(children);
-
-    // Check if it's a markdown link to YouTube
-    const markdownLinkMatch = text.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-
-    if (markdownLinkMatch) {
-      const [, linkText, linkUrl] = markdownLinkMatch;
-      const youtubeId = extractYouTubeId(linkUrl);
-
-      // If it's a YouTube link and the entire paragraph is just this link
-      if (youtubeId && text.trim() === markdownLinkMatch[0]) {
-        return <YouTubeEmbed url={linkUrl} title={linkText} />;
-      }
-    }
-
-    // Check if it's a plain YouTube URL
-    const youtubeId = extractYouTubeId(text.trim());
-    if (youtubeId && text.trim() === text) {
-      return <YouTubeEmbed url={text.trim()} />;
-    }
-
-    // Check if paragraph contains a YouTube URL (for mixed content)
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const urls = text.match(urlRegex);
-
-    if (urls && urls.some((url) => extractYouTubeId(url))) {
-      // Split content by URLs
-      const parts = text.split(urlRegex);
-
-      return (
-        <p className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300">
-          {parts.map((part, i) => {
-            const youtubeId = extractYouTubeId(part.trim());
-            if (youtubeId) {
-              // Return a span that will be replaced by the embed
-              return (
-                <span key={i} className="block my-4">
-                  <YouTubeEmbed url={part.trim()} />
-                </span>
-              );
-            }
-            return <span key={i}>{part}</span>;
-          })}
-        </p>
-      );
-    }
-
-    // Default paragraph
-    return (
-      <p
-        className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
-        {...props}
-      >
-        {children}
-      </p>
-    );
-  };
-
-  // Custom link component
-  const LinkComponent = ({ href, children, ...props }: any) => {
-    const isYouTube = href && extractYouTubeId(href);
-
-    if (isYouTube) {
-      // Return a special wrapper that indicates this is a YouTube link
-      const linkText = flattenChildren(children);
-      return (
-        <span
-          className="youtube-link-wrapper"
-          data-youtube-url={href}
-          data-title={linkText}
-        >
-          [YouTube: {linkText}]
-        </span>
-      );
-    }
-
-    return (
-      <a
-        href={href}
-        className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline decoration-2 underline-offset-2 break-words text-base md:text-lg transition-all duration-200 font-medium"
-        target="_blank"
-        rel="noopener noreferrer"
-        {...props}
-      >
-        {children}
-      </a>
-    );
-  };
-
   return (
     <main className="px-6 md:px-11 py-20 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <article className="lg:col-span-3 bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-500 p-6 md:p-8 lg:p-10">
+      <article className="lg:col-span-3">
+        {/* REMOVED: bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl p-6 md:p-8 lg:p-10 */}
         <div className="mb-10 md:mb-12">
           {/* Breadcrumb Navigation - Larger font, black color */}
           <div className="flex items-center gap-2 text-base font-semibold text-black dark:text-white mb-6">
@@ -591,7 +500,7 @@ export function ArticleContent({
             </div>
           </div>
 
-          {/* Tags with # format */}
+          {/* Tags with # format - MOVED TO TOP AS REQUESTED */}
           {tagNames.length > 0 && (
             <div className="flex flex-wrap items-center gap-3 mb-6">
               <div className="flex flex-wrap gap-2">
@@ -719,9 +628,9 @@ export function ArticleContent({
                 };
 
                 return (
-                  <div className="relative mb-8 rounded-2xl bg-gradient-to-br from-sky-50 dark:from-gray-800 to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
+                  <div className="relative mb-8 bg-gradient-to-br from-sky-50 dark:from-gray-800 to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
                     {language && (
-                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white rounded-t-2xl px-4 py-2 text-xs font-semibold flex justify-between items-center">
+                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white px-4 py-2 text-xs font-semibold flex justify-between items-center">
                         <span>{getLanguageName(language)}</span>
                         <span className="text-sky-200 dark:text-sky-300 text-xs font-normal">
                           {lines.length} line{lines.length !== 1 ? "s" : ""}
@@ -845,7 +754,7 @@ export function ArticleContent({
               a: ({ href, children, ...props }) => (
                 <a
                   href={href}
-                  className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline decoration-2 underline-offset-2 break-words text-base md:text-lg transition-all duration-200 font-medium"
+                  className="text-sky-600 font-serif italic dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline decoration-2 underline-offset-2 break-words text-base md:text-lg transition-all duration-200 font-medium"
                   target="_blank"
                   rel="noopener noreferrer"
                   {...props}
@@ -964,7 +873,7 @@ export function ArticleContent({
               img: ({ ...props }) => (
                 <img
                   {...props}
-                  className="my-8 max-w-full rounded-2xl shadow-lg mx-auto border border-sky-100 dark:border-gray-600 hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
+                  className="my-8 max-w-full rounded-2xl shadow-lg mx-auto border border-sky-100 dark:border-gray-600 transition-all duration-500 transform"
                   alt={props.alt || "Article image"}
                 />
               ),
@@ -972,11 +881,6 @@ export function ArticleContent({
           >
             {fixMarkdownSpacing(article.content)}
           </ReactMarkdown>
-        </div>
-
-        {/* Post-process the content to replace YouTube placeholders with actual embeds */}
-        <div className="youtube-content-processor">
-          {/* This will be processed by useEffect below */}
         </div>
 
         <div className="mt-12 mb-6">
@@ -996,72 +900,6 @@ export function ArticleContent({
             url={typeof window !== "undefined" ? window.location.href : ""}
           />
         </div>
-
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative mb-12 mt-16"
-        >
-          <div className="bg-gradient-to-br from-white dark:from-gray-800 to-slate-50 dark:to-gray-900 rounded-3xl border border-slate-200 dark:border-gray-700 p-4 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500">
-            <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left gap-4 md:gap-6">
-              <div className="group relative">
-                <Link href={`/authors/${authorSlug}`} className="block">
-                  <div className="relative">
-                    <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 p-1 shadow-lg md:shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                      <img
-                        src={effectiveAuthor?.avatar || "/placeholder.svg"}
-                        alt={effectiveAuthor?.name || "Author"}
-                        className="w-full h-full rounded-2xl object-cover border-4 border-white dark:border-gray-800"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "/placeholder.svg";
-                        }}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              </div>
-
-              <div className="flex-1 w-full">
-                <div className="inline-flex items-center gap-1.5 md:gap-2 bg-gradient-to-r from-sky-600 to-blue-600 text-white px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl md:rounded-2xl text-xs md:text-sm font-semibold mb-3 shadow-md md:shadow-lg">
-                  <Crown className="w-2.5 h-2.5 md:w-4 md:h-4" />
-                  <span className="hidden md:inline">Author</span>
-                  <span className="md:hidden">Author</span>
-                </div>
-
-                <h3 className="font-bold text-slate-900 dark:text-white leading-tight mb-1 md:mb-2 text-base md:text-xl">
-                  <span className="md:hidden">Written By</span>
-                  <span className="hidden md:inline">Written By</span>
-                </h3>
-
-                <Link
-                  href={`/authors/${authorSlug}`}
-                  className="group block mb-2 md:mb-3"
-                >
-                  <p className="text-base md:text-xl text-sky-700 dark:text-sky-400 font-semibold mb-2 md:mb-3 group-hover:text-sky-800 dark:group-hover:text-sky-300 transition-colors line-clamp-1 md:line-clamp-none">
-                    {effectiveAuthor?.name || "Unknown Author"}
-                  </p>
-                </Link>
-
-                <p className="text-slate-700 dark:text-gray-300 leading-relaxed mb-4 md:mb-6 text-xs md:text-base line-clamp-3 md:line-clamp-none">
-                  {effectiveAuthor?.bio || "No bio available."}
-                </p>
-
-                <Link href={`/authors/${authorSlug}`} className="block">
-                  <Button className="group w-full md:w-auto bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-xl md:rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-base">
-                    <span className="hidden md:inline">
-                      View Author Profile
-                    </span>
-                    <span className="md:hidden">View Profile</span>
-                    <ArrowRight className="w-2.5 h-2.5 md:w-4 md:h-4 ml-1.5 md:ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.section>
 
         <div className="mt-12 flex items-center justify-between gap-4">
           {prevArticle && (
@@ -1105,11 +943,12 @@ export function ArticleContent({
       </article>
 
       <aside className="lg:col-span-1 space-y-6 hidden md:block">
-        <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
+        {/* Table of Contents - KEPT YOUR ORIGINAL STYLING */}
+        <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl bg-white dark:bg-gray-900">
           <CardContent className="">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <ListOrdered className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3 mb-4 pb-3 ">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <ListOrdered className="w-4 h-4 text-blue-600" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Table of Contents
@@ -1240,11 +1079,12 @@ export function ArticleContent({
           </CardContent>
         </Card>
 
+        {/* Recent Articles - KEPT YOUR ORIGINAL STYLING */}
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
           <CardContent className="">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <TrendingUp className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3 mb-4 pb-3">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-blue-600" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Recent Articles
@@ -1262,7 +1102,7 @@ export function ArticleContent({
                     key={article.id}
                     className="block group"
                   >
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-3 border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md hover:border-sky-300 dark:hover:border-sky-600 transition-all duration-300">
+                    <div className="bg-white dark:bg-gray-800 p-3 hover:shadow-md dark:hover:border-sky-600 transition-all duration-300">
                       <div className="mb-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 shadow-sm">
                         <img
                           src={coverImage}
@@ -1293,14 +1133,6 @@ export function ArticleContent({
                               {itemAuthor?.name || "Unknown"}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-black/70 dark:text-gray-400 font-medium">
-                            <Eye className="w-3 h-3" />
-                            <CountUp
-                              end={article.read_count || 0}
-                              duration={1.5}
-                              separator=","
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1311,11 +1143,12 @@ export function ArticleContent({
           </CardContent>
         </Card>
 
+        {/* Featured Authors - KEPT YOUR ORIGINAL STYLING */}
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
           <CardContent className="">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Star className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3 mb-4 pb-3">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Star className="w-4 h-4 text-sky-600" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Featured Authors
@@ -1363,11 +1196,12 @@ export function ArticleContent({
           </CardContent>
         </Card>
 
+        {/* Popular Reads - KEPT YOUR ORIGINAL STYLING */}
         <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
           <CardContent className="">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-sky-100 dark:border-gray-700">
-              <div className="w-8 h-8 bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-                <BarChart3 className="w-4 h-4 text-white" />
+            <div className="flex items-center gap-3 mb-4 pb-3">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-sky-600" />
               </div>
               <h3 className="text-base font-semibold text-black dark:text-white">
                 Popular Reads

@@ -920,7 +920,7 @@ export function MinimalHeader() {
                 ) : (
                   <button
                     onClick={handleSignInClick}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-700 text-white rounded-full hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
                   >
                     Write Article
                   </button>
