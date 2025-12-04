@@ -24,6 +24,8 @@ import {
   TrendingUp as TrendingUpIcon,
   Loader2,
   BarChart,
+  BarChart4,
+  BarChart2,
 } from "lucide-react";
 import { Pie } from "react-chartjs-2";
 import {
@@ -756,8 +758,8 @@ export default function ArticlesClient() {
             {/* ===== ANALYTICS DASHBOARD SECTION ===== */}
             <div className="mb-20">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <TrendingUpIcon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 flex items-center justify-center">
+                  <BarChart2 className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">

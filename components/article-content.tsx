@@ -197,7 +197,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 // Inline code component - Update to quote/italic style
 const InlineCode = ({ children, ...props }: any) => (
   <code
-    className="text-gray-700 dark:text-gray-300 italic px-1 text-base font-serif"
+    className="text-gray-700 dark:text-gray-300 italic px-1 text-base font-sans"
     {...props}
   >
     "{children}"
