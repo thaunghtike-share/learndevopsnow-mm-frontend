@@ -1144,7 +1144,7 @@ export default function NewArticlePage() {
                           handleChange("slug", generatedSlug);
                         }
                       }}
-                      className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 px-2 py-1 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded"
+                      className="text-xs text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 px-2 py-1 rounded"
                     >
                       Regenerate
                     </button>
