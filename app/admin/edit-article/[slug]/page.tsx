@@ -846,7 +846,7 @@ export default function EditArticlePage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-medium text-black dark:text-white">
-                  {form.title ? `${form.title}` : "Edit Article"}
+                  Article Editor
                 </h1>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-2">
                   <FileText className="w-4 h-4" />
