@@ -687,6 +687,10 @@ export function ArticleContent({
                   "ruby",
                   "go",
                   "rust",
+                  "sql",
+                  "postgresql",
+                  "postgres",
+                  "mysql",
                 ].includes(language);
 
                 const getLanguageName = (lang: string): string => {
@@ -699,6 +703,10 @@ export function ArticleContent({
                     tf: "Terraform",
                     sh: "Shell",
                     zsh: "Z Shell",
+                    sql: "SQL", // ← ADD THIS
+                    postgresql: "PostgreSQL", // ← ADD THIS
+                    postgres: "PostgreSQL", // ← ADD THIS
+                    mysql: "MySQL", // ← ADD THIS
                   };
                   return (
                     langMap[lang] ||
