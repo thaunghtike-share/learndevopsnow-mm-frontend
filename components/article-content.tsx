@@ -52,7 +52,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShareButtons } from "./share-buttons";
 
 interface Article {
   id: number;
@@ -915,14 +914,6 @@ export function ArticleContent({
               isAuthenticated: true,
               authorSlug: effectiveAuthor?.slug,
             }}
-          />
-        </div>
-
-        <div className="mb-2 hidden md:block">
-          <ShareButtons
-            articleId={article.id}
-            title={article.title}
-            url={typeof window !== "undefined" ? window.location.href : ""}
           />
         </div>
 

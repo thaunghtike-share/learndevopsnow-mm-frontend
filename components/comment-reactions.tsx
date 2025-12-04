@@ -25,7 +25,6 @@ import { toast } from "sonner";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
-// Types
 interface Comment {
   id: number;
   content: string;
@@ -54,31 +53,6 @@ interface CommentsReactionsProps {
   };
 }
 
-// Modern Alert Component
-const ModernAlert = ({
-  message,
-  type = "error",
-}: {
-  message: string;
-  type?: "error" | "success";
-}) => (
-  <div
-    className={`flex items-center gap-3 p-4 rounded-2xl border-2 ${
-      type === "error"
-        ? "bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-700 dark:text-red-200"
-        : "bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-700 dark:text-green-200"
-    }`}
-  >
-    {type === "error" ? (
-      <AlertCircle className="w-5 h-5 flex-shrink-0" />
-    ) : (
-      <CheckCircle className="w-5 h-5 flex-shrink-0" />
-    )}
-    <span className="text-sm font-medium">{message}</span>
-  </div>
-);
-
-// Reaction Button Component - ALWAYS SHOW COUNT, EVEN ZERO
 const ReactionButton = ({
   type,
   count,
@@ -99,30 +73,15 @@ const ReactionButton = ({
   const getReactionColor = (type: string) => {
     switch (type) {
       case "like":
-        return "text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-600";
+        return "text-blue-600 dark:text-blue-400";
       case "love":
-        return "text-red-500 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-900/20 dark:border-red-600";
+        return "text-red-600 dark:text-red-400";
       case "celebrate":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200 dark:text-yellow-400 dark:bg-yellow-900/20 dark:border-yellow-600";
+        return "text-yellow-600 dark:text-yellow-400";
       case "insightful":
-        return "text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-900/20 dark:border-green-600";
+        return "text-green-600 dark:text-green-400";
       default:
-        return "text-gray-500 bg-gray-50 border-gray-200 dark:text-gray-400 dark:bg-gray-800 dark:border-gray-600";
-    }
-  };
-
-  const getReactionName = (type: string) => {
-    switch (type) {
-      case "like":
-        return "Like";
-      case "love":
-        return "Love";
-      case "celebrate":
-        return "Celebrate";
-      case "insightful":
-        return "Insightful";
-      default:
-        return type;
+        return "text-gray-600 dark:text-gray-400";
     }
   };
 
@@ -137,31 +96,15 @@ const ReactionButton = ({
   return (
     <button
       onClick={handleClick}
-      className={`group flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-xl transition-all duration-200 border-2 ${
+      className={`flex items-center gap-2 px-4 py-2.5 transition-all duration-200 ${
         isActive
-          ? `${getReactionColor(type)} font-semibold scale-105`
-          : "text-gray-500 bg-white border-gray-200 hover:bg-gray-50 hover:scale-105 dark:text-gray-400 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
-      } ${
-        !isAuthenticated ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+          ? `${getReactionColor(type)} font-medium`
+          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
       }`}
-      title={!isAuthenticated ? "Please sign in to react" : ""}
+      title={!isAuthenticated ? "Sign in to react" : ""}
     >
-      <Icon className="w-4 h-4 md:w-5 md:h-5" />
-      <div className="flex items-center gap-1 md:gap-2">
-        <span className="text-xs md:text-sm font-medium hidden xs:inline">
-          {getReactionName(type)}
-        </span>
-        {/* ALWAYS SHOW COUNT, EVEN IF ZERO */}
-        <span
-          className={`text-xs px-1.5 py-0.5 md:px-2 md:py-1 rounded-full font-semibold min-w-[18px] md:min-w-[20px] text-center ${
-            isActive
-              ? "bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-              : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
-          }`}
-        >
-          {count}
-        </span>
-      </div>
+      <Icon className="w-5 h-5" />
+      <span className="font-medium">{count}</span>
     </button>
   );
 };
@@ -170,7 +113,6 @@ export function CommentsReactions({
   articleSlug,
   currentUser,
 }: CommentsReactionsProps) {
-  // State
   const [comments, setComments] = useState<Comment[]>([]);
   const [reactions, setReactions] = useState<ReactionsSummary>({
     like: 0,
@@ -187,21 +129,14 @@ export function CommentsReactions({
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [alert, setAlert] = useState<{
-    message: string;
-    type: "error" | "success";
-  } | null>(null);
 
-  // Use your auth hook
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
-  // Show alert and auto-hide - FIXED
-  const showAlert = (message: string, type: "error" | "success" = "error") => {
-    setAlert({ message, type });
-    setTimeout(() => setAlert(null), 5000);
-  };
+  useEffect(() => {
+    fetchComments();
+    fetchReactions();
+  }, [articleSlug]);
 
-  // Fetch reactions for the article
   const fetchReactions = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -220,8 +155,6 @@ export function CommentsReactions({
 
       if (response.ok) {
         const data = await response.json();
-
-        // Ensure all reaction types have a count, even if zero
         setReactions({
           like: Number(data.summary?.like) || 0,
           love: Number(data.summary?.love) || 0,
@@ -238,7 +171,6 @@ export function CommentsReactions({
     }
   };
 
-  // Fetch comments
   const fetchComments = async () => {
     try {
       const response = await fetch(
@@ -253,13 +185,6 @@ export function CommentsReactions({
     }
   };
 
-  // Load data on component mount
-  useEffect(() => {
-    fetchComments();
-    fetchReactions();
-  }, [articleSlug]);
-
-  // Handle reaction - Only for authenticated users
   const handleReaction = async (reactionType: string) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
@@ -286,26 +211,7 @@ export function CommentsReactions({
 
       if (response.ok) {
         fetchReactions();
-        const reactionNames = {
-          like: "Like",
-          love: "Love",
-          celebrate: "Celebrate",
-          insightful: "Insightful",
-        };
-
-        if (userReactions.includes(reactionType)) {
-          toast.success(
-            `Removed ${
-              reactionNames[reactionType as keyof typeof reactionNames]
-            } reaction`
-          );
-        } else {
-          toast.success(
-            `Reacted with ${
-              reactionNames[reactionType as keyof typeof reactionNames]
-            }!`
-          );
-        }
+        toast.success("Reaction updated!");
       } else if (response.status === 401) {
         setShowAuthModal(true);
       }
@@ -319,7 +225,6 @@ export function CommentsReactions({
     setShowAuthModal(true);
   };
 
-  // Submit comment - Only for authenticated users
   const submitComment = async (
     content: string,
     parentId: number | null = null
@@ -380,43 +285,34 @@ export function CommentsReactions({
     }
   };
 
-  // Delete comment - SIMPLIFIED AND WORKING
   const deleteComment = async (commentId: number) => {
-    console.log("deleteComment function called for:", commentId);
-
-    // Show confirmation toast immediately
     toast.custom(
       (t) => (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-xl border border-gray-200 dark:border-gray-600 max-w-sm w-full mx-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-xl border border-gray-200 dark:border-gray-700 max-w-sm w-full">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
-              <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-red-600 dark:text-red-400" />
+            <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm md:text-base">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                 Delete Comment
               </h3>
-              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 This action cannot be undone
               </p>
             </div>
           </div>
-          <div className="flex gap-2 md:gap-3">
+          <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => {
-                console.log("Delete cancelled");
-                toast.dismiss(t);
-              }}
-              className="flex-1 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 text-xs md:text-sm"
+              onClick={() => toast.dismiss(t)}
+              className="flex-1"
             >
               Cancel
             </Button>
             <Button
               onClick={async () => {
-                console.log("Delete confirmed for:", commentId);
                 toast.dismiss(t);
-
                 try {
                   const token = localStorage.getItem("token");
                   if (!token) {
@@ -440,7 +336,6 @@ export function CommentsReactions({
                     toast.success("Comment deleted!");
                   } else if (response.status === 401) {
                     setShowAuthModal(true);
-                    toast.error("Please sign in to delete comments");
                   } else if (response.status === 403) {
                     toast.error("You can only delete your own comments");
                   } else {
@@ -451,7 +346,7 @@ export function CommentsReactions({
                   toast.error("Failed to delete comment");
                 }
               }}
-              className="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-xs md:text-sm"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
             >
               Delete
             </Button>
@@ -462,7 +357,6 @@ export function CommentsReactions({
     );
   };
 
-  // Update comment - Only for comment owner - FIXED with proper error handling
   const updateComment = async (commentId: number, content: string) => {
     if (!content.trim()) {
       toast.error("Please enter a comment");
@@ -473,7 +367,6 @@ export function CommentsReactions({
       const token = localStorage.getItem("token");
       if (!token) {
         setShowAuthModal(true);
-        toast.error("Please sign in to edit comments");
         return;
       }
 
@@ -495,53 +388,88 @@ export function CommentsReactions({
         toast.success("Comment updated!");
       } else if (response.status === 401) {
         setShowAuthModal(true);
-        toast.error("Please sign in to edit comments");
       } else if (response.status === 403) {
         toast.error("You can only edit your own comments");
-      } else if (response.status === 404) {
-        toast.error("Comment not found");
       } else {
         toast.error("Failed to update comment");
       }
     } catch (error) {
       console.error("Failed to update comment:", error);
-      toast.error("Failed to update comment - Network error");
+      toast.error("Failed to update comment");
     }
   };
 
-  // PROPER OWNERSHIP CHECK - FIXED
   const isCommentOwner = (comment: Comment) => {
     return isAuthenticated && comment.author_id === user?.id;
   };
 
-  // Comment component - UPDATED with author profile links
-  const CommentItem = ({
-    comment,
-    depth = 0,
-  }: {
+  interface CommentItemProps {
     comment: Comment;
     depth?: number;
-  }) => {
+  }
+
+  const CommentItem: React.FC<CommentItemProps> = ({ comment, depth = 0 }) => {
     const [showReplies, setShowReplies] = useState(true);
     const [localEditContent, setLocalEditContent] = useState(comment.content);
-
+    const [localReplyContent, setLocalReplyContent] = useState("");
+    const [isReplying, setIsReplying] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const userOwnsComment = isCommentOwner(comment);
+    const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Reset edit content when editing starts
-    useEffect(() => {
-      if (editingComment === comment.id) {
-        setLocalEditContent(comment.content);
+    // Use local state for reply content instead of global state
+    const handleStartReply = () => {
+      setIsReplying(true);
+      setIsEditing(false);
+      setTimeout(() => {
+        replyTextareaRef.current?.focus();
+      }, 10);
+    };
+
+    const handleCancelReply = () => {
+      setIsReplying(false);
+      setLocalReplyContent("");
+    };
+
+    const handleSubmitReply = async () => {
+      if (!localReplyContent.trim()) {
+        toast.error("Please enter a reply");
+        return;
       }
-    }, [editingComment, comment.id, comment.content]);
+      await submitComment(localReplyContent, comment.id);
+      setIsReplying(false);
+      setLocalReplyContent("");
+    };
 
-    // Generate avatar color based on name (fallback)
+    const handleStartEdit = () => {
+      setIsEditing(true);
+      setIsReplying(false);
+      setTimeout(() => {
+        editTextareaRef.current?.focus();
+      }, 10);
+    };
+
+    const handleCancelEdit = () => {
+      setIsEditing(false);
+      setLocalEditContent(comment.content);
+    };
+
+    const handleSubmitEdit = async () => {
+      if (!localEditContent.trim()) {
+        toast.error("Please enter a comment");
+        return;
+      }
+      await updateComment(comment.id, localEditContent);
+      setIsEditing(false);
+    };
+
     const getAvatarColor = (name: string) => {
       const colors = [
         "bg-gradient-to-br from-red-500 to-pink-500",
         "bg-gradient-to-br from-blue-500 to-cyan-500",
         "bg-gradient-to-br from-green-500 to-emerald-500",
         "bg-gradient-to-br from-purple-500 to-indigo-500",
-        "bg-gradient-to-br from-orange-500 to-amber-500",
       ];
       const index = name.charCodeAt(0) % colors.length;
       return colors[index];
@@ -549,25 +477,16 @@ export function CommentsReactions({
 
     const initial = comment.author_name?.charAt(0)?.toUpperCase() || "A";
     const avatarColor = getAvatarColor(comment.author_name || "Anonymous");
-
-    // Get author profile link - FIXED: Use author_slug if available
     const authorProfileLink = comment.author_slug
       ? `/authors/${comment.author_slug}`
       : "#";
 
     return (
-      <div
-        className={`mb-4 ${
-          depth > 0
-            ? "ml-4 md:ml-8 border-l-2 border-gray-100 dark:border-gray-600 pl-3 md:pl-4"
-            : ""
-        }`}
-      >
+      <div className={`mb-4 ${depth > 0 ? "ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-4" : ""}`}>
         <div className="flex items-start gap-3">
-          {/* AVATAR - Now clickable and links to author profile */}
           <Link
             href={authorProfileLink}
-            className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm flex-shrink-0 shadow-sm overflow-hidden ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 ${
               comment.author_avatar ? "bg-transparent" : avatarColor
             }`}
           >
@@ -575,100 +494,72 @@ export function CommentsReactions({
               <img
                 src={comment.author_avatar}
                 alt={comment.author_name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // If avatar fails to load, show colored initial
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  target.nextSibling &&
-                    ((target.nextSibling as HTMLElement).style.display =
-                      "flex");
-                }}
+                className="w-full h-full object-cover rounded-full"
               />
-            ) : null}
-            {/* Fallback initial */}
-            <div
-              className={`w-full h-full flex items-center justify-center ${
-                !comment.author_avatar ? "flex" : "hidden"
-              }`}
-            >
-              {initial}
-            </div>
+            ) : (
+              <div className={`w-full h-full flex items-center justify-center ${avatarColor} rounded-full`}>
+                {initial}
+              </div>
+            )}
           </Link>
 
-          {/* Comment Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex flex-col xs:flex-row xs:items-center gap-1 xs:gap-2 mb-1">
-              {/* Author name now clickable and links to author profile */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
               <Link
                 href={authorProfileLink}
-                className="font-semibold text-gray-900 dark:text-gray-100 text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-1"
+                className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {comment.author_name || "Anonymous"}
               </Link>
               <div className="flex items-center gap-2">
                 {comment.is_author && (
-                  <span className="px-1.5 py-0.5 md:px-2 md:py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs rounded-full font-medium">
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs rounded-full">
                     Author
                   </span>
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(comment.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {new Date(comment.created_at).toLocaleDateString()}
                 </span>
               </div>
             </div>
 
-            {/* Edit Form */}
-            {editingComment === comment.id ? (
+            {isEditing ? (
               <div className="mb-3">
                 <Textarea
+                  ref={editTextareaRef}
                   value={localEditContent}
                   onChange={(e) => setLocalEditContent(e.target.value)}
-                  className="mb-2 text-sm rounded-xl resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+                  className="mb-2 rounded-lg resize-none"
                   rows={3}
-                  placeholder="Edit your comment..."
                 />
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updateComment(comment.id, localEditContent)}
-                    className="text-xs rounded-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={handleSubmitEdit}
+                    disabled={!localEditContent.trim()}
                   >
-                    Save Changes
+                    Save
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      setEditingComment(null);
-                      setLocalEditContent(comment.content);
-                    }}
-                    className="text-xs rounded-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={handleCancelEdit}
                   >
                     Cancel
                   </Button>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-2 leading-relaxed">
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">
                 {comment.content}
               </p>
             )}
 
-            {/* Comment Actions */}
-            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
-              {/* Reply button */}
+            <div className="flex items-center gap-4 flex-wrap">
               {isAuthenticated ? (
                 <button
-                  onClick={() => {
-                    setReplyTo(replyTo === comment.id ? null : comment.id);
-                    setReplyContent("");
-                  }}
+                  onClick={handleStartReply}
                   className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center gap-1"
                 >
                   <Reply className="w-3 h-3" />
@@ -684,10 +575,9 @@ export function CommentsReactions({
                 </button>
               )}
 
-              {/* Edit Button - CLEAN VISIBLE BUTTON */}
-              {userOwnsComment && editingComment !== comment.id && (
+              {userOwnsComment && !isEditing && (
                 <button
-                  onClick={() => setEditingComment(comment.id)}
+                  onClick={handleStartEdit}
                   className="text-xs text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors flex items-center gap-1"
                 >
                   <Edit className="w-3 h-3" />
@@ -705,19 +595,18 @@ export function CommentsReactions({
                   ) : (
                     <ChevronDown className="w-3 h-3" />
                   )}
-                  {comment.replies.length}{" "}
-                  {comment.replies.length === 1 ? "reply" : "replies"}
+                  {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
                 </button>
               )}
             </div>
 
-            {/* Reply Form */}
-            {replyTo === comment.id && isAuthenticated && (
-              <div className="mt-3 p-3 md:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
+            {isReplying && (
+              <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <Textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  className="mb-2 md:mb-3 text-sm rounded-xl resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                  ref={replyTextareaRef}
+                  value={localReplyContent}
+                  onChange={(e) => setLocalReplyContent(e.target.value)}
+                  className="mb-2 rounded-lg"
                   rows={2}
                   placeholder="Write your reply..."
                 />
@@ -725,36 +614,26 @@ export function CommentsReactions({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      setReplyTo(null);
-                      setReplyContent("");
-                    }}
-                    className="text-xs rounded-lg dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={handleCancelReply}
                   >
                     Cancel
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() => submitComment(replyContent, comment.id)}
-                    disabled={!replyContent.trim() || loading}
-                    className="text-xs rounded-lg"
+                    onClick={handleSubmitReply}
+                    disabled={!localReplyContent.trim() || loading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    <Send className="w-3 h-3 mr-1" />
                     {loading ? "Posting..." : "Post Reply"}
                   </Button>
                 </div>
               </div>
             )}
 
-            {/* Nested Replies */}
             {showReplies && comment.replies && comment.replies.length > 0 && (
               <div className="mt-3">
                 {comment.replies.map((reply) => (
-                  <CommentItem
-                    key={reply.id}
-                    comment={reply}
-                    depth={depth + 1}
-                  />
+                  <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
                 ))}
               </div>
             )}
@@ -764,205 +643,175 @@ export function CommentsReactions({
     );
   };
 
-  // Show maximum 5 comments initially, then all when expanded
   const displayedComments = showAllComments ? comments : comments.slice(0, 5);
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-6">
       {/* Reactions Section */}
-      <Card className="border border-gray-200 dark:border-gray-600 shadow-sm rounded-2xl dark:bg-gray-800">
-        <CardContent className="p-4 md:p-6">
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-            <ReactionButton
-              type="like"
-              count={reactions.like}
-              icon={ThumbsUp}
-              isActive={userReactions.includes("like")}
-              onClick={() => handleReaction("like")}
-              isAuthenticated={isAuthenticated}
-              onAuthRequired={handleAuthRequired}
-            />
-            <ReactionButton
-              type="love"
-              count={reactions.love}
-              icon={Heart}
-              isActive={userReactions.includes("love")}
-              onClick={() => handleReaction("love")}
-              isAuthenticated={isAuthenticated}
-              onAuthRequired={handleAuthRequired}
-            />
-            <ReactionButton
-              type="celebrate"
-              count={reactions.celebrate}
-              icon={Sparkles}
-              isActive={userReactions.includes("celebrate")}
-              onClick={() => handleReaction("celebrate")}
-              isAuthenticated={isAuthenticated}
-              onAuthRequired={handleAuthRequired}
-            />
-            <ReactionButton
-              type="insightful"
-              count={reactions.insightful}
-              icon={Lightbulb}
-              isActive={userReactions.includes("insightful")}
-              onClick={() => handleReaction("insightful")}
-              isAuthenticated={isAuthenticated}
-              onAuthRequired={handleAuthRequired}
-            />
-          </div>
-
-          {/* Current Reaction Status */}
-          {isAuthenticated && userReactions.length > 0 && (
-            <div className="text-center mt-3 md:mt-4 p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200 dark:bg-blue-900/20 dark:border-blue-700">
-              <p className="text-xs md:text-sm text-blue-700 dark:text-blue-300 font-medium">
-                You reacted with{" "}
-                <span className="font-semibold capitalize">
-                  {userReactions[0]}
-                </span>
-              </p>
-            </div>
-          )}
-
-          {!isAuthenticated && (
-            <div className="text-center mt-3 md:mt-4">
-              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium underline"
-                >
-                  Sign in
-                </button>{" "}
-                to react to this article
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div className="text-center p-4 md:p-6">
+        <div className="flex justify-center flex-wrap gap-2">
+          <ReactionButton
+            type="like"
+            count={reactions.like}
+            icon={ThumbsUp}
+            isActive={userReactions.includes("like")}
+            onClick={() => handleReaction("like")}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={handleAuthRequired}
+          />
+          <ReactionButton
+            type="love"
+            count={reactions.love}
+            icon={Heart}
+            isActive={userReactions.includes("love")}
+            onClick={() => handleReaction("love")}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={handleAuthRequired}
+          />
+          <ReactionButton
+            type="celebrate"
+            count={reactions.celebrate}
+            icon={Sparkles}
+            isActive={userReactions.includes("celebrate")}
+            onClick={() => handleReaction("celebrate")}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={handleAuthRequired}
+          />
+          <ReactionButton
+            type="insightful"
+            count={reactions.insightful}
+            icon={Lightbulb}
+            isActive={userReactions.includes("insightful")}
+            onClick={() => handleReaction("insightful")}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={handleAuthRequired}
+          />
+        </div>
+      </div>
 
       {/* Comments Section */}
-      <Card className="border border-gray-200 dark:border-gray-600 shadow-sm rounded-2xl dark:bg-gray-800">
-        <CardContent className="p-4 md:p-6">
-          <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 dark:text-gray-100">
-            Comments ({comments.length})
-          </h3>
+      <div className="bg-white dark:bg-transparent p-4 md:p-6">
+        <h3 className="text-lg font-bold mb-4 dark:text-gray-100">
+          Comments ({comments.length})
+        </h3>
 
-          {/* Comment Form */}
-          {isAuthenticated ? (
-            <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-              <Textarea
-                placeholder="Share your thoughts..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="mb-2 md:mb-3 text-sm rounded-xl resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
-                rows={3}
-              />
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Commenting as{" "}
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {user?.username || "User"}
-                  </span>
-                </div>
-                <Button
-                  onClick={() => submitComment(newComment)}
-                  disabled={!newComment.trim() || loading}
-                  size="sm"
-                  className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
-                >
-                  <Send className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                  {loading ? "Posting..." : "Post Comment"}
-                </Button>
+        {isAuthenticated ? (
+          <div className="mb-6">
+            <Textarea
+              placeholder="Share your thoughts..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="mb-3 rounded-lg"
+              rows={3}
+            />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Commenting as {user?.username || "User"}
               </div>
-            </div>
-          ) : (
-            <div className="mb-4 md:mb-6 p-4 md:p-6 text-center bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Please sign in to leave a comment
-              </p>
               <Button
-                onClick={() => setShowAuthModal(true)}
-                size="sm"
-                className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
+                onClick={() => submitComment(newComment)}
+                disabled={!newComment.trim() || loading}
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
               >
-                Sign In to Comment
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Posting...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Send className="w-4 h-4" />
+                    Post Comment
+                  </span>
+                )}
               </Button>
             </div>
-          )}
-
-          {/* Comments List */}
-          <div className="space-y-4">
-            {displayedComments.length === 0 ? (
-              <div className="text-center py-6 md:py-8">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-                  <Edit className="w-5 h-5 md:w-6 md:h-6 text-gray-400 dark:text-gray-500" />
-                </div>
-                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                  {isAuthenticated
-                    ? "Be the first to share your thoughts!"
-                    : "Sign in to be the first to comment!"}
-                </p>
-              </div>
-            ) : (
-              <>
-                {displayedComments.map((comment) => (
-                  <CommentItem key={comment.id} comment={comment} />
-                ))}
-
-                {/* Show More/Less Button - Only show if there are more than 5 comments */}
-                {comments.length > 5 && (
-                  <div className="flex justify-center pt-3 md:pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAllComments(!showAllComments)}
-                      className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs md:text-sm"
-                    >
-                      {showAllComments ? (
-                        <>
-                          <ChevronUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          Show Less Comments
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          Show All {comments.length} Comments
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
           </div>
-        </CardContent>
-      </Card>
+        ) : (
+          <div className="mb-6 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Please sign in to leave a comment
+            </p>
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              Sign In to Comment
+            </Button>
+          </div>
+        )}
 
-      {/* Modern Auth Modal */}
+        <div className="space-y-4">
+          {displayedComments.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <Edit className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {isAuthenticated
+                  ? "Be the first to share your thoughts!"
+                  : "Sign in to be the first to comment!"}
+              </p>
+            </div>
+          ) : (
+            <>
+              {displayedComments.map((comment) => (
+                <CommentItem key={comment.id} comment={comment} />
+              ))}
+
+              {comments.length > 5 && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAllComments(!showAllComments)}
+                    className="rounded-lg border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    {showAllComments ? (
+                      <span className="flex items-center">
+                        <ChevronUp className="w-4 h-4 mr-2" />
+                        Show Less Comments
+                      </span>
+                    ) : (
+                      <span className="flex items-center">
+                        <ChevronDown className="w-4 h-4 mr-2" />
+                        Show All {comments.length} Comments
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Auth Modal */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 max-w-md w-full shadow-xl border border-gray-200 dark:border-gray-600 mx-4">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 Sign In Required
               </h3>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
               >
-                <X className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4 md:mb-6">
-              Please sign in via write article button in header to react to articles and leave comments.
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              Please sign in to react to articles and leave comments.
             </p>
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-              <Button
-                onClick={() => setShowAuthModal(false)}
-                variant="outline"
-                className="flex-1 rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base"
-              >
-                Close
-              </Button>
-            </div>
+            <Button
+              onClick={() => setShowAuthModal(false)}
+              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white"
+            >
+              Close
+            </Button>
           </div>
         </div>
       )}
