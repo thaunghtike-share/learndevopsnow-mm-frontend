@@ -245,6 +245,17 @@ export default function EditArticlePage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
+  // Auto-dismiss message timeout
+  useEffect(() => {
+    if (message) {
+      const timeout = message.type === "success" ? 3000 : 5000;
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, timeout);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   // Check for dark mode on initial load
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -826,7 +837,7 @@ export default function EditArticlePage() {
           className={`${
             fullscreen
               ? "h-full"
-              : "px-6 md:px-11 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8"
+              : "px-6 md:px-11 md:py-5 grid grid-cols-1 lg:grid-cols-4 gap-8"
           }`}
         >
           {/* Main Content Area - 3 columns on desktop */}
@@ -834,10 +845,10 @@ export default function EditArticlePage() {
             {/* Page Title and Auto-save Status */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white">
-                  {form.title ? `Edit: ${form.title}` : "Edit Article"}
+                <h1 className="text-3xl md:text-4xl font-medium text-black dark:text-white">
+                  {form.title ? `${form.title}` : "Edit Article"}
                 </h1>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mt-2">
                   <FileText className="w-4 h-4" />
                   {lastSaved ? (
                     <span>Draft auto-saved at {lastSaved}</span>
@@ -874,7 +885,7 @@ export default function EditArticlePage() {
                 onChange={(e) => handleChange("title", e.target.value)}
                 required
                 placeholder="Enter your article title here..."
-                className="w-full text-2xl md:text-3xl font-bold bg-transparent border-none focus:outline-none focus:ring-0 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full text-3xl md:text-4xl font-medium bg-transparent border-none focus:outline-none focus:ring-0 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
               />
               <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
             </div>
@@ -923,19 +934,6 @@ export default function EditArticlePage() {
               </div>
             )}
 
-            {/* Message Display */}
-            {message && (
-              <div
-                className={`p-4 rounded-lg ${
-                  message.type === "success"
-                    ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
-                    : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300"
-                }`}
-              >
-                {message.text}
-              </div>
-            )}
-
             {articleLoading ? (
               <div className="p-8 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -955,18 +953,14 @@ export default function EditArticlePage() {
                   Article Not Found
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {message?.type === "error"
-                    ? message.text
-                    : "The article you're looking for doesn't exist."}
+                  The article you're looking for doesn't exist.
                 </p>
-                {message?.type === "error" && (
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Try Again
-                  </button>
-                )}
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Try Again
+                </button>
               </div>
             ) : (
               <div className={`${fullscreen ? "h-full flex flex-col" : ""}`}>
@@ -1011,7 +1005,7 @@ export default function EditArticlePage() {
                       <button
                         type="button"
                         onClick={handleEditorFullscreen}
-                        className="px-4 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
+                        className="px-4 py-2 border border-sky-500 text-white dark:text-sky-400 bg-sky-600 dark:bg-gray-800 rounded-lg hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300 text-sm font-medium flex items-center gap-2"
                       >
                         {fullscreen ? (
                           <>
@@ -1137,23 +1131,24 @@ export default function EditArticlePage() {
           <aside className="lg:col-span-1 space-y-8">
             {/* Article Settings Card */}
             <div className="space-y-6">
-              <div>                
-                {/* Slug Field */}
+              <div>
+                {/* Slug Input - Editable */}
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                    <LinkIcon className="w-4 h-4" />
-                    <span>URL Slug</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <LinkIcon className="w-4 h-4" />
+                      <span>URL Slug</span>
+                    </div>
                   </div>
                   <input
                     type="text"
-                    value={form.slug || ""}
+                    value={form.slug}
                     onChange={(e) => handleChange("slug", e.target.value)}
-                    required
-                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm"
-                    placeholder="Enter URL slug"
+                    placeholder="article-slug"
+                    className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
                   />
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                    Final URL: /articles/{form.slug}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    /articles/{form.slug || "article-slug"}
                   </p>
                 </div>
 
@@ -1183,9 +1178,7 @@ export default function EditArticlePage() {
                   <div className="space-y-2">
                     <select
                       value={form.category}
-                      onChange={(e) =>
-                        handleChange("category", e.target.value)
-                      }
+                      onChange={(e) => handleChange("category", e.target.value)}
                       required
                       className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
                     >
@@ -1362,7 +1355,7 @@ export default function EditArticlePage() {
                 </div>
 
                 {/* Cover Image Upload */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                     <ImageIcon className="w-4 h-4" />
                     <span>Cover Image</span>
@@ -1449,6 +1442,28 @@ export default function EditArticlePage() {
       </main>
 
       {!fullscreen && <MinimalFooter />}
+
+      {/* Toast Notification */}
+      {message && (
+        <div className="fixed bottom-4 right-4 z-50 animate-fade-in">
+          <div
+            className={`px-6 py-4 rounded-lg shadow-xl max-w-sm border ${
+              message.type === "success"
+                ? "bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200"
+                : "bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              {message.type === "success" ? (
+                <Check className="w-5 h-5 flex-shrink-0" />
+              ) : (
+                <X className="w-5 h-5 flex-shrink-0" />
+              )}
+              <p className="text-sm font-medium">{message.text}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Alert and Confirm Dialogs */}
       <AlertDialog
