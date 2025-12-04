@@ -36,6 +36,7 @@ import {
   Heart,
   ThumbsUp,
   Lightbulb,
+  BarChart2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -1297,7 +1298,7 @@ export default function AuthorAdminDashboard() {
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                    <BarChart2 className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
                     <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white">
@@ -1499,17 +1500,10 @@ export default function AuthorAdminDashboard() {
 
                             {/* MOBILE OPTIMIZED ACTION BUTTONS */}
                             <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
-                              <Link
-                                href={`/articles/${article.slug}`}
-                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                              >
-                                <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                                View
-                              </Link>
                               <ProtectedAction action="edit articles">
                                 <Link
                                   href={`/admin/edit-article/${article.slug}`}
-                                  className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                  className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
                                 >
                                   <Edit className="w-3 h-3 md:w-4 md:h-4" />
                                   Edit
