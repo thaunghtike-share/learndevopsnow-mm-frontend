@@ -1111,23 +1111,106 @@ export function ArticleContent({
                 Table of Contents
               </h3>
             </div>
-            <nav className="space-y-1">
-              {validHeadings.map(({ id, text, level }) => (
-                <a
-                  key={id}
-                  href={`#${id}`}
-                  className={`block py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-l-2 ${
-                    level === 1
-                      ? "border-blue-500 font-semibold text-black dark:text-white"
-                      : level === 2
-                      ? "border-black-100 dark:border-gray-600 text-black dark:text-gray-300 ml-4"
-                      : "border-black-100 dark:border-gray-700 text-black dark:text-gray-400 ml-8 text-sm"
-                  }`}
-                >
-                  {text}
-                </a>
-              ))}
-            </nav>
+
+            {validHeadings.length > 0 ? (
+              <div className="max-h-[350px] overflow-y-auto pr-2">
+                <nav className="space-y-1">
+                  {(() => {
+                    let mainCounter = 0;
+                    let subCounter = 0;
+                    let subSubCounter = 0;
+
+                    return validHeadings.map(({ id, text, level }) => {
+                      // Update counters based on heading level
+                      if (level === 1 || level === 2) {
+                        subCounter = 0;
+                        subSubCounter = 0;
+                      }
+                      if (level === 3) {
+                        subSubCounter = 0;
+                      }
+
+                      // Generate numbers for H1, H2, H3
+                      let number = "";
+                      if (level === 1 || level === 2) {
+                        mainCounter++;
+                        number = mainCounter.toString();
+                      } else if (level === 3) {
+                        subCounter++;
+                        number = `${mainCounter}.${subCounter}`;
+                      }
+                      // H4+ gets no number
+
+                      // Indentation
+                      const indent =
+                        level === 1
+                          ? "pl-0"
+                          : level === 2
+                          ? "pl-4"
+                          : level === 3
+                          ? "pl-8"
+                          : "pl-12"; // H4+
+
+                      // Show number only for H1, H2, H3
+                      const showNumber = level <= 3;
+
+                      return (
+                        <a
+                          key={id}
+                          href={`#${id}`}
+                          className={`flex items-center ${indent} py-2 px-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const target = document.getElementById(id);
+                            if (target) {
+                              const headerOffset = 80;
+                              const elementPosition =
+                                target.getBoundingClientRect().top;
+                              const offsetPosition =
+                                elementPosition +
+                                window.pageYOffset -
+                                headerOffset;
+
+                              window.scrollTo({
+                                top: offsetPosition,
+                                behavior: "smooth",
+                              });
+
+                              history.replaceState(null, "", `#${id}`);
+                            }
+                          }}
+                        >
+                          {/* Show number for H1/H2/H3 */}
+                          {showNumber ? (
+                            <span className="font-mono text-xs text-sky-600 dark:text-gray-100 font-semibold w-6 mr-3">
+                              {number}
+                            </span>
+                          ) : (
+                            // For H4+, show a small dot instead
+                            <span className="w-6 mr-3 flex justify-center">
+                              <span className="w-1.5 h-1.5 bg-sky-400 dark:bg-gray-500 rounded-full"></span>
+                            </span>
+                          )}
+
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                            {text}
+                          </span>
+                        </a>
+                      );
+                    });
+                  })()}
+                </nav>
+              </div>
+            ) : (
+              <div className="py-6 text-center">
+                <div className="w-10 h-10 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
+                  <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No headings found
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
