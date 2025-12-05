@@ -36,6 +36,19 @@ export default function SignUpForm({
       return false;
     }
 
+    // ✅ ADD EMAIL VALIDATION
+    if (!formData.email || !formData.email.trim()) {
+      setError("Email is required");
+      return false;
+    }
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return false;
+    }
+
     if (formData.password1 !== formData.password2) {
       setError("Passwords do not match");
       return false;
@@ -132,13 +145,19 @@ export default function SignUpForm({
         console.log("❌ Validation errors:", errorData);
 
         const errorMessage = errorData.email?.[0]?.includes("already exists")
-          ? "This email is already registered. Please use a different email or leave it blank."
-          : errorData.username?.[0] ||
-            errorData.email?.[0] ||
-            errorData.password1?.[0] ||
-            errorData.password2?.[0] ||
-            errorData.non_field_errors?.[0] ||
-            "Please check your information and try again.";
+          ? "This email is already registered. Please use a different email."
+          : errorData.email?.[0]?.includes("required") ||
+            errorData.email?.[0]?.includes("blank")
+          ? "Email is required. Please enter your email address."
+          : errorData.username?.[0]
+          ? `Username error: ${errorData.username[0]}`
+          : errorData.password1?.[0]
+          ? `Password error: ${errorData.password1[0]}`
+          : errorData.password2?.[0]
+          ? `Password confirmation error: ${errorData.password2[0]}`
+          : errorData.non_field_errors?.[0]
+          ? errorData.non_field_errors[0]
+          : "Please check your information and try again.";
 
         throw new Error(errorMessage);
       } else {
@@ -155,7 +174,7 @@ export default function SignUpForm({
       setLoading(false);
     }
   };
-  
+
   // Success message - improved mobile sizing
   if (success) {
     return (
@@ -179,7 +198,8 @@ export default function SignUpForm({
           Account Created Successfully!
         </h3>
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
-          Your account has been created. You can now sign in to start writing articles.
+          Your account has been created. You can now sign in to start writing
+          articles.
         </p>
         <div className="space-y-2 sm:space-y-3">
           <button
@@ -209,7 +229,9 @@ export default function SignUpForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4"> {/* Reduced mobile spacing */}
+    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+      {" "}
+      {/* Reduced mobile spacing */}
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Username *
@@ -226,22 +248,24 @@ export default function SignUpForm({
           disabled={loading}
         />
       </div>
-
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Email Address (Optional)
+          Email Address * {/* ADD ASTERISK */}
         </label>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleInputChange}
+          required
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-          placeholder="Enter your email (optional)"
+          placeholder="Enter your email (required)"
           disabled={loading}
         />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Required for notifications
+        </p>
       </div>
-
       {/* Password fields - stack on mobile, side-by-side on larger screens */}
       <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
         <div>
@@ -277,11 +301,11 @@ export default function SignUpForm({
           />
         </div>
       </div>
-
-      {/* Password Hint Field */}
+      {/* Password Hint Field - OPTIONAL */}
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Password Hint (Optional)
+          Password Hint{" "}
+          <span className="text-xs text-gray-500">(optional)</span>
         </label>
         <input
           type="text"
@@ -289,20 +313,18 @@ export default function SignUpForm({
           value={formData.password_hint}
           onChange={handleInputChange}
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-          placeholder="e.g., name + date of birth"
+          placeholder="e.g., name + date of birth (optional)"
           disabled={loading}
         />
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          This will help you remember your password if you forget it
+          Optional: Helps you remember your password if you forget it
         </p>
       </div>
-
       {error && (
         <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
         </div>
       )}
-
       <button
         type="submit"
         disabled={loading}
@@ -317,7 +339,6 @@ export default function SignUpForm({
           "Create Account"
         )}
       </button>
-
       {/* Sign In Link - adjusted mobile spacing */}
       <div className="text-center pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
         <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">

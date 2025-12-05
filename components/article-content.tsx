@@ -54,6 +54,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SimpleTTSPlayer } from "./tts-player";
 import { ShareButtons } from "./share-buttons";
+import { BellSubscription } from "./subscription-button";
 
 interface Article {
   id: number;
@@ -453,10 +454,20 @@ export function ArticleContent({
             </Link>
           </div>
 
-          {/* Main Title - Mobile responsive */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl text-black dark:text-white mb-4 sm:mb-6 leading-[1.2] sm:leading-[1.15] tracking-tight">
-            {article.title}
-          </h1>
+          {/* Main Title with Bell Button */}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl text-black dark:text-white leading-[1.2] sm:leading-[1.15] tracking-tight flex-1">
+              {article.title}
+            </h1>
+
+            {/* Bell button on the right */}
+            <div className="flex items-center gap-2 self-start">
+              <BellSubscription />
+              <span className="text-sm text-black dark:text-gray-400 hidden md:inline">
+                Subscribe
+              </span>
+            </div>
+          </div>
 
           {article.cover_image && (
             <div className="mb-6 sm:mb-8 md:mb-10 overflow-hidden">
