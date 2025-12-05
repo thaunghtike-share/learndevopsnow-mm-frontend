@@ -257,16 +257,27 @@ export default function AuthorDetailPage() {
       day: "numeric",
     });
 
+  // Replace the existing stripMarkdown function with this updated version:
   const stripMarkdown = (md?: string) => {
     if (!md) return "";
     let text = md;
-    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, "");
+
+    // Remove image markdown patterns: ![alt text](url) and variations
+    text = text.replace(/!\[.*?\]\(.*?\)/g, ""); // Regular images
+    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, ""); // Your specific pattern
+    text = text.replace(/!\[.*?\]\\$\$.*?\\$\$/g, ""); // Another variation
+    text = text.replace(/<img.*?>/g, ""); // HTML images
+
+    // Keep the rest of your existing markdown stripping logic
     text = text.replace(/\[(.*?)\]\\$\$.*?\\$\$/g, "$1");
     text = text.replace(/[*_~`]/g, "");
     text = text.replace(/^#+\s+/gm, "");
     text = text.replace(/^>\s+/gm, "");
     text = text.replace(/^[-+*]\s+/gm, "");
     text = text.replace(/<[^>]+>/g, "");
+
+    // Remove extra whitespace created by removing images
+    text = text.replace(/\s+/g, " ");
     return text.trim();
   };
 

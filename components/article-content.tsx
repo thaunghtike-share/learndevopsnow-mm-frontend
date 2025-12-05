@@ -52,6 +52,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { SimpleTTSPlayer } from "./tts-player";
+import { ShareButtons } from "./share-buttons";
 
 interface Article {
   id: number;
@@ -472,8 +474,7 @@ export function ArticleContent({
                   alt={article.title}
                   className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black/0 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                </div>
+                <div className="absolute inset-0 bg-black/0 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100"></div>
               </div>
             </div>
           )}
@@ -532,6 +533,11 @@ export function ArticleContent({
                 </div>
               </div>
             </div>
+
+            <SimpleTTSPlayer
+              text={article.content}
+              articleTitle={article.title}
+            />
           </div>
 
           {/* Tags with reduced gap for mobile */}
@@ -914,6 +920,14 @@ export function ArticleContent({
               isAuthenticated: true,
               authorSlug: effectiveAuthor?.slug,
             }}
+          />
+        </div>
+
+        <div className="mb-2 hidden md:block">
+          <ShareButtons
+            articleId={article.id}
+            title={article.title}
+            url={typeof window !== "undefined" ? window.location.href : ""}
           />
         </div>
 

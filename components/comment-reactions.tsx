@@ -690,103 +690,101 @@ export function CommentsReactions({
       </div>
 
       {/* Comments Section */}
-      <div className="bg-white dark:bg-transparent p-4 md:p-6">
-        <h3 className="text-lg font-bold mb-4 dark:text-gray-100">
-          Comments ({comments.length})
-        </h3>
+      <Card className="border border-gray-200 dark:border-gray-600 shadow-sm rounded-2xl dark:bg-gray-800">
+        <CardContent className="p-4 md:p-6">
+          <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 dark:text-gray-100">
+            Comments ({comments.length})
+          </h3>
 
-        {isAuthenticated ? (
-          <div className="mb-6">
-            <Textarea
-              placeholder="Share your thoughts..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="mb-3 rounded-lg"
-              rows={3}
-            />
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Commenting as {user?.username || "User"}
-              </div>
-              <Button
-                onClick={() => submitComment(newComment)}
-                disabled={!newComment.trim() || loading}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Posting...
+          {/* Comment Form */}
+          {isAuthenticated ? (
+            <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+              <Textarea
+                placeholder="Share your thoughts..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="mb-2 md:mb-3 text-sm rounded-xl resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+                rows={3}
+              />
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Commenting as{" "}
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    {user?.username || "User"}
                   </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Send className="w-4 h-4" />
-                    Post Comment
-                  </span>
-                )}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="mb-6 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Please sign in to leave a comment
-            </p>
-            <Button
-              onClick={() => setShowAuthModal(true)}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              Sign In to Comment
-            </Button>
-          </div>
-        )}
-
-        <div className="space-y-4">
-          {displayedComments.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                <Edit className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                </div>
+                <Button
+                  onClick={() => submitComment(newComment)}
+                  disabled={!newComment.trim() || loading}
+                  size="sm"
+                  className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
+                >
+                  <Send className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  {loading ? "Posting..." : "Post Comment"}
+                </Button>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {isAuthenticated
-                  ? "Be the first to share your thoughts!"
-                  : "Sign in to be the first to comment!"}
-              </p>
             </div>
           ) : (
-            <>
-              {displayedComments.map((comment) => (
-                <CommentItem key={comment.id} comment={comment} />
-              ))}
-
-              {comments.length > 5 && (
-                <div className="flex justify-center pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowAllComments(!showAllComments)}
-                    className="rounded-lg border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    {showAllComments ? (
-                      <span className="flex items-center">
-                        <ChevronUp className="w-4 h-4 mr-2" />
-                        Show Less Comments
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <ChevronDown className="w-4 h-4 mr-2" />
-                        Show All {comments.length} Comments
-                      </span>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </>
+            <div className="mb-4 md:mb-6 p-4 md:p-6 text-center bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-3">
+                Please sign in to leave a comment
+              </p>
+              <Button
+                onClick={() => setShowAuthModal(true)}
+                size="sm"
+                className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
+              >
+                Sign In to Comment
+              </Button>
+            </div>
           )}
-        </div>
-      </div>
+
+          {/* Comments List */}
+          <div className="space-y-4">
+            {displayedComments.length === 0 ? (
+              <div className="text-center py-6 md:py-8">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <Edit className="w-5 h-5 md:w-6 md:h-6 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                  {isAuthenticated
+                    ? "Be the first to share your thoughts!"
+                    : "Sign in to be the first to comment!"}
+                </p>
+              </div>
+            ) : (
+              <>
+                {displayedComments.map((comment) => (
+                  <CommentItem key={comment.id} comment={comment} />
+                ))}
+
+                {/* Show More/Less Button - Only show if there are more than 5 comments */}
+                {comments.length > 5 && (
+                  <div className="flex justify-center pt-3 md:pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAllComments(!showAllComments)}
+                      className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs md:text-sm"
+                    >
+                      {showAllComments ? (
+                        <>
+                          <ChevronUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                          Show Less Comments
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                          Show All {comments.length} Comments
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Auth Modal */}
       {showAuthModal && (
