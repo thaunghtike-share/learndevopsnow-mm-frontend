@@ -16,28 +16,79 @@ import {
   Code,
   Server,
   Send,
+  Loader2,
+  CheckCircle,
+  X,
+  Bell,
+  BellOff,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/app/auth/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export function MinimalFooter() {
   const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
-  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [subscriptionMessage, setSubscriptionMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
+  // Check subscription status for authenticated users
   useEffect(() => {
-    // First, check if user has a saved theme preference
+    if (isAuthenticated) {
+      checkSubscription();
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [isAuthenticated]);
+
+  const checkSubscription = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setIsSubscribed(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/subscribe/`, {
+        headers: {
+          "Authorization": `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsSubscribed(data.subscribed);
+      } else {
+        setIsSubscribed(false);
+      }
+    } catch (error) {
+      console.error("Failed to check subscription:", error);
+      setIsSubscribed(false);
+    }
+  };
+
+  // Theme handling
+  useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as
       | "light"
       | "dark"
       | "system"
       | null;
 
-    // If there's a saved theme, use it
     if (savedTheme) {
       setTheme(savedTheme);
       applyTheme(savedTheme);
     } else {
-      // No saved theme, default to "light"
       setTheme("light");
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
@@ -50,9 +101,7 @@ export function MinimalFooter() {
     } else if (theme === "light") {
       document.documentElement.classList.remove("dark");
     } else {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (prefersDark) {
         document.documentElement.classList.add("dark");
       } else {
@@ -67,21 +116,111 @@ export function MinimalFooter() {
     applyTheme(newTheme);
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      // Here you would typically send the email to your backend
-      console.log("Subscribing email:", email);
-      setIsSubscribed(true);
-      setEmail("");
-      // Reset after 3 seconds
-      setTimeout(() => setIsSubscribed(false), 3000);
+  const showMessage = (type: "success" | "error", text: string) => {
+    setSubscriptionMessage({ type, text });
+    setTimeout(() => setSubscriptionMessage(null), 5000);
+  };
+
+  const toggleSubscription = async () => {
+    console.log("Toggle clicked, current state:", { isSubscribed, isAuthenticated });
+    
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
     }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showMessage("error", "Please sign in to subscribe");
+        setLoading(false);
+        return;
+      }
+
+      if (isSubscribed) {
+        // Unsubscribe
+        console.log("Unsubscribing...");
+        const response = await fetch(`${API_BASE_URL}/subscribe/`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Token ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsSubscribed(false);
+          showMessage("success", "Unsubscribed from notifications");
+        } else {
+          showMessage("error", "Failed to unsubscribe");
+        }
+      } else {
+        // Subscribe
+        console.log("Subscribing...");
+        const response = await fetch(`${API_BASE_URL}/subscribe/`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Token ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsSubscribed(true);
+          showMessage("success", "Subscribed! You'll get email notifications");
+        } else {
+          showMessage("error", "Failed to subscribe");
+        }
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      showMessage("error", "Failed to update subscription");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = () => {
+    setShowAuthModal(false);
+    router.push("/auth");
   };
 
   return (
     <footer className="bg-white dark:bg-[#000000] relative z-10 transition-colors duration-300 overflow-hidden">
       <div className="px-6 md:px-11 relative z-10 py-12 md:py-16">
+        {/* Subscription Message Alert */}
+        {subscriptionMessage && (
+          <div className={`fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-5 duration-300 ${
+            subscriptionMessage.type === "success" 
+              ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800" 
+              : "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800"
+          } rounded-lg shadow-xl border p-4 max-w-sm`}>
+            <div className="flex items-start gap-3">
+              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                subscriptionMessage.type === "success" 
+                  ? "bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-300" 
+                  : "bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-300"
+              }`}>
+                {subscriptionMessage.type === "success" ? "✓" : "!"}
+              </div>
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${
+                  subscriptionMessage.type === "success" 
+                    ? "text-green-800 dark:text-green-300" 
+                    : "text-red-800 dark:text-red-300"
+                }`}>
+                  {subscriptionMessage.text}
+                </p>
+              </div>
+              <button
+                onClick={() => setSubscriptionMessage(null)}
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-12">
           {/* Brand Section */}
@@ -140,49 +279,45 @@ export function MinimalFooter() {
                   Stay Updated
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-3 md:mb-4 text-xs md:text-sm">
-                  Get the latest DevOps guides, tutorials, and project updates
-                  delivered to your inbox.
+                  Get email notifications when new articles are published.
                 </p>
 
-                {isSubscribed ? (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg md:rounded-xl p-3 md:p-4 text-center">
-                    <div className="flex items-center justify-center space-x-2 text-green-600 dark:text-green-400">
-                      <Send className="h-4 w-4" />
-                      <span className="font-medium text-sm md:text-base">
-                        Thank you for subscribing!
-                      </span>
-                    </div>
-                    <p className="text-green-600 dark:text-green-400 text-xs md:text-sm mt-1">
-                      You'll receive our next update.
-                    </p>
-                  </div>
-                ) : (
-                  <form
-                    onSubmit={handleSubscribe}
-                    className="space-y-2 md:space-y-3"
+                <div className="space-y-3">
+                  <button
+                    onClick={toggleSubscription}
+                    disabled={loading}
+                    className={`w-full px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium flex items-center justify-center space-x-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                      isSubscribed
+                        ? "bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 focus:ring-red-500"
+                        : "bg-gradient-to-r from-sky-600 to-blue-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-blue-500"
+                    }`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 md:space-y-3 sm:space-y-0">
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        className="flex-1 px-3 py-2 md:px-4 md:py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm"
-                        required
-                      />
-                      <button
-                        type="submit"
-                        className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg md:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium flex items-center justify-center space-x-2 text-sm"
-                      >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : isSubscribed ? (
+                      <>
+                        <BellOff className="h-4 w-4" />
+                        <span>Unsubscribe from Notifications</span>
+                      </>
+                    ) : (
+                      <>
                         <Send className="h-4 w-4" />
-                        <span>Subscribe</span>
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      No spam. Unsubscribe at any time.
-                    </p>
-                  </form>
-                )}
+                        <span>Subscribe to Notifications</span>
+                      </>
+                    )}
+                  </button>
+                  
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    {isAuthenticated 
+                      ? (isSubscribed 
+                          ? "You'll receive email notifications for new articles." 
+                          : "Click to get notified about new articles.")
+                      : "Sign in to subscribe to article notifications."}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -378,6 +513,49 @@ export function MinimalFooter() {
           </div>
         </div>
       </div>
+
+      {/* Auth Required Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
+                  <Send className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                    Sign In Required
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    To subscribe to notifications
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="p-1 hover:bg-sky-600 bg-sky-600 hover:scale-100 border-sky-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-white dark:text-gray-400" />
+              </button>
+            </div>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
+              Sign in to get email notifications when new articles are published.
+            </p>
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={() => setShowAuthModal(false)}
+                variant="outline"
+                className="flex-1 border-gray-300 dark:border-gray-600"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }
