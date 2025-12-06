@@ -24,18 +24,22 @@ export function BellSubscription() {
 
   // Check subscription status
   useEffect(() => {
+    console.log("Auth state changed:", { isAuthenticated, isSubscribed });
     if (isAuthenticated) {
       checkSubscription();
     } else {
       setChecking(false);
+      setIsSubscribed(false);
     }
   }, [isAuthenticated]);
 
   const checkSubscription = async () => {
     try {
       const token = localStorage.getItem("token");
+      console.log("Checking subscription, token exists:", !!token);
       if (!token) {
         setChecking(false);
+        setIsSubscribed(false);
         return;
       }
 
@@ -47,10 +51,14 @@ export function BellSubscription() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Subscription data:", data);
         setIsSubscribed(data.subscribed);
+      } else {
+        setIsSubscribed(false);
       }
     } catch (error) {
       console.error("Failed to check subscription:", error);
+      setIsSubscribed(false);
     } finally {
       setChecking(false);
     }
@@ -64,6 +72,8 @@ export function BellSubscription() {
   };
 
   const toggleSubscription = async () => {
+    console.log("Toggle clicked, current state:", { isSubscribed, isAuthenticated });
+    
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
@@ -74,11 +84,13 @@ export function BellSubscription() {
       const token = localStorage.getItem("token");
       if (!token) {
         showCustomAlert("error", "Please sign in to subscribe");
+        setLoading(false);
         return;
       }
 
       if (isSubscribed) {
         // Unsubscribe
+        console.log("Unsubscribing...");
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "DELETE",
           headers: {
@@ -94,6 +106,7 @@ export function BellSubscription() {
         }
       } else {
         // Subscribe
+        console.log("Subscribing...");
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "POST",
           headers: {
@@ -122,28 +135,40 @@ export function BellSubscription() {
   };
 
   if (checking) {
+    console.log("Showing loading state");
     return (
-      <Button variant="ghost" size="icon" className="p-2">
-        <Loader2 className="h-5 w-5 animate-spin" />
+      <Button variant="ghost" className="px-4" disabled>
+        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+        Loading...
       </Button>
     );
   }
+
+  console.log("Rendering button with state:", { isSubscribed, loading });
 
   return (
     <>
       <Button
         variant="ghost"
-        size="icon"
         onClick={toggleSubscription}
         disabled={loading}
-        className="p-2 hover:bg-transparent"
+        className="px-4"
       >
         {loading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
+          <>
+            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            Processing...
+          </>
         ) : isSubscribed ? (
-          <BellRing className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <>
+            <BellRing className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+            Unsubscribe
+          </>
         ) : (
-          <Bell className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <>
+            <Bell className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+            Subscribe
+          </>
         )}
       </Button>
 

@@ -463,9 +463,6 @@ export function ArticleContent({
             {/* Bell button on the right */}
             <div className="flex items-center gap-2 self-start">
               <BellSubscription />
-              <span className="text-sm text-black dark:text-gray-400 hidden md:inline">
-                Subscribe
-              </span>
             </div>
           </div>
 
