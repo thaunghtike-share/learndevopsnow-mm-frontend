@@ -140,7 +140,9 @@ export default function ProfileForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null); // Reset success state
 
+    // Validation checks
     if (
       !formData.name?.trim() ||
       !formData.bio?.trim() ||
@@ -193,11 +195,13 @@ export default function ProfileForm() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to save profile");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to save profile");
       }
 
       const savedProfile = await response.json();
 
+      // Update auth state
       updateProfile({
         profileComplete: true,
         username: savedProfile.name || user?.username,
@@ -206,11 +210,19 @@ export default function ProfileForm() {
 
       setSuccess("stay");
 
+      // Wait for success message to show, then navigate
       setTimeout(() => {
-        router.back();
+        // Use window.history for more reliable navigation
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          // If no history, go to home
+          router.push('/');
+        }
       }, 1500);
+
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || "An error occurred while saving");
     } finally {
       setLoading(false);
     }
