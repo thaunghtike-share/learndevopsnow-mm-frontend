@@ -113,7 +113,7 @@ export function SimpleTTSPlayer({ text, articleTitle }: SimpleTTSPlayerProps) {
       {/* Play/Pause button */}
       <button
         onClick={handlePlayPause}
-        className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 transition-colors group"
+        className="flex items-center gap-1.5 text-sky-700 dark:text-gray-300 transition-colors group"
         title={isPlaying ? "" : ""}
       >
         {isPlaying ? (
@@ -133,10 +133,10 @@ export function SimpleTTSPlayer({ text, articleTitle }: SimpleTTSPlayerProps) {
       <div className="relative">
         <button
           onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-          className="text-sm font-sans text-black dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 px-1.5 py-0.5 transition-colors"
+          className="text-sm font-mono text-black dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 px-1.5 py-0.5 transition-colors"
           title="Playback speed"
         >
-          {playbackRate} x
+          {playbackRate}x
         </button>
         
         {showSpeedMenu && (
