@@ -579,8 +579,15 @@ export function ArticleContent({
                 const className = codeProps.className || "";
                 const childrenContent = codeProps.children || "";
 
+                // Handle the case where there's no language specified or it's just backticks
                 const match = /language-(\w+)/.exec(className || "");
-                const language = match?.[1]?.toLowerCase() || "";
+                let language = match?.[1]?.toLowerCase() || "";
+
+                // If className exists but doesn't match language-*, it might be something else
+                if (className && !match) {
+                  // It could be just "```" without language
+                  language = "";
+                }
 
                 const extractCodeString = (children: any): string => {
                   if (typeof children === "string") return children;
@@ -601,6 +608,7 @@ export function ArticleContent({
                 );
                 const lines = codeString.split("\n");
 
+                // Check if it's a shell-like language
                 const isShellLike = ["bash", "shell", "sh", "zsh"].includes(
                   language
                 );
@@ -609,37 +617,12 @@ export function ArticleContent({
                 const promptChar =
                   lines[0]?.trim().match(/^(\$|#|>)/)?.[1] || "$";
 
-                const showCopyButton = [
-                  "bash",
-                  "shell",
-                  "sh",
-                  "zsh",
-                  "python",
-                  "py",
-                  "javascript",
-                  "js",
-                  "typescript",
-                  "ts",
-                  "hcl",
-                  "terraform",
-                  "yaml",
-                  "yml",
-                  "toml",
-                  "json",
-                  "html",
-                  "css",
-                  "dockerfile",
-                  "sql",
-                  "ruby",
-                  "go",
-                  "rust",
-                  "sql",
-                  "postgresql",
-                  "postgres",
-                  "mysql",
-                ].includes(language);
+                // Show copy button for all code blocks, even without language
+                const showCopyButton = true; // Always show copy button for code blocks
 
                 const getLanguageName = (lang: string): string => {
+                  if (!lang || lang.trim() === "") return "Code";
+
                   const langMap: { [key: string]: string } = {
                     js: "JavaScript",
                     ts: "TypeScript",
@@ -649,10 +632,31 @@ export function ArticleContent({
                     tf: "Terraform",
                     sh: "Shell",
                     zsh: "Z Shell",
-                    sql: "SQL", // ← ADD THIS
-                    postgresql: "PostgreSQL", // ← ADD THIS
-                    postgres: "PostgreSQL", // ← ADD THIS
-                    mysql: "MySQL", // ← ADD THIS
+                    sql: "SQL",
+                    postgresql: "PostgreSQL",
+                    postgres: "PostgreSQL",
+                    mysql: "MySQL",
+                    html: "HTML",
+                    css: "CSS",
+                    json: "JSON",
+                    xml: "XML",
+                    java: "Java",
+                    cpp: "C++",
+                    csharp: "C#",
+                    go: "Go",
+                    rust: "Rust",
+                    ruby: "Ruby",
+                    php: "PHP",
+                    swift: "Swift",
+                    kotlin: "Kotlin",
+                    dockerfile: "Dockerfile",
+                    yaml: "YAML",
+                    toml: "TOML",
+                    ini: "INI",
+                    markdown: "Markdown",
+                    md: "Markdown",
+                    txt: "Text",
+                    text: "Text",
                   };
                   return (
                     langMap[lang] ||
@@ -662,23 +666,21 @@ export function ArticleContent({
 
                 return (
                   <div className="relative mb-8 bg-gradient-to-br from-sky-50 dark:from-gray-800 rounded-xl to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    {language && (
-                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white px-4 py-2 text-xs font-semibold flex justify-between items-center">
-                        <span>{getLanguageName(language)}</span>
-                        <span className="text-sky-200 dark:text-sky-300 text-xs font-normal">
-                          {lines.length} line{lines.length !== 1 ? "s" : ""}
-                        </span>
-                      </div>
-                    )}
+                    {/* Language header - show even if no language (shows "Code") */}
+                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white px-4 py-2 text-xs font-semibold flex justify-between items-center">
+                      <span>{getLanguageName(language)}</span>
+                      <span className="text-sky-200 dark:text-sky-300 text-xs font-normal">
+                        {lines.length} line{lines.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+
                     {showCopyButton && <CopyButton code={codeString} />}
-                    <pre
-                      className={`p-6 overflow-x-auto rounded-2xl ${
-                        language ? "pt-12" : "pt-6"
-                      }`}
-                    >
+                    <pre className={`p-6 overflow-x-auto rounded-2xl pt-12`}>
                       <code className="font-mono text-sm block">
                         {lines.map((line, idx) => {
-                          const hasPrompt = idx === 0 && startsWithDollar;
+                          // Only show prompt for shell-like languages with proper syntax
+                          const hasPrompt =
+                            idx === 0 && startsWithDollar && isShellLike;
                           const isEmptyLine = line.trim() === "";
 
                           return (
@@ -710,7 +712,7 @@ export function ArticleContent({
                   </div>
                 );
               },
-
+              
               h1: ({ children, ...props }) => {
                 const id = slugify(flattenChildren(children));
                 return (
