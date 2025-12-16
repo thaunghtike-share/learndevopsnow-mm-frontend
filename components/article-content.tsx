@@ -991,112 +991,53 @@ export function ArticleContent({
             {validHeadings.length > 0 ? (
               <div className="max-h-[350px] overflow-y-auto pr-2">
                 <nav className="space-y-1">
-                  {(() => {
-                    let mainCounter = 0;
-                    let subCounter = 0;
-                    let subSubCounter = 0;
-                    let subSubSubCounter = 0; // Added for H4
+                  {validHeadings.map(({ id, text, level }) => {
+                    // Indentation
+                    const indent =
+                      level === 1
+                        ? "pl-0"
+                        : level === 2
+                        ? "pl-4"
+                        : level === 3
+                        ? "pl-6"
+                        : level === 4
+                        ? "pl-8"
+                        : level === 5
+                        ? "pl-10"
+                        : "pl-12";
 
-                    return validHeadings.map(({ id, text, level }) => {
-                      // Update counters based on heading level
-                      if (level === 1 || level === 2) {
-                        subCounter = 0;
-                        subSubCounter = 0;
-                        subSubSubCounter = 0; // Reset for H4
-                      }
-                      if (level === 3) {
-                        subSubCounter = 0;
-                        subSubSubCounter = 0; // Reset for H4
-                      }
-                      if (level === 4) {
-                        subSubSubCounter = 0; // Reset for deeper levels
-                      }
+                    return (
+                      <a
+                        key={id}
+                        href={`#${id}`}
+                        className={`${indent} py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group block`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const target = document.getElementById(id);
+                          if (target) {
+                            const headerOffset = 80;
+                            const elementPosition =
+                              target.getBoundingClientRect().top;
+                            const offsetPosition =
+                              elementPosition +
+                              window.pageYOffset -
+                              headerOffset;
 
-                      // Generate numbers for H1, H2, H3, H4
-                      let number = "";
-                      if (level === 1 || level === 2) {
-                        mainCounter++;
-                        subCounter = 0; // Reset sub-counter for H2
-                        number = mainCounter.toString();
-                      } else if (level === 3) {
-                        subCounter++;
-                        number = `${mainCounter}.${subCounter}`;
-                      } else if (level === 4) {
-                        subSubCounter++;
-                        number = `${mainCounter}.${subCounter}.${subSubCounter}`;
-                      } else if (level === 5) {
-                        subSubSubCounter++;
-                        number = `${mainCounter}.${subCounter}.${subSubCounter}.${subSubSubCounter}`;
-                      }
-                      // H6 gets no structured number
+                            window.scrollTo({
+                              top: offsetPosition,
+                              behavior: "smooth",
+                            });
 
-                      // Indentation
-                      const indent =
-                        level === 1
-                          ? "pl-0"
-                          : level === 2
-                          ? "pl-4"
-                          : level === 3
-                          ? "pl-6" // Changed from pl-8 to pl-6
-                          : level === 4
-                          ? "pl-8" // Changed from pl-12 to pl-8
-                          : level === 5
-                          ? "pl-10" // Changed from pl-16 to pl-10
-                          : "pl-12"; // Ch
-
-                      // Show number for H1, H2, H3, H4, H5
-                      const showNumber = level <= 5;
-
-                      return (
-                        <a
-                          key={id}
-                          href={`#${id}`}
-                          className={`flex items-center ${indent} py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const target = document.getElementById(id);
-                            if (target) {
-                              const headerOffset = 80;
-                              const elementPosition =
-                                target.getBoundingClientRect().top;
-                              const offsetPosition =
-                                elementPosition +
-                                window.pageYOffset -
-                                headerOffset;
-
-                              window.scrollTo({
-                                top: offsetPosition,
-                                behavior: "smooth",
-                              });
-
-                              history.replaceState(null, "", `#${id}`);
-                            }
-                          }}
-                        >
-                          {showNumber ? (
-                            <span
-                              className={`text-xs font-medium text-gray-800 dark:text-gray-100 flex-shrink-0 ${
-                                number.length <= 3
-                                  ? "w-6"
-                                  : number.length <= 5
-                                  ? "w-8"
-                                  : "w-10"
-                              } mr-1`}
-                            >
-                              {number}
-                            </span>
-                          ) : (
-                            <span className="w-5 mr-1 flex justify-center flex-shrink-0">
-                              <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full"></span>
-                            </span>
-                          )}
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                            {text}
-                          </span>
-                        </a>
-                      );
-                    });
-                  })()}
+                            history.replaceState(null, "", `#${id}`);
+                          }
+                        }}
+                      >
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                          {text}
+                        </span>
+                      </a>
+                    );
+                  })}
                 </nav>
               </div>
             ) : (
