@@ -27,7 +27,7 @@ import {
   BarChart4,
   BarChart2,
 } from "lucide-react";
-import { Pie } from "react-chartjs-2";
+import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -35,10 +35,21 @@ import {
   Legend,
   Title,
   ChartOptions,
+  CategoryScale,
+  LinearScale,
+  BarElement,
 } from "chart.js";
 
 // Register Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
 interface AuthorSummary {
   id: number;
@@ -84,9 +95,48 @@ function AuthorStatsPieChart({
   height?: number;
 }) {
   const [isClient, setIsClient] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [chartKey, setChartKey] = useState(Date.now()); // Force re-render
 
   useEffect(() => {
     setIsClient(true);
+    
+    // Check for dark mode
+    const checkDarkMode = () => {
+      if (typeof window !== 'undefined') {
+        // Check if dark class is present on html element
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        setIsDarkMode(isDark);
+        setChartKey(Date.now()); // Force chart re-render
+      }
+    };
+    
+    checkDarkMode();
+    
+    // Listen for theme changes on html element
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    // Also listen for system preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (!document.documentElement.classList.contains('dark') && 
+          !document.documentElement.classList.contains('light')) {
+        setIsDarkMode(e.matches);
+        setChartKey(Date.now());
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleMediaChange);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
   }, []);
 
   if (!isClient) {
@@ -141,7 +191,7 @@ function AuthorStatsPieChart({
       legend: {
         position: "right",
         labels: {
-          color: "#6b7280",
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
           font: {
             size: 12,
             family: "Inter, sans-serif",
@@ -152,7 +202,7 @@ function AuthorStatsPieChart({
         },
       },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        backgroundColor: isDarkMode ? "rgba(30, 41, 59, 0.95)" : "rgba(15, 23, 42, 0.95)",
         titleColor: "#f1f5f9",
         bodyColor: "#cbd5e1",
         borderColor: "rgba(255, 255, 255, 0.1)",
@@ -183,7 +233,7 @@ function AuthorStatsPieChart({
       </div>
 
       <div className="relative" style={{ height: `${height}px` }}>
-        <Pie data={chartData} options={options} />
+        <Pie key={chartKey} data={chartData} options={options} />
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -194,7 +244,7 @@ function AuthorStatsPieChart({
               Most Articles
             </span>
           </div>
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+          <div className="text-sm font-medium text-black dark:text-white text-right">
             {topAuthors[0]?.author}: {topAuthors[0]?.count} articles
           </div>
         </div>
@@ -203,8 +253,8 @@ function AuthorStatsPieChart({
   );
 }
 
-// Views Pie Chart Component
-function AuthorViewsPieChart({
+// Bar Chart Component for Views
+function AuthorViewsBarChart({
   data,
   title = "Views by Author",
   height = 280,
@@ -214,9 +264,48 @@ function AuthorViewsPieChart({
   height?: number;
 }) {
   const [isClient, setIsClient] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [chartKey, setChartKey] = useState(Date.now()); // Force re-render
 
   useEffect(() => {
     setIsClient(true);
+    
+    // Check for dark mode
+    const checkDarkMode = () => {
+      if (typeof window !== 'undefined') {
+        // Check if dark class is present on html element
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        setIsDarkMode(isDark);
+        setChartKey(Date.now()); // Force chart re-render
+      }
+    };
+    
+    checkDarkMode();
+    
+    // Listen for theme changes on html element
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    // Also listen for system preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (!document.documentElement.classList.contains('dark') && 
+          !document.documentElement.classList.contains('light')) {
+        setIsDarkMode(e.matches);
+        setChartKey(Date.now());
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleMediaChange);
+    
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
   }, []);
 
   if (!isClient) {
@@ -230,9 +319,9 @@ function AuthorViewsPieChart({
   // Sort by views and take top 8
   const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
 
-  // Standard pie chart colors (different set for variety)
-  const generateColors = (count: number) => {
-    const standardColors = [
+  // Generate colors for bars
+  const generateBarColors = (count: number) => {
+    const colors = [
       "rgba(34, 197, 94, 0.8)", // Green
       "rgba(59, 130, 246, 0.8)", // Blue
       "rgba(168, 85, 247, 0.8)", // Purple
@@ -243,7 +332,7 @@ function AuthorViewsPieChart({
       "rgba(249, 115, 22, 0.8)", // Orange
     ];
 
-    return standardColors.slice(0, count);
+    return colors.slice(0, count);
   };
 
   const chartData = {
@@ -256,33 +345,62 @@ function AuthorViewsPieChart({
       {
         label: "Views",
         data: topAuthors.map((item) => item.views),
-        backgroundColor: generateColors(topAuthors.length),
-        borderColor: "rgba(255, 255, 255, 0.8)",
+        backgroundColor: generateBarColors(topAuthors.length),
+        borderColor: generateBarColors(topAuthors.length).map(color =>
+          color.replace('0.8', '1')
+        ),
         borderWidth: 2,
-        hoverOffset: 15,
+        borderRadius: 8,
+        hoverBackgroundColor: generateBarColors(topAuthors.length).map(color =>
+          color.replace('0.8', '1')
+        ),
       },
     ],
   };
 
-  const options: ChartOptions<"pie"> = {
+  const options: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "right",
-        labels: {
-          color: "#6b7280",
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+        },
+        ticks: {
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
           font: {
-            size: 12,
+            size: 11,
             family: "Inter, sans-serif",
           },
-          padding: 10,
-          usePointStyle: true,
-          pointStyle: "circle",
+          callback: (value) => {
+            if (typeof value === "number") {
+              if (value >= 1000) return (value / 1000).toFixed(1) + 'k';
+              return value.toString();
+            }
+            return value;
+          },
         },
       },
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
+          font: {
+            size: 11,
+            family: "Inter, sans-serif",
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        backgroundColor: isDarkMode ? "rgba(30, 41, 59, 0.95)" : "rgba(15, 23, 42, 0.95)",
         titleColor: "#f1f5f9",
         bodyColor: "#cbd5e1",
         borderColor: "rgba(255, 255, 255, 0.1)",
@@ -292,11 +410,7 @@ function AuthorViewsPieChart({
         callbacks: {
           label: (context) => {
             const value = context.raw as number;
-            const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${
-              context.label
-            }: ${value.toLocaleString()} views (${percentage}%)`;
+            return `${context.dataset.label}: ${value.toLocaleString()} views`;
           },
         },
       },
@@ -315,7 +429,7 @@ function AuthorViewsPieChart({
       </div>
 
       <div className="relative" style={{ height: `${height}px` }}>
-        <Pie data={chartData} options={options} />
+        <Bar key={chartKey} data={chartData} options={options} />
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -326,7 +440,7 @@ function AuthorViewsPieChart({
               Most Viewed
             </span>
           </div>
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+          <div className="text-sm font-medium text-black dark:text-white text-right">
             {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
             views
           </div>
@@ -771,7 +885,7 @@ export default function ArticlesClient() {
                 </div>
               </div>
 
-              {/* Pie Charts Section */}
+              {/* Charts Section */}
               {chartsLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
@@ -783,14 +897,14 @@ export default function ArticlesClient() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Chart 1: Articles by Author */}
+                  {/* Chart 1: Articles by Author (Pie Chart) */}
                   <AuthorStatsPieChart
                     data={prepareArticlesByAuthorData()}
                     title="Articles Distribution"
                   />
 
-                  {/* Chart 2: Views by Author */}
-                  <AuthorViewsPieChart
+                  {/* Chart 2: Views by Author (Bar Chart) */}
+                  <AuthorViewsBarChart
                     data={prepareViewsByAuthorData()}
                     title="Top Views"
                   />
@@ -832,6 +946,13 @@ export default function ArticlesClient() {
         }
         .animate-float {
           animation: float 20s ease-in-out infinite;
+        }
+        
+        /* Dark mode adjustments for charts */
+        @media (prefers-color-scheme: dark) {
+          .chartjs-render-monitor {
+            filter: brightness(1.1);
+          }
         }
       `}</style>
     </div>

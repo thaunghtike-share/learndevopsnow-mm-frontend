@@ -41,18 +41,28 @@ import {
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
 import ProtectedAction from "@/components/ProtectedAction";
-import { Pie } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  ArcElement,
   Tooltip,
   Legend,
   Title,
   ChartOptions,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
 } from "chart.js";
 
-// Register Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  Title
+);
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -111,7 +121,7 @@ interface BanDetails {
   is_temporary: boolean;
 }
 
-// Pie Chart Component for Admin Dashboard (same as articles page)
+// Keep the original AuthorStatsPieChart component (unchanged)
 function AuthorStatsPieChart({
   data,
   title = "Articles by Author",
@@ -122,9 +132,32 @@ function AuthorStatsPieChart({
   height?: number;
 }) {
   const [isClient, setIsClient] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [chartKey, setChartKey] = useState(Date.now());
 
   useEffect(() => {
     setIsClient(true);
+
+    // Check for dark mode
+    const checkDarkMode = () => {
+      if (typeof window !== "undefined") {
+        const html = document.documentElement;
+        const isDark = html.classList.contains("dark");
+        setIsDarkMode(isDark);
+        setChartKey(Date.now());
+      }
+    };
+
+    checkDarkMode();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   if (!isClient) {
@@ -179,7 +212,7 @@ function AuthorStatsPieChart({
       legend: {
         position: "right",
         labels: {
-          color: "#6b7280",
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
           font: {
             size: 12,
             family: "Inter, sans-serif",
@@ -190,7 +223,9 @@ function AuthorStatsPieChart({
         },
       },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        backgroundColor: isDarkMode
+          ? "rgba(30, 41, 59, 0.95)"
+          : "rgba(15, 23, 42, 0.95)",
         titleColor: "#f1f5f9",
         bodyColor: "#cbd5e1",
         borderColor: "rgba(255, 255, 255, 0.1)",
@@ -221,7 +256,7 @@ function AuthorStatsPieChart({
       </div>
 
       <div className="relative" style={{ height: `${height}px` }}>
-        <Pie data={chartData} options={options} />
+        <Pie key={chartKey} data={chartData} options={options} />
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -232,7 +267,7 @@ function AuthorStatsPieChart({
               Most Articles
             </span>
           </div>
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+          <div className="text-sm font-medium text-black dark:text-white text-right">
             {topAuthors[0]?.author}: {topAuthors[0]?.count} articles
           </div>
         </div>
@@ -241,8 +276,8 @@ function AuthorStatsPieChart({
   );
 }
 
-// Views Pie Chart Component for Admin Dashboard (same as articles page)
-function AuthorViewsPieChart({
+// Keep the Bar chart component for "Your Top Articles" only
+function AuthorViewsBarChart({
   data,
   title = "Views by Author",
   height = 280,
@@ -252,9 +287,32 @@ function AuthorViewsPieChart({
   height?: number;
 }) {
   const [isClient, setIsClient] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [chartKey, setChartKey] = useState(Date.now());
 
   useEffect(() => {
     setIsClient(true);
+
+    // Check for dark mode
+    const checkDarkMode = () => {
+      if (typeof window !== "undefined") {
+        const html = document.documentElement;
+        const isDark = html.classList.contains("dark");
+        setIsDarkMode(isDark);
+        setChartKey(Date.now());
+      }
+    };
+
+    checkDarkMode();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   if (!isClient) {
@@ -268,9 +326,9 @@ function AuthorViewsPieChart({
   // Sort by views and take top 8
   const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
 
-  // Standard pie chart colors (different set for variety)
-  const generateColors = (count: number) => {
-    const standardColors = [
+  // Generate colors for bars
+  const generateBarColors = (count: number) => {
+    const colors = [
       "rgba(34, 197, 94, 0.8)", // Green
       "rgba(59, 130, 246, 0.8)", // Blue
       "rgba(168, 85, 247, 0.8)", // Purple
@@ -281,7 +339,7 @@ function AuthorViewsPieChart({
       "rgba(249, 115, 22, 0.8)", // Orange
     ];
 
-    return standardColors.slice(0, count);
+    return colors.slice(0, count);
   };
 
   const chartData = {
@@ -294,33 +352,64 @@ function AuthorViewsPieChart({
       {
         label: "Views",
         data: topAuthors.map((item) => item.views),
-        backgroundColor: generateColors(topAuthors.length),
-        borderColor: "rgba(255, 255, 255, 0.8)",
+        backgroundColor: generateBarColors(topAuthors.length),
+        borderColor: generateBarColors(topAuthors.length).map((color) =>
+          color.replace("0.8", "1")
+        ),
         borderWidth: 2,
-        hoverOffset: 15,
+        borderRadius: 8,
+        hoverBackgroundColor: generateBarColors(topAuthors.length).map(
+          (color) => color.replace("0.8", "1")
+        ),
       },
     ],
   };
 
-  const options: ChartOptions<"pie"> = {
+  const options: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "right",
-        labels: {
-          color: "#6b7280",
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+        },
+        ticks: {
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
           font: {
-            size: 12,
+            size: 11,
             family: "Inter, sans-serif",
           },
-          padding: 10,
-          usePointStyle: true,
-          pointStyle: "circle",
+          callback: (value) => {
+            if (typeof value === "number") {
+              if (value >= 1000) return (value / 1000).toFixed(1) + "k";
+              return value.toString();
+            }
+            return value;
+          },
         },
       },
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
+          font: {
+            size: 11,
+            family: "Inter, sans-serif",
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
       tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
+        backgroundColor: isDarkMode
+          ? "rgba(30, 41, 59, 0.95)"
+          : "rgba(15, 23, 42, 0.95)",
         titleColor: "#f1f5f9",
         bodyColor: "#cbd5e1",
         borderColor: "rgba(255, 255, 255, 0.1)",
@@ -333,8 +422,8 @@ function AuthorViewsPieChart({
             const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
             const percentage = ((value / total) * 100).toFixed(1);
             return `${
-              context.label
-            }: ${value.toLocaleString()} views (${percentage}%)`;
+              context.dataset.label
+            }: ${value.toLocaleString()} (${percentage}%)`;
           },
         },
       },
@@ -353,7 +442,7 @@ function AuthorViewsPieChart({
       </div>
 
       <div className="relative" style={{ height: `${height}px` }}>
-        <Pie data={chartData} options={options} />
+        <Bar key={chartKey} data={chartData} options={options} />
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -364,7 +453,7 @@ function AuthorViewsPieChart({
               Most Viewed
             </span>
           </div>
-          <div className="text-sm font-medium text-gray-800 dark:text-gray-200 text-right">
+          <div className="text-sm font-medium text-black dark:text-white text-right">
             {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
             views
           </div>
@@ -525,7 +614,7 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // Fetch all articles for pie charts
+  // Fetch all articles for bar charts
   const fetchAllArticlesStats = async () => {
     try {
       setChartsLoading(true);
@@ -745,7 +834,7 @@ export default function AuthorAdminDashboard() {
         });
 
         await checkBanStatus();
-        // Fetch all articles for pie charts
+        // Fetch all articles for bar charts
         await fetchAllArticlesStats();
       } catch (err) {
         console.error("Error fetching author data:", err);
@@ -976,7 +1065,7 @@ export default function AuthorAdminDashboard() {
       currentPage * articlesPerPage
     ) || [];
 
-  // Prepare articles by author data (same as articles page)
+  // Prepare articles by author data
   const prepareArticlesByAuthorData = () => {
     const authorMap = new Map<string, number>();
 
@@ -991,7 +1080,7 @@ export default function AuthorAdminDashboard() {
       .sort((a, b) => b.count - a.count);
   };
 
-  // Prepare views by author data (same as articles page)
+  // Prepare views by author data
   const prepareViewsByAuthorData = () => {
     const authorMap = new Map<string, number>();
 
@@ -1289,7 +1378,7 @@ export default function AuthorAdminDashboard() {
                 </div>
               </div>
 
-              {/* PIE CHARTS SECTION - Same as articles page */}
+              {/* BAR CHARTS SECTION - Changed from pie to bar charts */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1310,7 +1399,7 @@ export default function AuthorAdminDashboard() {
                   </div>
                 </div>
 
-                {/* Pie Charts Section */}
+                {/* Bar Charts Section */}
                 {chartsLoading ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="text-center">
@@ -1322,13 +1411,14 @@ export default function AuthorAdminDashboard() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Chart 1: Articles by Author */}
+                    {/* Chart 1: Articles Distribution (Pie Chart) */}
                     <AuthorStatsPieChart
                       data={prepareArticlesByAuthorData()}
                       title="Articles Distribution"
                     />
 
-                    <AuthorViewsPieChart
+                    {/* Chart 2: Your Top Articles (Bar Chart) */}
+                    <AuthorViewsBarChart
                       data={prepareViewsData()}
                       title="Your Top Articles"
                       height={280}
