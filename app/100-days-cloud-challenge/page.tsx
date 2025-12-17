@@ -287,12 +287,22 @@ export default function HundredDaysCloudChallenge() {
           })
         );
 
-        // Sort articles by published date (newest first)
-        const sortedArticles = articlesWithEngagement.sort(
-          (a, b) =>
+        // Sort articles by day number in DESCENDING order (Day 19, Day 18, Day 17, ...)
+        const sortedArticles = articlesWithEngagement.sort((a, b) => {
+          const dayA = extractDayNumber(a);
+          const dayB = extractDayNumber(b);
+
+          // Sort by day number DESCENDING (Day 19, Day 18, Day 17, ...)
+          if (dayA > dayB) return -1;
+          if (dayA < dayB) return 1;
+
+          // If day numbers are equal (shouldn't happen), sort by published date
+          return (
             new Date(b.published_at).getTime() -
             new Date(a.published_at).getTime()
-        );
+          );
+        });
+
         setArticles(sortedArticles);
 
         // Fetch authors
