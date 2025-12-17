@@ -30,7 +30,6 @@ import { Button } from "@/components/ui/button";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 export function MinimalFooter() {
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
   const [loading, setLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -75,45 +74,6 @@ export function MinimalFooter() {
       console.error("Failed to check subscription:", error);
       setIsSubscribed(false);
     }
-  };
-
-  // Theme handling
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
-
-    if (savedTheme) {
-      setTheme(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      setTheme("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, []);
-
-  const applyTheme = (theme: "light" | "dark" | "system") => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else if (theme === "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (prefersDark) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-  };
-
-  const setThemeMode = (newTheme: "light" | "dark" | "system") => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    applyTheme(newTheme);
   };
 
   const showMessage = (type: "success" | "error", text: string) => {

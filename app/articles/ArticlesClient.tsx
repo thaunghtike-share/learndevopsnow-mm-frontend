@@ -440,7 +440,7 @@ export default function ArticlesClient() {
           const countB = b.articles_count || 0;
           return countB - countA;
         })
-        .slice(0, 3)
+        .slice(0, 4)
         .map((author: AuthorSummary) => ({
           ...author,
           articles_count: author.articles_count || 0,
