@@ -484,32 +484,6 @@ export function MinimalFooter() {
                 </Link>
               ))}
             </div>
-
-            {/* Theme Toggle */}
-            <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl p-1 border border-gray-200 dark:border-gray-700">
-              {[
-                { mode: "light", icon: Sun, label: "Light" },
-                { mode: "system", icon: Monitor, label: "System" },
-                { mode: "dark", icon: Moon, label: "Dark" },
-              ].map(({ mode, icon: Icon, label }) => (
-                <button
-                  key={mode}
-                  onClick={() =>
-                    setThemeMode(mode as "light" | "dark" | "system")
-                  }
-                  className={`flex items-center gap-1 md:gap-2 px-3 py-1 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 ${
-                    theme === mode
-                      ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-lg"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <Icon className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="text-xs md:text-sm font-medium">
-                    {label}
-                  </span>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>

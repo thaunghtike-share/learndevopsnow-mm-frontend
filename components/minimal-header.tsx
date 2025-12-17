@@ -26,6 +26,8 @@ import {
   Users,
   PenSquare,
   Zap,
+  Moon,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,6 +43,7 @@ export function MinimalHeader() {
   const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   // Desktop dropdown states
   const [isArticlesOpen, setIsArticlesOpen] = useState(false);
@@ -67,6 +70,14 @@ export function MinimalHeader() {
 
   useEffect(() => {
     setMounted(true);
+    
+    // Initialize dark mode from localStorage
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    setDarkMode(savedDarkMode);
+    if (savedDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
+    
     return () => {
       if (articlesTimeout.current) clearTimeout(articlesTimeout.current);
       if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
@@ -164,6 +175,22 @@ export function MinimalHeader() {
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
+  };
+
+  // Dark mode toggle function
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    // Save to localStorage
+    localStorage.setItem('darkMode', newDarkMode.toString());
+    
+    // Apply to document
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   // Desktop hover handlers
@@ -614,7 +641,7 @@ export function MinimalHeader() {
             <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
           </Link>
 
-          {/* Navigation - Removed border/frame (the bg-white/80 dark:bg-[#000000]/80 backdrop-blur-md rounded-2xl border border-gray-400/50 dark:border-gray-700/50 px-2 py-1 shadow-sm) */}
+          {/* Navigation - Removed border/frame */}
           <nav className="flex items-center space-x-1 -ml-12">
             <Link
               href="/"
@@ -842,7 +869,20 @@ export function MinimalHeader() {
           </nav>
 
           {/* Right Section - Search + Auth */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-5">
+            {/* Dark Mode Toggle - Desktop Only */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-1"
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {darkMode ? (
+                <Sun className="w-6 h-6" />
+              ) : (
+                <Moon className="w-6 h-6" />
+              )}
+            </button>
+
             {/* Search */}
             <div className="relative w-64">
               <div className="relative group">
