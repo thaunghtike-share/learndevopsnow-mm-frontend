@@ -149,7 +149,7 @@ export default async function ArticlePage({
 
     return (
       <>
-        <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+        <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300 scrollbar-hide">
           <MinimalHeader />
 
           <div className="md:-mt-1 -mt-19">
