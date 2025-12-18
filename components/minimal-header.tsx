@@ -70,14 +70,14 @@ export function MinimalHeader() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Initialize dark mode from localStorage
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    const savedDarkMode = localStorage.getItem("darkMode") === "true";
     setDarkMode(savedDarkMode);
     if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     }
-    
+
     return () => {
       if (articlesTimeout.current) clearTimeout(articlesTimeout.current);
       if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
@@ -181,15 +181,15 @@ export function MinimalHeader() {
   const toggleDarkMode = () => {
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
-    
+
     // Save to localStorage
-    localStorage.setItem('darkMode', newDarkMode.toString());
-    
+    localStorage.setItem("darkMode", newDarkMode.toString());
+
     // Apply to document
     if (newDarkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   };
 
@@ -667,7 +667,8 @@ export function MinimalHeader() {
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
                   pathname.includes("/articles") ||
-                  pathname.includes("/100-days-cloud-challenge")
+                  pathname.includes("/100-days-cloud-challenge") ||
+                  pathname.includes("/learn-linux-basic")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
@@ -695,7 +696,13 @@ export function MinimalHeader() {
                     href="/100-days-cloud-challenge"
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    Explore 100 Days of Cloud
+                    Learn 100 Days of Azure
+                  </Link>
+                  <Link
+                    href="/learn-linux-basic"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                  >
+                    Learn Linux Essentials 
                   </Link>
                   <Link
                     href="/categories"
@@ -874,7 +881,9 @@ export function MinimalHeader() {
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-1"
-              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={
+                darkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
             >
               {darkMode ? (
                 <Sun className="w-6 h-6" />
