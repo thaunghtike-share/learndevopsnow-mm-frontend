@@ -1132,7 +1132,7 @@ export function ArticleContent({
             </Card>
 
             {/* Recent Articles */}
-            <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
+            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
               <CardContent className="">
                 <div className="flex items-center gap-3 mb-4 pb-3">
                   <div className="w-8 h-8 flex items-center justify-center">
@@ -1198,7 +1198,7 @@ export function ArticleContent({
             </Card>
 
             {/* Featured Authors */}
-            <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
+            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
               <CardContent className="">
                 <div className="flex items-center gap-3 mb-4 pb-3">
                   <div className="w-8 h-8 flex items-center justify-center">
@@ -1251,7 +1251,7 @@ export function ArticleContent({
             </Card>
 
             {/* Popular Reads */}
-            <Card className="border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
+            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
               <CardContent className="">
                 <div className="flex items-center gap-3 mb-4 pb-3">
                   <div className="w-8 h-8 flex items-center justify-center">
