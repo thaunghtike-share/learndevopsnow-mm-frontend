@@ -146,7 +146,7 @@ export function SuccessStoriesSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-gray-600 dark:text-gray-300 text-base md:text-lg max-w-2xl"
+                className="text-black dark:text-gray-300 text-base md:text-lg max-w-2xl"
               >
                 See how students and junior engineers from Myanmar are growing
                 their careers and mastering DevOps skills
@@ -190,7 +190,7 @@ export function SuccessStoriesSection() {
                   className="min-w-[85vw] sm:min-w-0 snap-start flex-shrink-0"
                 >
                   {/* Enhanced Card Design - Better for mobile */}
-                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl md:rounded-2xl p-5 md:p-6 h-full flex flex-col border border-gray-300 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 min-h-[220px]">
+                  <div className="bg-white/50 dark:bg-gray-800/50 rounded-xl md:rounded-2xl p-5 md:p-6 h-full flex flex-col border border-gray-400 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors duration-200 min-h-[220px]">
                     {/* Top Section with Quote and Rating */}
                     <div className="flex items-start justify-between mb-3 md:mb-4">
                       <div className="p-2 md:p-3 bg-white dark:bg-gray-700 rounded-lg border border-sky-300 dark:border-sky-600">
@@ -203,7 +203,7 @@ export function SuccessStoriesSection() {
                             className={`w-3 h-3 md:w-4 md:h-4 ${
                               i < testimonial.rating
                                 ? "text-yellow-500 fill-yellow-500"
-                                : "text-gray-300 dark:text-gray-600"
+                                : "text-black dark:text-gray-600"
                             }`}
                           />
                         ))}
@@ -212,7 +212,7 @@ export function SuccessStoriesSection() {
 
                     {/* Feedback Text - Better mobile display */}
                     <div className="flex-grow mb-4 md:mb-6 overflow-hidden">
-                      <p className="text-gray-500 dark:text-gray-300 text-sm md:text-base leading-relaxed line-clamp-4 md:line-clamp-none">
+                      <p className="text-black dark:text-gray-300 text-sm md:text-base leading-relaxed line-clamp-4 md:line-clamp-none">
                         "{testimonial.feedback}"
                       </p>
                     </div>
@@ -222,7 +222,7 @@ export function SuccessStoriesSection() {
                       <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {testimonial.name}
                       </div>
-                      <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <div className="text-xs md:text-sm text-yellow-800 dark:text-gray-400 mt-1">
                         {testimonial.role}
                       </div>
                     </div>

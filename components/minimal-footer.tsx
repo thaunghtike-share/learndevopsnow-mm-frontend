@@ -185,7 +185,7 @@ export function MinimalFooter() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
-            <p className="text-gray-700 dark:text-gray-300 text-sm md:text-lg leading-relaxed max-w-xl font-medium">
+            <p className="text-black dark:text-gray-300 text-sm md:text-lg leading-relaxed max-w-xl font-base">
               Your go-to resource for mastering DevOps, cloud-native
               technologies, and automation. Practical guides, tutorials, and
               real-world projects.
@@ -303,7 +303,7 @@ export function MinimalFooter() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
+                        className="text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
                       >
                         <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                         {link.label}
@@ -335,7 +335,7 @@ export function MinimalFooter() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
+                        className="text-black dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
                       >
                         <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                         {link.label}
@@ -373,7 +373,7 @@ export function MinimalFooter() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
+                        className="text-black dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
                       >
                         <ArrowRight className="h-3 w-3 mr-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-1" />
                         {link.label}
@@ -394,7 +394,7 @@ export function MinimalFooter() {
                   <li>
                     <a
                       href="mailto:thaunghtikeoo.tho1234@gmail.com"
-                      className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
+                      className="text-black dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
                     >
                       <Mail className="h-4 w-4 mr-2 md:mr-3 text-purple-500" />
                       <span>Email Me</span>
@@ -403,13 +403,13 @@ export function MinimalFooter() {
                   <li>
                     <a
                       href="tel:+959952492359"
-                      className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
+                      className="text-black dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 flex items-center group font-medium text-sm md:text-base"
                     >
                       <Phone className="h-4 w-4 mr-2 md:mr-3 text-green-500" />
                       <span>+95 9952492359</span>
                     </a>
                   </li>
-                  <li className="text-gray-700 dark:text-gray-300 flex items-center font-medium text-sm md:text-base">
+                  <li className="text-black dark:text-gray-300 flex items-center font-medium text-sm md:text-base">
                     <MapPin className="h-4 w-4 mr-2 md:mr-3 text-red-500" />
                     <span>Yangon, Myanmar</span>
                   </li>
@@ -423,7 +423,7 @@ export function MinimalFooter() {
         <div className="border-t border-gray-200 dark:border-gray-800 pt-6 md:pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 md:space-y-6 lg:space-y-0">
             {/* Copyright */}
-            <p className="text-gray-700 text-xs md:text-sm dark:text-gray-300 text-center lg:text-left font-medium">
+            <p className="text-black text-xs md:text-sm dark:text-gray-300 text-center lg:text-left font-medium">
               &copy; {new Date().getFullYear()} Learn DevOps Now. All rights
               reserved.
             </p>
@@ -438,7 +438,7 @@ export function MinimalFooter() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-medium hover:scale-105"
+                  className="text-black dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-medium hover:scale-105"
                 >
                   {link.label}
                 </Link>
