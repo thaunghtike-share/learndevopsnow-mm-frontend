@@ -820,7 +820,7 @@ export default function EditArticlePage() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors duration-300 overflow-x-hidden ${
+      className={`min-h-screen flex flex-col bg-white dark:bg-[#000000] transition-colors duration-300 ${
         fullscreen ? "overflow-hidden" : ""
       }`}
     >

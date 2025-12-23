@@ -83,20 +83,7 @@ export default function HomeClient() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Add this to your existing useEffects in HomeClient
-  useEffect(() => {
-    // Load saved theme or detect system preference
-    const savedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-
-    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
+  
   // Handle initial load scroll
   useEffect(() => {
     if (isInitialLoad) {
@@ -129,7 +116,7 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       {/* Remove the fixed background div - it's causing the issue */}
 
       <div className="relative z-10">

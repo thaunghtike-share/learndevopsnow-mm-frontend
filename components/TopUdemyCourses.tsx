@@ -449,7 +449,7 @@ export function TopUdemyCourses() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <main className="max-w-7xl mx-auto px-4 py-20">
           {/* Simple Elegant Loading */}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">

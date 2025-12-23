@@ -1130,7 +1130,7 @@ export default function AuthorAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
       <BanNotification />

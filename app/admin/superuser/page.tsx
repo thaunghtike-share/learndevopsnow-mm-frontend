@@ -116,7 +116,7 @@ export default function SuperUserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative">
       <MinimalHeader />
 
       <ImpersonationBanner />

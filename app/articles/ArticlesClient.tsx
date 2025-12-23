@@ -738,7 +738,7 @@ export default function ArticlesClient() {
   // Loading state
   if (authorsLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="px-6 md:px-11 py-20">
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -766,7 +766,7 @@ export default function ArticlesClient() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       <div className="relative z-10">
         <MinimalHeader />
 

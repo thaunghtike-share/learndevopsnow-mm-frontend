@@ -6,7 +6,7 @@ import { TopUdemyCourses } from "@/components/TopUdemyCourses";
 
 export default function LearnDevOpsOnUdemyPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] overflow-x-hidden relative">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative">
       <MinimalHeader />
       <main className="relative z-10 -mt-12 md:-mt-5">
         <TopUdemyCourses />

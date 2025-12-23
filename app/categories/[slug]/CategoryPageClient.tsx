@@ -407,7 +407,7 @@ export default function CategoryPageClient({ slug }: Props) {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
           {/* Simple Elegant Loading */}

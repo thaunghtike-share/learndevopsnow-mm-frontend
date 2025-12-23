@@ -193,7 +193,7 @@ const staticLabs: DevOpsLab[] = [
 
 export default function DevOpsPlaygroundsPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
       <MinimalHeader />
 
       <main className="py-1 md:py-8">

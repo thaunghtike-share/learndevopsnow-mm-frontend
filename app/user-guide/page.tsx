@@ -85,7 +85,7 @@ export default function DocsPage() {
   )?.content;
 
   return (
-    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 md:px-11 md:py-8">

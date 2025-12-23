@@ -341,7 +341,7 @@ export default function AuthorDetailPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
           {/* Simple Elegant Loading */}
@@ -373,7 +373,7 @@ export default function AuthorDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-8 relative z-10">

@@ -6,7 +6,7 @@ import { Rocket } from "lucide-react";
 
 export default function WebsiteDevelopmentPage() {
   return (
-    <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 relative">
       {/* Subtle background pattern */}
       <div
         className="absolute inset-0 z-0 opacity-10"

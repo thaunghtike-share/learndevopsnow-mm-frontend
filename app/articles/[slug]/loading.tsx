@@ -3,7 +3,7 @@ import { MinimalFooter } from "@/components/minimal-footer";
 
 export default function ArticleLoading() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
       {/* Use actual header */}
       <MinimalHeader />
 
