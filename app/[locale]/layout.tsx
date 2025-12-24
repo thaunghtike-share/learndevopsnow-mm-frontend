@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
 
@@ -91,13 +94,31 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+  params: Promise<{ // <-- Make params a Promise
+    locale: string;
+  }>;
+}
+
+const locales = ["en", "my"];
+
+export default async function RootLayout({
+  children,
+  params
+}: RootLayoutProps) {
+  // Await the params first
+  const { locale } = await params; // <-- AWAIT here too
+  
+  // Ensure the locale is valid
+  if (!locales.includes(locale as any)) {
+    notFound();
+  }
+
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className="h-full">
+    <html lang={locale} className="h-full">
       <head>
         {/* Preload critical resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -135,7 +156,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}>
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
         <GoogleAnalytics gaId="G-1XGYJMR2B7" />
       </body>
     </html>

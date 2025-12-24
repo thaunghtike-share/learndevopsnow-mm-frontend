@@ -101,6 +101,8 @@ export default function HomeClient() {
 
   // Update URL when tag changes
   useEffect(() => {
+    if (!mounted) return;
+    
     const params = new URLSearchParams(window.location.search);
     if (selectedTag) {
       params.set("tag", selectedTag);
@@ -109,7 +111,7 @@ export default function HomeClient() {
     }
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     router.replace(newUrl);
-  }, [selectedTag, router]);
+  }, [selectedTag, router, mounted]);
 
   const updateTagFilter = (tagSlug: string | null) => {
     setSelectedTag(tagSlug);
@@ -117,13 +119,10 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
-      {/* Remove the fixed background div - it's causing the issue */}
-
       <div className="relative z-10">
         <MinimalHeader />
 
         <main className="relative z-10">
-          {/* Add explicit background to each section */}
           <section className="bg-white dark:bg-[#000000]">
             <DevOpsCyclingHero />
           </section>

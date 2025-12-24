@@ -30,12 +30,17 @@ import {
   Sun,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AuthModal from "@/app/auth/auth-modal";
 import { useAuth } from "@/app/auth/hooks/use-auth";
+import { useTranslations, useLocale } from "next-intl";
 
 export function MinimalHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("header");
+  const commonT = useTranslations("common");
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -67,6 +72,16 @@ export function MinimalHeader() {
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Language switcher function - SIMPLIFIED
+  const switchLanguage = (newLocale: string) => {
+    // Always go to home page of new language
+    router.push(`/${newLocale}/`);
+
+    // Close mobile menu if open
+    setIsMobileMenuOpen(false);
+    setIsUserDropdownOpen(false);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -168,7 +183,7 @@ export function MinimalHeader() {
     setTimeout(() => {
       logout();
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = `/${locale}/`;
       }, 100);
     }, 500);
   };
@@ -223,31 +238,31 @@ export function MinimalHeader() {
   };
 
   // Mobile navigation items
-  const mobileNavItems = [{ href: "/", label: "Home", icon: Home }];
+  const mobileNavItems = [{ href: "/", label: t("home"), icon: Home }];
 
   const mobileArticlesItems = [
-    { href: "/articles", label: "All Articles" },
-    { href: "/100-days-cloud-challenge", label: "Explore 100 Days of Cloud" },
+    { href: "/articles", label: t("readArticles") },
+    { href: "/100-days-cloud-challenge", label: t("learn100DaysAzure") },
   ];
 
   const mobileResourcesItems = [
-    { href: "/learn-devops-on-youtube", label: "Learn DevOps on YouTube" },
-    { href: "/devops-playgrounds", label: "Explore DevOps Playgrounds" },
+    { href: "/learn-devops-on-youtube", label: t("learnDevOpsYouTube") },
+    { href: "/devops-playgrounds", label: t("devOpsPlaygrounds") },
   ];
 
   const mobileServicesItems = [
-    { href: "/services/cloud-migration", label: "Cloud Migration" },
+    { href: "/services/cloud-migration", label: t("cloudMigration") },
     {
       href: "/services/infrastructure-automation",
-      label: "Infrastructure as Code",
+      label: t("infrastructureAsCode"),
     },
-    { href: "/services/part-time-devops-support", label: "DevOps Support" },
+    { href: "/services/part-time-devops-support", label: t("devOpsSupport") },
   ];
 
   const mobileOthersItems = [
-    { href: "/about", label: "About" },
-    { href: "/faqs", label: "FAQs" },
-    { href: "/user-guide", label: "User Guide" },
+    { href: "/about", label: t("about") },
+    { href: "/faqs", label: t("faqs") },
+    { href: "/user-guide", label: t("userGuide") },
   ];
 
   // Delete account functionality
@@ -268,7 +283,7 @@ export function MinimalHeader() {
 
       if (response.ok) {
         localStorage.removeItem("token");
-        window.location.href = "/";
+        window.location.href = `/${locale}/`;
       } else {
         const errorData = await response.json();
         alert(
@@ -298,7 +313,7 @@ export function MinimalHeader() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-red-900 dark:text-red-100">
-                Delete Your Account
+                {t("deleteAccount")}
               </h3>
               <p className="text-red-600 dark:text-red-400 text-sm">
                 This action cannot be undone
@@ -338,7 +353,7 @@ export function MinimalHeader() {
               disabled={isDeleting}
               className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 font-medium disabled:opacity-50"
             >
-              Cancel
+              {commonT("cancel")}
             </button>
             <button
               onClick={handleDeleteAccount}
@@ -353,7 +368,7 @@ export function MinimalHeader() {
               ) : (
                 <>
                   <Trash2 className="w-4 h-4" />
-                  Yes, Delete My Account
+                  {commonT("confirmDelete")}
                 </>
               )}
             </button>
@@ -376,7 +391,7 @@ export function MinimalHeader() {
         <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <p className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-              Hello, {user?.username}!
+              {t("hello", { username: user?.username || "User" })}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
               {user?.email}
@@ -384,30 +399,30 @@ export function MinimalHeader() {
           </div>
 
           <Link
-            href="/author-profile-form"
+            href={`/${locale}/author-profile-form`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <Settings className="w-4 h-4 mr-3" />
-            Edit Your Profile
+            {t("editProfile")}
           </Link>
 
           <Link
-            href={`/admin/author/${user?.username}`}
+            href={`/${locale}/admin/author/${user?.username}`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <LayoutDashboard className="w-4 h-4 mr-3" />
-            Dashboard
+            {t("dashboard")}
           </Link>
 
           <Link
-            href={`/authors/${user?.slug}`}
+            href={`/${locale}/authors/${user?.slug}`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <Crown className="w-4 h-4 mr-3" />
-            Public Profile View
+            {t("publicProfile")}
           </Link>
 
           <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
@@ -416,7 +431,7 @@ export function MinimalHeader() {
               className="flex items-center w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             >
               <LogOut className="w-4 h-4 mr-3" />
-              Sign Out
+              {t("signOut")}
             </button>
 
             <button
@@ -424,7 +439,7 @@ export function MinimalHeader() {
               className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium border-t border-gray-100 dark:border-gray-700 mt-2 pt-2"
             >
               <Trash2 className="w-4 h-4 mr-3" />
-              Delete Account
+              {t("deleteAccount")}
             </button>
           </div>
         </div>
@@ -470,42 +485,42 @@ export function MinimalHeader() {
 
         {/* User Menu Items */}
         <Link
-          href="/author-profile-form"
+          href={`/${locale}/author-profile-form`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname === "/author-profile-form"
+            pathname === `/${locale}/author-profile-form`
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Settings className="w-6 h-6 mr-3" />
-          Edit Your Profile
+          {t("editProfile")}
         </Link>
 
         <Link
-          href={`/admin/author/${user?.username}`}
+          href={`/${locale}/admin/author/${user?.username}`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname.includes("/admin/author")
+            pathname.includes(`/${locale}/admin/author`)
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <LayoutDashboard className="w-6 h-6 mr-3" />
-          Dashboard
+          {t("dashboard")}
         </Link>
 
         <Link
-          href={`/authors/${user?.slug}`}
+          href={`/${locale}/authors/${user?.slug}`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname.includes(`/authors/${user?.slug}`)
+            pathname.includes(`/${locale}/authors/${user?.slug}`)
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Crown className="w-6 h-6 mr-3" />
-          Public Profile View
+          {t("publicProfile")}
         </Link>
 
         <button
@@ -513,7 +528,7 @@ export function MinimalHeader() {
           className="flex items-center w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
         >
           <LogOut className="w-6 h-6 mr-3" />
-          Sign Out
+          {t("signOut")}
         </button>
 
         <button
@@ -521,7 +536,7 @@ export function MinimalHeader() {
           className="flex items-center w-full px-4 py-4 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium text-lg mt-2"
         >
           <Trash2 className="w-6 h-6 mr-3" />
-          Delete Account
+          {t("deleteAccount")}
         </button>
       </div>
     );
@@ -557,7 +572,7 @@ export function MinimalHeader() {
           <div className="flex items-center justify-between py-4 px-6 gap-3">
             {/* Logo - KEEP ORIGINAL SIZE */}
             <Link
-              href="/"
+              href={`/${locale}/`}
               className="flex items-center justify-start group flex-shrink-0"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -568,13 +583,25 @@ export function MinimalHeader() {
               />
             </Link>
 
+            {/* Language Switcher - Mobile */}
+            <button
+              onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
+              className="p-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium flex items-center gap-1"
+            >
+              {locale === "en" ? (
+                <span className="text-sm">🇲🇲</span>
+              ) : (
+                <span className="text-sm">🇺🇸</span>
+              )}
+            </button>
+
             {/* Search Bar - WIDER */}
             <div className="flex-1 relative max-w-[200px] ml-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
-                  placeholder="Search articles..."
+                  placeholder={t("search")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-xl text-sm pl-10 pr-8 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 font-medium h-10 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
@@ -598,7 +625,7 @@ export function MinimalHeader() {
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
-                      href={`/articles/${article.slug}`}
+                      href={`/${locale}/articles/${article.slug}`}
                       className="block px-4 py-3 text-sm text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all font-medium hover:text-blue-700 dark:hover:text-blue-300"
                       onClick={() => {
                         handleClear();
@@ -629,7 +656,10 @@ export function MinimalHeader() {
         {/* DESKTOP HEADER - Only removed the border/frame around navigation */}
         <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-11">
           {/* Logo Section */}
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link
+            href={`/${locale}/`}
+            className="flex items-center space-x-3 group"
+          >
             <div className="relative">
               <div className="absolute -inset-3 bg-gradient-to-r from-blue-200 to-purple-200 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
               <img
@@ -644,14 +674,14 @@ export function MinimalHeader() {
           {/* Navigation - Removed border/frame */}
           <nav className="flex items-center space-x-1 -ml-12">
             <Link
-              href="/"
+              href={`/${locale}/`}
               className={`px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                pathname === "/"
+                pathname === `/${locale}/`
                   ? "bg-blue-600 dark:bg-blue-700 text-white"
                   : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
               }`}
             >
-              <span className="relative z-10">Home</span>
+              <span className="relative z-10">{t("home")}</span>
             </Link>
 
             {/* Articles Dropdown */}
@@ -666,14 +696,14 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("/articles") ||
-                  pathname.includes("/100-days-cloud-challenge") ||
-                  pathname.includes("/learn-linux-basic")
+                  pathname.includes("articles") ||
+                  pathname.includes("100-days-cloud-challenge") ||
+                  pathname.includes("learn-linux-basic")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">Articles</span>
+                <span className="relative z-10">{t("articles")}</span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isArticlesOpen && (
@@ -687,28 +717,28 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href="/articles"
+                    href={`/${locale}/articles`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    Read Articles
+                    {t("readArticles")}
                   </Link>
                   <Link
-                    href="/100-days-cloud-challenge"
+                    href={`/${locale}/100-days-cloud-challenge`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    Learn 100 Days of Azure
+                    {t("learn100DaysAzure")}
                   </Link>
                   <Link
-                    href="/learn-linux-basic"
+                    href={`/${locale}/learn-linux-basic`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    Learn Linux Essentials 
+                    {t("learnLinuxEssentials")}
                   </Link>
                   <Link
-                    href="/categories"
+                    href={`/${locale}/categories`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    Explore All Categories
+                    {t("exploreCategories")}
                   </Link>
                 </div>
               )}
@@ -726,14 +756,14 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("/learn-devops-on-youtube") ||
-                  pathname.includes("/free-courses") ||
-                  pathname.includes("/devops-playgrounds")
+                  pathname.includes("learn-devops-on-youtube") ||
+                  pathname.includes("free-courses") ||
+                  pathname.includes("devops-playgrounds")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">Resources</span>
+                <span className="relative z-10">{t("resources")}</span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isResourcesOpen && (
@@ -747,22 +777,22 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href="/learn-devops-on-youtube"
+                    href={`/${locale}/learn-devops-on-youtube`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    Learn DevOps on YouTube
+                    {t("learnDevOpsYouTube")}
                   </Link>
                   <Link
-                    href="/free-courses"
+                    href={`/${locale}/free-courses`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    Learn Free Courses
+                    {t("freeCourses")}
                   </Link>
                   <Link
-                    href="/devops-playgrounds"
+                    href={`/${locale}/devops-playgrounds`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    Explore DevOps Playgrounds
+                    {t("devOpsPlaygrounds")}
                   </Link>
                 </div>
               )}
@@ -780,12 +810,12 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("/services")
+                  pathname.includes("services")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">Services</span>
+                <span className="relative z-10">{t("services")}</span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isServicesOpen && (
@@ -799,22 +829,22 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href="/services/cloud-migration"
+                    href={`/${locale}/services/cloud-migration`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    Cloud Migration
+                    {t("cloudMigration")}
                   </Link>
                   <Link
-                    href="/services/infrastructure-automation"
+                    href={`/${locale}/services/infrastructure-automation`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    Infrastructure as Code
+                    {t("infrastructureAsCode")}
                   </Link>
                   <Link
-                    href="/services/part-time-devops-support"
+                    href={`/${locale}/services/part-time-devops-support`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    DevOps Support
+                    {t("devOpsSupport")}
                   </Link>
                 </div>
               )}
@@ -832,14 +862,14 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("/about") ||
-                  pathname.includes("/faqs") ||
-                  pathname.includes("/user-guide")
+                  pathname.includes("about") ||
+                  pathname.includes("faqs") ||
+                  pathname.includes("user-guide")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">Others</span>
+                <span className="relative z-10">{t("others")}</span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isOthersOpen && (
@@ -853,22 +883,22 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href="/about"
+                    href={`/${locale}/about`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    About
+                    {t("about")}
                   </Link>
                   <Link
-                    href="/faqs"
+                    href={`/${locale}/faqs`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    FAQs
+                    {t("faqs")}
                   </Link>
                   <Link
-                    href="/user-guide"
+                    href={`/${locale}/user-guide`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    User Guide
+                    {t("userGuide")}
                   </Link>
                 </div>
               )}
@@ -877,13 +907,29 @@ export function MinimalHeader() {
 
           {/* Right Section - Search + Auth */}
           <div className="flex items-center space-x-5">
+            {/* Language Switcher - Desktop */}
+            <button
+              onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
+              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium flex items-center gap-2"
+            >
+              {locale === "en" ? (
+                <>
+                  <span className="text-sm">🇲🇲</span>
+                  <span>မြန်မာ</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-sm">🇺🇸</span>
+                  <span>English</span>
+                </>
+              )}
+            </button>
+
             {/* Dark Mode Toggle - Desktop Only */}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-1"
-              aria-label={
-                darkMode ? "Switch to light mode" : "Switch to dark mode"
-              }
+              aria-label={darkMode ? t("lightMode") : t("darkMode")}
             >
               {darkMode ? (
                 <Sun className="w-6 h-6" />
@@ -898,7 +944,7 @@ export function MinimalHeader() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-800 dark:text-gray-300 w-4 h-4 z-10" />
                 <Input
                   type="text"
-                  placeholder="Search articles..."
+                  placeholder={t("search")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-full pl-10 pr-8 bg-white dark:bg-gray-900 border-gray-400 dark:border-gray-700 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 transition-all group-hover:border-gray-300 dark:group-hover:border-gray-600 font-medium"
@@ -921,7 +967,7 @@ export function MinimalHeader() {
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
-                      href={`/articles/${article.slug}`}
+                      href={`/${locale}/articles/${article.slug}`}
                       className="block px-4 py-3 text-black dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all group font-medium"
                       onClick={handleClear}
                     >
@@ -971,7 +1017,7 @@ export function MinimalHeader() {
                     onClick={handleSignInClick}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
                   >
-                    Write Article
+                    {t("writeArticle")}
                   </button>
                 )}
               </div>
@@ -1000,7 +1046,7 @@ export function MinimalHeader() {
           {/* Menu Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              Menu
+              {t("menu")}
             </span>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
@@ -1012,6 +1058,46 @@ export function MinimalHeader() {
 
           {/* Menu Content */}
           <div className="flex-1 overflow-y-auto py-6">
+            {/* Language Switcher - Mobile Menu */}
+            <div className="px-6 mb-4">
+              <button
+                onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
+                className="w-full py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 text-gray-700 dark:text-gray-300 rounded-xl hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 transition-all shadow-sm font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
+              >
+                {locale === "en" ? (
+                  <>
+                    <span className="text-lg">🇲🇲</span>
+                    <span className="text-lg">Switch to Myanmar (မြန်မာ)</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-lg">🇺🇸</span>
+                    <span className="text-lg">Switch to English</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Dark Mode Toggle - Mobile Menu */}
+            <div className="px-6 mb-6">
+              <button
+                onClick={toggleDarkMode}
+                className="w-full py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/10 dark:to-gray-900/20 text-gray-700 dark:text-gray-300 rounded-xl hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-900/20 dark:hover:to-gray-900/30 transition-all shadow-sm font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
+              >
+                {darkMode ? (
+                  <>
+                    <Sun className="w-5 h-5" />
+                    <span>{t("lightMode")}</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-5 h-5" />
+                    <span>{t("darkMode")}</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Show User Dropdown when logged in */}
             {isAuthenticated ? (
               <MobileUserDropdown />
@@ -1023,7 +1109,7 @@ export function MinimalHeader() {
                   className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg font-medium flex items-center justify-center gap-2"
                 >
                   <PenSquare className="w-5 h-5" />
-                  Write Article
+                  {t("writeArticle")}
                 </button>
               </div>
             )}
@@ -1035,9 +1121,9 @@ export function MinimalHeader() {
                 return (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={`/${locale}${item.href}`}
                     className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-                      pathname === item.href
+                      pathname === `/${locale}${item.href}`
                         ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
@@ -1058,7 +1144,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <FileText className="w-6 h-6 mr-3" />
-                  Articles
+                  {t("articles")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1072,7 +1158,7 @@ export function MinimalHeader() {
                   {mobileArticlesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={`/${locale}${item.href}`}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1094,7 +1180,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <Zap className="w-6 h-6 mr-3" />
-                  Resources
+                  {t("resources")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1108,7 +1194,7 @@ export function MinimalHeader() {
                   {mobileResourcesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={`/${locale}${item.href}`}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1130,7 +1216,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <Server className="w-6 h-6 mr-3" />
-                  Services
+                  {t("services")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1144,7 +1230,7 @@ export function MinimalHeader() {
                   {mobileServicesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={`/${locale}${item.href}`}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1166,7 +1252,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <HelpCircle className="w-6 h-6 mr-3" />
-                  Others
+                  {t("others")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1180,7 +1266,7 @@ export function MinimalHeader() {
                   {mobileOthersItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={`/${locale}${item.href}`}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
