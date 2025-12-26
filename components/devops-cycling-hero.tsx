@@ -19,7 +19,7 @@ const DevOpsCyclingHero = () => {
       title: "What is DevOps?",
       titleMy: "What is DevOps?",
       description: "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle and provide continuous delivery with high software quality.",
-      descriptionMy: "DevOps ဆိုတာ ထပ်တလဲလဲလုပ်နေရတဲ့ အလုပ်တွေကို Automation စနစ်နဲ့ လျှော့ချပစ်ပြီး Software တစ်ခု စရေးတာကနေ အသုံးပြုသူလက်ထဲ ရောက်တဲ့အထိ Development Cycle တစ်ခုလုံးကို အမြန်ဆုံးဖြစ်အောင် ပေါင်းစပ်ပေးတာပဲ",
+      descriptionMy: "DevOps ဆိုတာ ထပ်တလဲလဲလုပ်နေရတဲ့ အလုပ်တွေကို Automation စနစ်နဲ့ လျှော့ချပစ်ပြီး Software တစ်ခု စရေးတာကနေ အဆုံးထိ Development Cycle တစ်ခုလုံးကို အမြန်ဆုံးဖြစ်အောင် လုပ်ပေးတဲ့ နည်းပညာ ဖြစ်ပါတယ်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
       tagsMy: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
