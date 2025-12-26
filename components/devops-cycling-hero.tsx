@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from 'next-intl';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const DevOpsCyclingHero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -16,19 +17,19 @@ const DevOpsCyclingHero = () => {
     {
       id: "devops",
       title: "What is DevOps?",
-      titleMy: "DevOps ဆိုတာဘာလဲ",
+      titleMy: "What is DevOps?",
       description: "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle and provide continuous delivery with high software quality.",
-      descriptionMy: "DevOps သည် Software Development (Dev) နှင့် IT Operations (Ops) ကို ပေါင်းစပ်ထားသော အလေ့အကျင့်များဖြစ်ပြီး ဖွံ့ဖြိုးမှုသံသရာကို တိုစေကာ အရည်အသွေးမြင့် Software များကို အဆက်မပြတ် ပေးပို့နိုင်စေရန် ရည်ရွယ်ပါသည်။",
+      descriptionMy: "DevOps ဆိုတာ ထပ်တလဲလဲလုပ်နေရတဲ့ အလုပ်တွေကို Automation စနစ်နဲ့ လျှော့ချပစ်ပြီး Software တစ်ခု စရေးတာကနေ အသုံးပြုသူလက်ထဲ ရောက်တဲ့အထိ Development Cycle တစ်ခုလုံးကို အမြန်ဆုံးဖြစ်အောင် ပေါင်းစပ်ပေးတာပဲ",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
-      tagsMy: ["အလိုအလျောက်ပြုလုပ်ခြင်း", "ပူးပေါင်းဆောင်ရွက်ခြင်း", "စောင့်ကြည့်ခြင်း", "အဆက်မပြတ်ပေးပို့ခြင်း"]
+      tagsMy: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
     },
     {
       id: "linux",
       title: "Master Linux",
-      titleMy: "Linux ကိုကျွမ်းကျင်အောင်လုပ်ပါ",
+      titleMy: "Master Linux",
       description: "Build your foundation with Linux - the operating system that powers most servers, containers, and cloud infrastructure in modern DevOps environments.",
-      descriptionMy: "Linux ဖြင့် အခြေခံအုတ်မြစ်ချပါ - ခေတ်မီ DevOps ပတ်ဝန်းကျင်များတွင် Server အများစု၊ Container များနှင့် Cloud Infrastructure များကို စွမ်းအားပေးသော Operating System ဖြစ်ပါသည်။",
+      descriptionMy: "Linux OS ကိုသေချာသုံးတတ်ရပါမယ်။ Linux Command Line တွေကိုလည်း ကျွမ်းကျင်ဖို့ လိုအပ်ပါတယ်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Command Line", "File System", "Permissions", "Shell Scripting"],
       tagsMy: ["Command Line", "File System", "Permissions", "Shell Scripting"]
@@ -36,9 +37,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "network",
       title: "Learn Network Basics",
-      titleMy: "Network အခြေခံများလေ့လာပါ",
+      titleMy: "Learn Network Basics",
       description: "Understand networking basics - the protocols, architectures, and tools that enable communication between computers, servers, and cloud services in DevOps.",
-      descriptionMy: "DevOps တွင် ကွန်ပျူတာများ၊ Server များနှင့် Cloud Service များအကြား ဆက်သွယ်မှုကို ခွင့်ပြုပေးသော Protocol များ၊ Architecture များနှင့် Tool များ၏ Network အခြေခံများကို နားလည်ပါ။",
+      descriptionMy: "CCNA level လောက်အထိ networking သဘောတရားတွေကို နားလည်ဖို့ လိုအပ်ပါတယ်။ ဒါမှလည်း cloud ကိုလေ့လာတဲ့အခါ အထောက်အကူဖြစ်မယ်။",
       iconGradient: "from-sky-600 to-blue-600",
       tags: ["TCP/IP", "DNS", "Subnet", "Routing", "Switching"],
       tagsMy: ["TCP/IP", "DNS", "Subnet", "Routing", "Switching"]
@@ -46,9 +47,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "cloud",
       title: "Explore Cloud Basic",
-      titleMy: "Cloud အခြေခံများလေ့လာပါ",
+      titleMy: "Explore Cloud Basic",      
       description: "Dive into cloud computing - learn how to leverage scalable, on-demand resources like servers, storage, and applications without managing physical infrastructure.",
-      descriptionMy: "Cloud Computing ကို နှစ်မြုပ်လေ့လာပါ - ရုပ်ပိုင်းဆိုင်ရာ Infrastructure များကို စီမံခန့်ခွဲရန် မလိုဘဲ Server များ၊ Storage များနှင့် Application များကဲ့သို့သော စကေးတိုးနိုင်သည့်၊ လိုအပ်ချိန်တွင်တောင်းဆိုနိုင်သည့် အရင်းအမြစ်များကို မည်သို့အသုံးချရမည်ကို လေ့လာပါ။",
+      descriptionMy: "AWS, Azure, GCP စသည့် Cloud Provider များကို သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ Cloud ရဲ့ အခြေခံသဘောတရားတွေကိုလည်း နားလည်ဖို့ လိုအပ်ပါတယ်။",
       iconGradient: "from-sky-600 to-blue-600",
       tags: ["AWS", "Azure", "GCP"],
       tagsMy: ["AWS", "Azure", "GCP"]
@@ -56,9 +57,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "git",
       title: "Master Version Control",
-      titleMy: "Version Control ကိုကျွမ်းကျင်အောင်လုပ်ပါ",
+      titleMy: "Master Version Control",      
       description: "Learn Git - the distributed version control system that enables collaboration, branching, and code management in modern software development and DevOps workflows.",
-      descriptionMy: "Git ကိုလေ့လာပါ - ခေတ်မီ Software Development နှင့် DevOps Workflow များတွင် Collaboration၊ Branching နှင့် Code Management ကို ခွင့်ပြုပေးသော Distributed Version Control System ဖြစ်ပါသည်။",
+      descriptionMy: "Git ကို ကျွမ်းကျင်စွာ သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ GitHub, GitLab, Bitbucket စသည့် Git Repository Hosting Service များကိုလည်း သုံးတတ်ဖို့ လိုအပ်ပါတယ်။",
       iconGradient: "from-blue-600 to-cyan-600",
       tags: ["Branches", "Merge", "Pull Requests", "GitHub"],
       tagsMy: ["Branches", "Merge", "Pull Requests", "GitHub"]
@@ -66,9 +67,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "containerization",
       title: "Learn Containerization",
-      titleMy: "Containerization လေ့လာပါ",
+      titleMy: "Learn Containerization",
       description: "Understand containerization - how to package applications and dependencies into lightweight, portable containers that run consistently across different environments.",
-      descriptionMy: "Containerization ကို နားလည်ပါ - Application များနှင့် Dependencies များကို ပတ်ဝန်းကျင်အမျိုးမျိုးတွင် တစ်သမတ်တည်း လည်ပတ်နိုင်သော ပေါ့ပါးပြီး သယ်ဆောင်နိုင်သည့် Container များထဲသို့ မည်သို့ထည့်သွင်းရမည်ကို လေ့လာပါ။",
+      descriptionMy: "Containerization ကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Applications တွေကို Containers အဖြစ် package လုပ်ပြီး Environment မျိုးစုံမှာ တူညီစွာ run နိုင်ဖို့ ဖြစ်ပါတယ်။",
       iconGradient: "from-pink-600 to-purple-600",
       tags: ["Docker", "Images", "Containers", "Podman"],
       tagsMy: ["Docker", "Images", "Containers", "Podman"]
@@ -76,9 +77,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "cicd",
       title: "Understand CI/CD",
-      titleMy: "CI/CD ကိုနားလည်ပါ",
+      titleMy: "Understand CI/CD",
       description: "Explore Continuous Integration and Continuous Deployment - the practices that enable teams to deliver code changes more frequently and reliably through automated pipelines.",
-      descriptionMy: "Continuous Integration နှင့် Continuous Deployment ကို လေ့လာပါ - အဖွဲ့များအား Automated Pipeline များမှတစ်ဆင့် Code ပြောင်းလဲမှုများကို ပိုမိုမကြာခဏနှင့် ယုံကြည်စိတ်ချစွာ ပေးပို့နိုင်စေရန် ခွင့်ပြုပေးသော အလေ့အကျင့်များဖြစ်ပါသည်။",
+      descriptionMy: "Continuous Integration (CI) နှင့် Continuous Deployment (CD) ကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Automated Pipelines တွေကနေတစ်ဆင့် Code Changes တွေကို လျှင်မြန် ထိရောက်စွာ deliver လုပ်နိုင်ဖို့ ဖြစ်ပါတယ်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Jenkins", "GitLab CI", "Github Actions", "CircleCI"],
       tagsMy: ["Jenkins", "GitLab CI", "Github Actions", "CircleCI"]
@@ -86,9 +87,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "kubernetes",
       title: "Master Kubernetes",
-      titleMy: "Kubernetes ကိုကျွမ်းကျင်အောင်လုပ်ပါ",
+      titleMy: "Master Kubernetes",
       description: "Learn container orchestration with Kubernetes - the industry standard for automating deployment, scaling, and management of containerized applications.",
-      descriptionMy: "Kubernetes ဖြင့် Container Orchestration ကို လေ့လာပါ - Containerized Application များ၏ Deployment၊ Scaling နှင့် Management ကို အလိုအလျောက်ပြုလုပ်ရန်အတွက် စက်မှုလုပ်ငန်းစံဖြစ်ပါသည်။",
+      descriptionMy: "Kubernetes ကို ကျွမ်းကျင်စွာ သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ Containerized Applications တွေကို Deployment, Scaling, Management စသည့် အလုပ်တွေကို Automation လုပ်ပေးနိုင်ပါတယ်။",
       iconGradient: "from-blue-600 to-cyan-600",
       tags: ["Pods", "Rancher", "Microk8s", "Helm", "Kubeadm"],
       tagsMy: ["Pods", "Rancher", "Microk8s", "Helm", "Kubeadm"]
@@ -96,9 +97,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "monitoring",
       title: "Explore Observability",
-      titleMy: "Observability ကိုလေ့လာပါ",
+      titleMy: "Explore Observability",
       description: "Understand the importance of monitoring and logging in DevOps - how to track application performance, detect issues, and gain insights through tools like Prometheus, Grafana, and ELK Stack.",
-      descriptionMy: "DevOps တွင် Monitoring နှင့် Logging ၏ အရေးပါမှုကို နားလည်ပါ - Prometheus၊ Grafana နှင့် ELK Stack ကဲ့သို့သော Tool များမှတစ်ဆင့် Application စွမ်းဆောင်ရည်ကို မည်သို့တိုင်းတာရမည်၊ ပြဿနာများကို မည်သို့ရှာဖွေရမည်နှင့် ထိုးထွင်းသိမြင်မှုများ မည်သို့ရရှိနိုင်မည်ကို လေ့လာပါ။",
+      descriptionMy: "DevOps မှာ Monitoring နှင့် Logging ရဲ့ အရေးပါမှုကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Application Performance ကို ချက်ချင်းသိရှိနိုင်ဖို့  issue ပြဿနာများကို ရှာဖွေနိုင်ဖို့ ဖြစ်ပါတယ်။ Prometheus, Grafana, ELK Stack စသည့် Tools များကို သုံးနိုင်ဖို့ လိုအပ်ပါတယ်။",
       iconGradient: "from-pink-600 to-purple-600",
       tags: ["Prometheus", "Loki", "Kibana", "Logs", "Alerts", "Grafana"],
       tagsMy: ["Prometheus", "Loki", "Kibana", "Logs", "Alerts", "Grafana"]
@@ -106,9 +107,9 @@ const DevOpsCyclingHero = () => {
     {
       id: "iac",
       title: "Discover IAC",
-      titleMy: "Infrastructure as Code (IAC) ကိုရှာဖွေပါ",
+      titleMy: "Discover IAC",
       description: "Master Infrastructure as Code (IaC) - learn to manage and provision computing infrastructure through code for version control and automated deployment.",
-      descriptionMy: "Infrastructure as Code (IaC) ကို ကျွမ်းကျင်အောင်လုပ်ပါ - Version Control နှင့် Automated Deployment အတွက် Code မှတစ်ဆင့် Computing Infrastructure များကို မည်သို့စီမံခန့်ခွဲရမည်နှင့် Provision လုပ်ရမည်ကို လေ့လာပါ။",
+      descriptionMy: "Infrastructure as Code (IaC) ကို ကျွမ်းကျင်စွာ ရေးနိုင်ဖို့ လိုအပ်ပါတယ်။ Infrastructure ကို Code မှတစ်ဆင့် စီမံခန့်ခွဲပြီး Automated Deployment အတွက် ဖြစ်ပါတယ်။",
       iconGradient: "from-sky-600 to-purple-600",
       tags: ["Terraform", "CloudFormation", "Pulumi", "Boto3", "Packer"],
       tagsMy: ["Terraform", "CloudFormation", "Pulumi", "Boto3", "Packer"]
@@ -119,16 +120,6 @@ const DevOpsCyclingHero = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [slides.length, mounted]);
-
   const currentSlideData = slides[currentSlide];
 
   const handleImageError = (
@@ -136,6 +127,15 @@ const DevOpsCyclingHero = () => {
   ) => {
     const target = e.currentTarget;
     target.src = "/devops.png";
+  };
+
+  // Add manual navigation functions
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
   return (
@@ -249,7 +249,7 @@ const DevOpsCyclingHero = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + index * 0.05 }}
-                        className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-full text-xs font-medium bg-white dark:from-gray-300 dark:to-gray-400 border border-black-200 dark:border-orange-700 text-orange-500 dark:text-orange-400 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
+                        className="inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-full text-xs font-medium bg-white dark:bg-gray-100 border border-black-200 dark:border-orange-700 text-orange-500 dark:text-orange-400 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300"
                       >
                         {tag}
                       </motion.span>
@@ -257,24 +257,45 @@ const DevOpsCyclingHero = () => {
                   </div>
                 </div>
 
-                {/* Progress Indicators */}
-                <div className="flex items-center justify-center gap-1 sm:gap-2 pt-2 md:pt-4">
-                  {slides.map((slide, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className="group relative"
-                      aria-label={`Go to slide ${index + 1}`}
-                    >
-                      <div
-                        className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full transition-all duration-300 ${
-                          index === currentSlide
-                            ? `scale-150 bg-gradient-to-r ${slide.iconGradient}`
-                            : "bg-gray-300 dark:bg-gray-600 group-hover:bg-gray-400 dark:group-hover:bg-gray-500"
-                        }`}
-                      />
-                    </button>
-                  ))}
+                {/* Progress Indicators WITH CHEVRON CONTROLS */}
+                <div className="flex items-center justify-center gap-4 sm:gap-6 pt-2 md:pt-4">
+                  {/* Left Chevron */}
+                  <button
+                    onClick={prevSlide}
+                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    aria-label="Previous topic"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </button>
+
+                  {/* Dotted Line Indicators */}
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    {slides.map((slide, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className="group relative"
+                        aria-label={`Go to slide ${index + 1}`}
+                      >
+                        <div
+                          className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full transition-all duration-300 ${
+                            index === currentSlide
+                              ? `scale-150 bg-gradient-to-r ${slide.iconGradient}`
+                              : "bg-gray-300 dark:bg-gray-600 group-hover:bg-gray-400 dark:group-hover:bg-gray-500"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Right Chevron */}
+                  <button
+                    onClick={nextSlide}
+                    className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    aria-label="Next topic"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>

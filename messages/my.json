@@ -31,9 +31,9 @@
     "menu": "မီနူး"
   },
   "hero": {
-    "mission": "ကျွန်ုပ်တို့၏ ရည်မှန်းချက်",
-    "studentsDevelopers": "ကျောင်းသားများနှင့် Developer များအတွက်",
-    "description": "ဤဝဘ်ဆိုက်သည် DevOps သင်ယူလိုသော မြန်မာကျောင်းသားများနှင့် Developer များအတွက် ခေတ်မီ Software Development နှင့် Cloud Infrastructure တွင် အသက်မွေးဝမ်းကြောင်းတိုးတက်ရန် ရည်ရွယ်ပါသည်။"
+    "mission": "Our Mission for",
+    "studentsDevelopers": "Students & Developers",
+    "description": "ဤဝဘ်ဆိုက်သည် devops ကို လေ့လာလိုသော မြန်မာနိုင်ငံရှိ ကျောင်းသား ကျောင်းသူ များနှင့် developer များအတွက် အထောက်အကူပြုစေရန် ရည်ရွယ်ပါသည်။"
   },
   "common": {
     "loading": "တင်နေသည်...",

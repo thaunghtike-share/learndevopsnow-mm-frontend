@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
@@ -16,7 +15,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// FIXED: Use absolute URLs for OG image
 const SITE_URL = 'https://www.learndevopsnow-mm.blog';
 
 export const metadata: Metadata = {
@@ -96,26 +94,38 @@ export const metadata: Metadata = {
 
 interface RootLayoutProps {
   children: React.ReactNode;
-  params: Promise<{ // <-- Make params a Promise
+  params: Promise<{
     locale: string;
   }>;
 }
 
 const locales = ["en", "my"];
 
+export async function generateStaticParams() {
+  return locales.map((locale) => ({
+    locale,
+  }));
+}
+
 export default async function RootLayout({
   children,
   params
 }: RootLayoutProps) {
-  // Await the params first
-  const { locale } = await params; // <-- AWAIT here too
+  const { locale } = await params;
   
-  // Ensure the locale is valid
-  if (!locales.includes(locale as any)) {
+  if (!locales.includes(locale)) {
     notFound();
   }
 
-  const messages = await getMessages();
+  // FIXED: From app/[locale]/layout.tsx, go up 2 levels to messages folder
+  let messages;
+  try {
+    messages = (await import(`../../messages/${locale}.json`)).default;
+  } catch (error) {
+    console.error(`Failed to load messages for locale: ${locale}`, error);
+    // Fallback to English if messages file not found
+    messages = (await import(`../../messages/en.json`)).default;
+  }
 
   return (
     <html lang={locale} className="h-full">
@@ -156,7 +166,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}>
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
         <GoogleAnalytics gaId="G-1XGYJMR2B7" />

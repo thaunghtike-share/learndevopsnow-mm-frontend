@@ -29,11 +29,13 @@ import {
   Globe,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import AuthModal from "@/app/[locale]/auth/auth-modal";
 import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 
 export function MinimalHeader() {
+  const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -190,14 +192,17 @@ export function MinimalHeader() {
     setShowAuthModal(false);
   };
 
-  // Language switcher
+  // In MinimalHeader component
   const switchLanguage = (newLocale: "en" | "my") => {
     setCurrentLocale(newLocale);
     localStorage.setItem("locale", newLocale);
 
-    // Navigate to the new locale
-    const newPath = pathname.replace(/^\/(en|my)/, `/${newLocale}`);
-    window.location.href = newPath;
+    // IMPORTANT: Get the current path without the locale prefix
+    const pathWithoutLocale = pathname.replace(/^\/(en|my)/, "");
+
+    // IMPORTANT: Navigate to the new locale
+    // Since you're in a client component, use router.push
+    router.push(`/${newLocale}${pathWithoutLocale || "/"}`);
 
     setIsLanguageOpen(false);
     setIsMobileMenuOpen(false);
@@ -1058,9 +1063,9 @@ export function MinimalHeader() {
                 handleMouseLeave(setIsLanguageOpen, languageTimeout)
               }
             >
-              <button className="flex items-center px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+              <button className="flex items-center px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
                 <span className="mr-2">
-                  {currentLocale === "en" ? "Eng 🇺🇸" : "Myan 🇲🇲"}
+                  {currentLocale === "en" ? "Eng 🇺🇸" : "မြန်မာ 🇲🇲"}
                 </span>
                 <ChevronDown className="w-4 h-4" />
               </button>
