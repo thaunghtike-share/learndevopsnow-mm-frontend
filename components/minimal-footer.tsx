@@ -23,7 +23,7 @@ import {
   BellOff,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/app/auth/hooks/use-auth";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -37,7 +37,7 @@ export function MinimalFooter() {
     type: "success" | "error";
     text: string;
   } | null>(null);
-  
+
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -60,7 +60,7 @@ export function MinimalFooter() {
 
       const response = await fetch(`${API_BASE_URL}/subscribe/`, {
         headers: {
-          "Authorization": `Token ${token}`,
+          Authorization: `Token ${token}`,
         },
       });
 
@@ -82,8 +82,11 @@ export function MinimalFooter() {
   };
 
   const toggleSubscription = async () => {
-    console.log("Toggle clicked, current state:", { isSubscribed, isAuthenticated });
-    
+    console.log("Toggle clicked, current state:", {
+      isSubscribed,
+      isAuthenticated,
+    });
+
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
@@ -104,7 +107,7 @@ export function MinimalFooter() {
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "DELETE",
           headers: {
-            "Authorization": `Token ${token}`,
+            Authorization: `Token ${token}`,
           },
         });
 
@@ -120,7 +123,7 @@ export function MinimalFooter() {
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "POST",
           headers: {
-            "Authorization": `Token ${token}`,
+            Authorization: `Token ${token}`,
           },
         });
 
@@ -149,25 +152,31 @@ export function MinimalFooter() {
       <div className="px-6 md:px-11 relative z-10 py-12 md:py-16">
         {/* Subscription Message Alert */}
         {subscriptionMessage && (
-          <div className={`fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-5 duration-300 ${
-            subscriptionMessage.type === "success" 
-              ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800" 
-              : "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800"
-          } rounded-lg shadow-xl border p-4 max-w-sm`}>
+          <div
+            className={`fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-5 duration-300 ${
+              subscriptionMessage.type === "success"
+                ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800"
+                : "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800"
+            } rounded-lg shadow-xl border p-4 max-w-sm`}
+          >
             <div className="flex items-start gap-3">
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                subscriptionMessage.type === "success" 
-                  ? "bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-300" 
-                  : "bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-300"
-              }`}>
+              <div
+                className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                  subscriptionMessage.type === "success"
+                    ? "bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-300"
+                    : "bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-300"
+                }`}
+              >
                 {subscriptionMessage.type === "success" ? "✓" : "!"}
               </div>
               <div className="flex-1">
-                <p className={`text-sm font-medium ${
-                  subscriptionMessage.type === "success" 
-                    ? "text-green-800 dark:text-green-300" 
-                    : "text-red-800 dark:text-red-300"
-                }`}>
+                <p
+                  className={`text-sm font-medium ${
+                    subscriptionMessage.type === "success"
+                      ? "text-green-800 dark:text-green-300"
+                      : "text-red-800 dark:text-red-300"
+                  }`}
+                >
                   {subscriptionMessage.text}
                 </p>
               </div>
@@ -269,12 +278,12 @@ export function MinimalFooter() {
                       </>
                     )}
                   </button>
-                  
+
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {isAuthenticated 
-                      ? (isSubscribed 
-                          ? "You'll receive email notifications for new articles." 
-                          : "Click to get notified about new articles.")
+                    {isAuthenticated
+                      ? isSubscribed
+                        ? "You'll receive email notifications for new articles."
+                        : "Click to get notified about new articles."
                       : "Sign in to subscribe to article notifications."}
                   </p>
                 </div>
@@ -473,11 +482,12 @@ export function MinimalFooter() {
                 <X className="w-5 h-5 text-white dark:text-gray-400" />
               </button>
             </div>
-            
+
             <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
-              Sign in to get email notifications when new articles are published.
+              Sign in to get email notifications when new articles are
+              published.
             </p>
-            
+
             <div className="flex gap-3">
               <Button
                 onClick={() => setShowAuthModal(false)}

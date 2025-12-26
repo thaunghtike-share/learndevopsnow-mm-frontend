@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/app/auth/hooks/use-auth";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -482,7 +482,13 @@ export function CommentsReactions({
       : "#";
 
     return (
-      <div className={`mb-4 ${depth > 0 ? "ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-4" : ""}`}>
+      <div
+        className={`mb-4 ${
+          depth > 0
+            ? "ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-4"
+            : ""
+        }`}
+      >
         <div className="flex items-start gap-3">
           <Link
             href={authorProfileLink}
@@ -497,7 +503,9 @@ export function CommentsReactions({
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <div className={`w-full h-full flex items-center justify-center ${avatarColor} rounded-full`}>
+              <div
+                className={`w-full h-full flex items-center justify-center ${avatarColor} rounded-full`}
+              >
                 {initial}
               </div>
             )}
@@ -595,7 +603,8 @@ export function CommentsReactions({
                   ) : (
                     <ChevronDown className="w-3 h-3" />
                   )}
-                  {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
+                  {comment.replies.length}{" "}
+                  {comment.replies.length === 1 ? "reply" : "replies"}
                 </button>
               )}
             </div>
@@ -633,7 +642,11 @@ export function CommentsReactions({
             {showReplies && comment.replies && comment.replies.length > 0 && (
               <div className="mt-3">
                 {comment.replies.map((reply) => (
-                  <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+                  <CommentItem
+                    key={reply.id}
+                    comment={reply}
+                    depth={depth + 1}
+                  />
                 ))}
               </div>
             )}

@@ -20,27 +20,21 @@ import {
   Loader,
   Home,
   FileText,
-  BookOpen,
   Server,
   HelpCircle,
-  Users,
   PenSquare,
   Zap,
   Moon,
   Sun,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import AuthModal from "@/app/auth/auth-modal";
-import { useAuth } from "@/app/auth/hooks/use-auth";
-import { useTranslations, useLocale } from "next-intl";
+import { usePathname } from "next/navigation";
+import AuthModal from "@/app/[locale]/auth/auth-modal";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 
 export function MinimalHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const locale = useLocale();
-  const t = useTranslations("header");
-  const commonT = useTranslations("common");
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -49,6 +43,7 @@ export function MinimalHeader() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [currentLocale, setCurrentLocale] = useState<"en" | "my">("en");
 
   // Desktop dropdown states
   const [isArticlesOpen, setIsArticlesOpen] = useState(false);
@@ -56,6 +51,7 @@ export function MinimalHeader() {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isOthersOpen, setIsOthersOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
 
   // Mobile states
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -69,22 +65,23 @@ export function MinimalHeader() {
   const servicesTimeout = useRef<NodeJS.Timeout | null>(null);
   const userDropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const othersTimeout = useRef<NodeJS.Timeout | null>(null);
+  const languageTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Language switcher function - SIMPLIFIED
-  const switchLanguage = (newLocale: string) => {
-    // Always go to home page of new language
-    router.push(`/${newLocale}/`);
-
-    // Close mobile menu if open
-    setIsMobileMenuOpen(false);
-    setIsUserDropdownOpen(false);
-  };
+  // Language options
+  const languageOptions = [
+    { code: "en", name: "English", flag: "🇺🇸" },
+    { code: "my", name: "မြန်မာ", flag: "🇲🇲" },
+  ];
 
   useEffect(() => {
     setMounted(true);
+
+    // Initialize locale from localStorage or default to 'en'
+    const savedLocale = (localStorage.getItem("locale") as "en" | "my") || "en";
+    setCurrentLocale(savedLocale);
 
     // Initialize dark mode from localStorage
     const savedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -100,6 +97,7 @@ export function MinimalHeader() {
       if (othersTimeout.current) clearTimeout(othersTimeout.current);
       if (userDropdownTimeout.current)
         clearTimeout(userDropdownTimeout.current);
+      if (languageTimeout.current) clearTimeout(languageTimeout.current);
     };
   }, []);
 
@@ -183,13 +181,26 @@ export function MinimalHeader() {
     setTimeout(() => {
       logout();
       setTimeout(() => {
-        window.location.href = `/${locale}/`;
+        window.location.href = "/";
       }, 100);
     }, 500);
   };
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
+  };
+
+  // Language switcher
+  const switchLanguage = (newLocale: "en" | "my") => {
+    setCurrentLocale(newLocale);
+    localStorage.setItem("locale", newLocale);
+
+    // Navigate to the new locale
+    const newPath = pathname.replace(/^\/(en|my)/, `/${newLocale}`);
+    window.location.href = newPath;
+
+    setIsLanguageOpen(false);
+    setIsMobileMenuOpen(false);
   };
 
   // Dark mode toggle function
@@ -237,32 +248,87 @@ export function MinimalHeader() {
     );
   };
 
+  // Navigation items with translations
+  const getNavText = (enText: string, myText: string) => {
+    return currentLocale === "en" ? enText : myText;
+  };
+
   // Mobile navigation items
-  const mobileNavItems = [{ href: "/", label: t("home"), icon: Home }];
+  const mobileNavItems = [
+    {
+      href: `/${currentLocale}`,
+      label: getNavText("Home", "ပင်မစာမျက်နှာ"),
+      icon: Home,
+    },
+  ];
 
   const mobileArticlesItems = [
-    { href: "/articles", label: t("readArticles") },
-    { href: "/100-days-cloud-challenge", label: t("learn100DaysAzure") },
+    {
+      href: `/${currentLocale}/articles`,
+      label: getNavText("All Articles", "စာများအားလုံး"),
+    },
+    {
+      href: `/${currentLocale}/100-days-cloud-challenge`,
+      label: getNavText(
+        "Explore 100 Days of Cloud",
+        "Cloud 100 ရက်စိန်ခေါ်မှု"
+      ),
+    },
+    {
+      href: `/${currentLocale}/categories`,
+      label: getNavText("Explore All Categories", "အမျိုးအစားများ"),
+    },
   ];
 
   const mobileResourcesItems = [
-    { href: "/learn-devops-on-youtube", label: t("learnDevOpsYouTube") },
-    { href: "/devops-playgrounds", label: t("devOpsPlaygrounds") },
+    {
+      href: `/${currentLocale}/learn-devops-on-youtube`,
+      label: getNavText(
+        "Learn DevOps on YouTube",
+        "YouTube တွင် DevOps သင်ယူရန်"
+      ),
+    },
+    {
+      href: `/${currentLocale}/free-courses`,
+      label: getNavText("Learn Free Courses", "အခမဲ့သင်တန်းများ"),
+    },
+    {
+      href: `/${currentLocale}/devops-playgrounds`,
+      label: getNavText(
+        "Explore DevOps Playgrounds",
+        "DevOps Playgrounds များ"
+      ),
+    },
   ];
 
   const mobileServicesItems = [
-    { href: "/services/cloud-migration", label: t("cloudMigration") },
     {
-      href: "/services/infrastructure-automation",
-      label: t("infrastructureAsCode"),
+      href: `/${currentLocale}/services/cloud-migration`,
+      label: getNavText("Cloud Migration", "Cloud Migration"),
     },
-    { href: "/services/part-time-devops-support", label: t("devOpsSupport") },
+    {
+      href: `/${currentLocale}/services/infrastructure-automation`,
+      label: getNavText("Infrastructure as Code", "Infrastructure as Code"),
+    },
+    {
+      href: `/${currentLocale}/services/part-time-devops-support`,
+      label: getNavText("DevOps Support", "DevOps အကူအညီ"),
+    },
   ];
 
   const mobileOthersItems = [
-    { href: "/about", label: t("about") },
-    { href: "/faqs", label: t("faqs") },
-    { href: "/user-guide", label: t("userGuide") },
+    {
+      href: `/${currentLocale}/about`,
+      label: getNavText("About", "ကျွန်ုပ်တို့အကြောင်း"),
+    },
+    {
+      href: `/${currentLocale}/faqs`,
+      label: getNavText("FAQs", "အမေးများသောမေးခွန်းများ"),
+    },
+    {
+      href: `/${currentLocale}/user-guide`,
+      label: getNavText("User Guide", "အသုံးပြုနည်း"),
+    },
   ];
 
   // Delete account functionality
@@ -283,7 +349,7 @@ export function MinimalHeader() {
 
       if (response.ok) {
         localStorage.removeItem("token");
-        window.location.href = `/${locale}/`;
+        window.location.href = `/${currentLocale}`;
       } else {
         const errorData = await response.json();
         alert(
@@ -313,35 +379,61 @@ export function MinimalHeader() {
             </div>
             <div>
               <h3 className="text-lg font-bold text-red-900 dark:text-red-100">
-                {t("deleteAccount")}
+                {getNavText("Delete Your Account", "အကောင့်ဖျက်ရန်")}
               </h3>
               <p className="text-red-600 dark:text-red-400 text-sm">
-                This action cannot be undone
+                {getNavText(
+                  "This action cannot be undone",
+                  "ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ရယူ၍မရပါ"
+                )}
               </p>
             </div>
           </div>
 
           <div className="mb-6">
             <p className="text-gray-900 dark:text-gray-100 font-medium mb-3">
-              Are you absolutely sure you want to delete your account?
+              {getNavText(
+                "Are you absolutely sure you want to delete your account?",
+                "သင်၏အကောင့်ကို ဖျက်ရန်သေချာပါသလား?"
+              )}
             </p>
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <ul className="text-red-800 dark:text-red-200 text-sm space-y-2">
                 <li className="flex items-start gap-2">
                   <X className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                  <span>All your articles will be permanently deleted</span>
+                  <span>
+                    {getNavText(
+                      "All your articles will be permanently deleted",
+                      "သင်၏ဆောင်းပါးအားလုံး အမြဲတမ်းဖျက်ပစ်မည်"
+                    )}
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <X className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                  <span>Your author profile will be removed</span>
+                  <span>
+                    {getNavText(
+                      "Your author profile will be removed",
+                      "သင်၏စာရေးဆရာပရိုဖိုင်ကို ဖယ်ရှားမည်"
+                    )}
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <X className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                  <span>All comments and reactions will be deleted</span>
+                  <span>
+                    {getNavText(
+                      "All comments and reactions will be deleted",
+                      "မှတ်ချက်နှင့် တုံ့ပြန်မှုအားလုံး ဖျက်ပစ်မည်"
+                    )}
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <X className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                  <span>This action cannot be reversed</span>
+                  <span>
+                    {getNavText(
+                      "This action cannot be reversed",
+                      "ဤလုပ်ဆောင်ချက်ကို ပြန်လှန်း၍မရပါ"
+                    )}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -353,7 +445,7 @@ export function MinimalHeader() {
               disabled={isDeleting}
               className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 font-medium disabled:opacity-50"
             >
-              {commonT("cancel")}
+              {getNavText("Cancel", "မလုပ်တော့ပါ")}
             </button>
             <button
               onClick={handleDeleteAccount}
@@ -363,12 +455,15 @@ export function MinimalHeader() {
               {isDeleting ? (
                 <>
                   <Loader className="w-4 h-4 animate-spin" />
-                  Deleting...
+                  {getNavText("Deleting...", "ဖျက်နေသည်...")}
                 </>
               ) : (
                 <>
                   <Trash2 className="w-4 h-4" />
-                  {commonT("confirmDelete")}
+                  {getNavText(
+                    "Yes, Delete My Account",
+                    "ဟုတ်ကဲ့၊ အကောင့်ဖျက်ပါ"
+                  )}
                 </>
               )}
             </button>
@@ -391,7 +486,7 @@ export function MinimalHeader() {
         <div className="absolute top-full right-0 mt-3 w-56 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <p className="text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-              {t("hello", { username: user?.username || "User" })}
+              {getNavText("Hello", "မင်္ဂလာပါ")}, {user?.username}!
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
               {user?.email}
@@ -399,30 +494,30 @@ export function MinimalHeader() {
           </div>
 
           <Link
-            href={`/${locale}/author-profile-form`}
+            href={`/${currentLocale}/author-profile-form`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <Settings className="w-4 h-4 mr-3" />
-            {t("editProfile")}
+            {getNavText("Edit Your Profile", "ပရိုဖိုင်ပြင်ဆင်ရန်")}
           </Link>
 
           <Link
-            href={`/${locale}/admin/author/${user?.username}`}
+            href={`/${currentLocale}/admin/author/${user?.username}`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <LayoutDashboard className="w-4 h-4 mr-3" />
-            {t("dashboard")}
+            {getNavText("Dashboard", "ဒက်ရှ်ဘုတ်")}
           </Link>
 
           <Link
-            href={`/${locale}/authors/${user?.slug}`}
+            href={`/${currentLocale}/authors/${user?.slug}`}
             className="flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <Crown className="w-4 h-4 mr-3" />
-            {t("publicProfile")}
+            {getNavText("Public Profile View", "အများသိပရိုဖိုင်ကြည့်ရန်")}
           </Link>
 
           <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
@@ -431,7 +526,7 @@ export function MinimalHeader() {
               className="flex items-center w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
             >
               <LogOut className="w-4 h-4 mr-3" />
-              {t("signOut")}
+              {getNavText("Sign Out", "ထွက်ရန်")}
             </button>
 
             <button
@@ -439,7 +534,7 @@ export function MinimalHeader() {
               className="flex items-center w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium border-t border-gray-100 dark:border-gray-700 mt-2 pt-2"
             >
               <Trash2 className="w-4 h-4 mr-3" />
-              {t("deleteAccount")}
+              {getNavText("Delete Account", "အကောင့်ဖျက်ရန်")}
             </button>
           </div>
         </div>
@@ -485,42 +580,42 @@ export function MinimalHeader() {
 
         {/* User Menu Items */}
         <Link
-          href={`/${locale}/author-profile-form`}
+          href={`/${currentLocale}/author-profile-form`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname === `/${locale}/author-profile-form`
+            pathname === `/${currentLocale}/author-profile-form`
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Settings className="w-6 h-6 mr-3" />
-          {t("editProfile")}
+          {getNavText("Edit Your Profile", "ပရိုဖိုင်ပြင်ဆင်ရန်")}
         </Link>
 
         <Link
-          href={`/${locale}/admin/author/${user?.username}`}
+          href={`/${currentLocale}/admin/author/${user?.username}`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname.includes(`/${locale}/admin/author`)
+            pathname.includes(`/${currentLocale}/admin/author`)
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <LayoutDashboard className="w-6 h-6 mr-3" />
-          {t("dashboard")}
+          {getNavText("Dashboard", "ဒက်ရှ်ဘုတ်")}
         </Link>
 
         <Link
-          href={`/${locale}/authors/${user?.slug}`}
+          href={`/${currentLocale}/authors/${user?.slug}`}
           className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-            pathname.includes(`/${locale}/authors/${user?.slug}`)
+            pathname.includes(`/${currentLocale}/authors/${user?.slug}`)
               ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
               : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Crown className="w-6 h-6 mr-3" />
-          {t("publicProfile")}
+          {getNavText("Public Profile View", "အများသိပရိုဖိုင်ကြည့်ရန်")}
         </Link>
 
         <button
@@ -528,7 +623,7 @@ export function MinimalHeader() {
           className="flex items-center w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
         >
           <LogOut className="w-6 h-6 mr-3" />
-          {t("signOut")}
+          {getNavText("Sign Out", "ထွက်ရန်")}
         </button>
 
         <button
@@ -536,7 +631,7 @@ export function MinimalHeader() {
           className="flex items-center w-full px-4 py-4 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all font-medium text-lg mt-2"
         >
           <Trash2 className="w-6 h-6 mr-3" />
-          {t("deleteAccount")}
+          {getNavText("Delete Account", "အကောင့်ဖျက်ရန်")}
         </button>
       </div>
     );
@@ -572,7 +667,7 @@ export function MinimalHeader() {
           <div className="flex items-center justify-between py-4 px-6 gap-3">
             {/* Logo - KEEP ORIGINAL SIZE */}
             <Link
-              href={`/${locale}/`}
+              href={`/${currentLocale}`}
               className="flex items-center justify-start group flex-shrink-0"
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -583,17 +678,35 @@ export function MinimalHeader() {
               />
             </Link>
 
-            {/* Language Switcher - Mobile */}
+            {/* Language Switcher Button - Mobile */}
             <button
-              onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
-              className="p-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium flex items-center gap-1"
+              onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+              className="p-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium flex items-center gap-1"
             >
-              {locale === "en" ? (
-                <span className="text-sm">🇲🇲</span>
-              ) : (
-                <span className="text-sm">🇺🇸</span>
-              )}
+              <span className="text-sm">
+                {currentLocale === "en" ? "🇺🇸" : "🇲🇲"}
+              </span>
             </button>
+
+            {/* Language Dropdown - Mobile */}
+            {isLanguageOpen && (
+              <div className="absolute top-16 right-6 w-40 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50">
+                {languageOptions.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => switchLanguage(lang.code as "en" | "my")}
+                    className={`flex items-center w-full px-4 py-3 text-left ${
+                      currentLocale === lang.code
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <span className="mr-3">{lang.flag}</span>
+                    <span>{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Search Bar - WIDER */}
             <div className="flex-1 relative max-w-[200px] ml-2">
@@ -601,7 +714,10 @@ export function MinimalHeader() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
-                  placeholder={t("search")}
+                  placeholder={getNavText(
+                    "Search articles...",
+                    "စာများရှာဖွေရန်..."
+                  )}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-xl text-sm pl-10 pr-8 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 font-medium h-10 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
@@ -625,7 +741,7 @@ export function MinimalHeader() {
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
-                      href={`/${locale}/articles/${article.slug}`}
+                      href={`/${currentLocale}/articles/${article.slug}`}
                       className="block px-4 py-3 text-sm text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all font-medium hover:text-blue-700 dark:hover:text-blue-300"
                       onClick={() => {
                         handleClear();
@@ -653,11 +769,11 @@ export function MinimalHeader() {
           </div>
         </div>
 
-        {/* DESKTOP HEADER - Only removed the border/frame around navigation */}
-        <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-11">
+        {/* DESKTOP HEADER */}
+        <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-5">
           {/* Logo Section */}
           <Link
-            href={`/${locale}/`}
+            href={`/${currentLocale}`}
             className="flex items-center space-x-3 group"
           >
             <div className="relative">
@@ -668,20 +784,24 @@ export function MinimalHeader() {
                 className="h-37 w-35 relative z-10 transition-transform group-hover:scale-105"
               />
             </div>
-            <div className="h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
           </Link>
 
-          {/* Navigation - Removed border/frame */}
+          {/* Navigation */}
           <nav className="flex items-center space-x-1 -ml-12">
             <Link
-              href={`/${locale}/`}
-              className={`px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                pathname === `/${locale}/`
+              href={`/${currentLocale}`}
+              className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
+                pathname === `/${currentLocale}` ||
+                pathname === `/${currentLocale}/` ||
+                pathname === "/" ||
+                pathname === ""
                   ? "bg-blue-600 dark:bg-blue-700 text-white"
                   : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
               }`}
             >
-              <span className="relative z-10">{t("home")}</span>
+              <span className="relative z-10">
+                {getNavText("Home", "ပင်မ")}
+              </span>
             </Link>
 
             {/* Articles Dropdown */}
@@ -696,14 +816,17 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("articles") ||
-                  pathname.includes("100-days-cloud-challenge") ||
-                  pathname.includes("learn-linux-basic")
+                  pathname.includes("/articles") ||
+                  pathname.includes("/100-days-cloud-challenge") ||
+                  pathname.includes("/learn-linux-basic") ||
+                  pathname.includes("/categories")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">{t("articles")}</span>
+                <span className="relative z-10">
+                  {getNavText("Articles", "စာဖတ်ရန်")}
+                </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isArticlesOpen && (
@@ -717,28 +840,31 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href={`/${locale}/articles`}
+                    href={`/${currentLocale}/articles`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("readArticles")}
+                    {getNavText("Read Articles", "စာဖတ်ရန်")}
                   </Link>
                   <Link
-                    href={`/${locale}/100-days-cloud-challenge`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    href={`/${currentLocale}/100-days-cloud-challenge`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("learn100DaysAzure")}
+                    {getNavText(
+                      "Learn 100 Days of Azure",
+                      "Azure 100 ရက်စိန်ခေါ်မှု"
+                    )}
                   </Link>
                   <Link
-                    href={`/${locale}/learn-linux-basic`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    href={`/${currentLocale}/learn-linux-basic`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("learnLinuxEssentials")}
+                    {getNavText("Learn Linux Essentials", "Linux အခြေခံများ")}
                   </Link>
                   <Link
-                    href={`/${locale}/categories`}
+                    href={`/${currentLocale}/categories`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    {t("exploreCategories")}
+                    {getNavText("Explore All Categories", "အမျိုးအစားများ")}
                   </Link>
                 </div>
               )}
@@ -756,14 +882,16 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("learn-devops-on-youtube") ||
-                  pathname.includes("free-courses") ||
-                  pathname.includes("devops-playgrounds")
+                  pathname.includes("/learn-devops-on-youtube") ||
+                  pathname.includes("/free-courses") ||
+                  pathname.includes("/devops-playgrounds")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">{t("resources")}</span>
+                <span className="relative z-10">
+                  {getNavText("Resources", "အရင်းအမြစ်")}
+                </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isResourcesOpen && (
@@ -777,22 +905,28 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href={`/${locale}/learn-devops-on-youtube`}
+                    href={`/${currentLocale}/learn-devops-on-youtube`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("learnDevOpsYouTube")}
+                    {getNavText(
+                      "Learn DevOps on YouTube",
+                      "YouTube တွင် DevOps သင်ယူရန်"
+                    )}
                   </Link>
                   <Link
-                    href={`/${locale}/free-courses`}
+                    href={`/${currentLocale}/free-courses`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("freeCourses")}
+                    {getNavText("Learn Free Courses", "အခမဲ့သင်တန်းများ")}
                   </Link>
                   <Link
-                    href={`/${locale}/devops-playgrounds`}
+                    href={`/${currentLocale}/devops-playgrounds`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    {t("devOpsPlaygrounds")}
+                    {getNavText(
+                      "Explore DevOps Playgrounds",
+                      "DevOps Playgrounds များ"
+                    )}
                   </Link>
                 </div>
               )}
@@ -810,12 +944,14 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("services")
+                  pathname.includes("/services")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">{t("services")}</span>
+                <span className="relative z-10">
+                  {getNavText("Services", "ဝန်ဆောင်မှု")}
+                </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isServicesOpen && (
@@ -829,22 +965,25 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href={`/${locale}/services/cloud-migration`}
+                    href={`/${currentLocale}/services/cloud-migration`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("cloudMigration")}
+                    {getNavText("Cloud Migration", "Cloud Migration")}
                   </Link>
                   <Link
-                    href={`/${locale}/services/infrastructure-automation`}
+                    href={`/${currentLocale}/services/infrastructure-automation`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("infrastructureAsCode")}
+                    {getNavText(
+                      "Infrastructure as Code",
+                      "Infrastructure as Code"
+                    )}
                   </Link>
                   <Link
-                    href={`/${locale}/services/part-time-devops-support`}
+                    href={`/${currentLocale}/services/part-time-devops-support`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    {t("devOpsSupport")}
+                    {getNavText("DevOps Support", "DevOps အကူအညီ")}
                   </Link>
                 </div>
               )}
@@ -862,14 +1001,16 @@ export function MinimalHeader() {
             >
               <button
                 className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                  pathname.includes("about") ||
-                  pathname.includes("faqs") ||
-                  pathname.includes("user-guide")
+                  pathname.includes("/about") ||
+                  pathname.includes("/faqs") ||
+                  pathname.includes("/user-guide")
                     ? "bg-blue-600 dark:bg-blue-700 text-white"
                     : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
-                <span className="relative z-10">{t("others")}</span>
+                <span className="relative z-10">
+                  {getNavText("Others", "အခြား")}
+                </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
               {isOthersOpen && (
@@ -883,53 +1024,83 @@ export function MinimalHeader() {
                   }
                 >
                   <Link
-                    href={`/${locale}/about`}
+                    href={`/${currentLocale}/about`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("about")}
+                    {getNavText("About", "ကျွန်ုပ်တို့အကြောင်း")}
                   </Link>
                   <Link
-                    href={`/${locale}/faqs`}
+                    href={`/${currentLocale}/faqs`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {t("faqs")}
+                    {getNavText("FAQs", "အမေးများသောမေးခွန်းများ")}
                   </Link>
                   <Link
-                    href={`/${locale}/user-guide`}
+                    href={`/${currentLocale}/user-guide`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    {t("userGuide")}
+                    {getNavText("User Guide", "အသုံးပြုနည်း")}
                   </Link>
                 </div>
               )}
             </div>
           </nav>
 
-          {/* Right Section - Search + Auth */}
+          {/* Right Section - Language, Dark Mode, Search + Auth */}
           <div className="flex items-center space-x-5">
-            {/* Language Switcher - Desktop */}
-            <button
-              onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors font-medium flex items-center gap-2"
+            {/* Language Switcher Dropdown - Desktop */}
+            <div
+              className="relative"
+              onMouseEnter={() =>
+                handleMouseEnter(setIsLanguageOpen, languageTimeout)
+              }
+              onMouseLeave={() =>
+                handleMouseLeave(setIsLanguageOpen, languageTimeout)
+              }
             >
-              {locale === "en" ? (
-                <>
-                  <span className="text-sm">🇲🇲</span>
-                  <span>မြန်မာ</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-sm">🇺🇸</span>
-                  <span>English</span>
-                </>
+              <button className="flex items-center px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium">
+                <span className="mr-2">
+                  {currentLocale === "en" ? "Eng 🇺🇸" : "Myan 🇲🇲"}
+                </span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {isLanguageOpen && (
+                <div
+                  className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  onMouseEnter={() =>
+                    handleMouseEnter(setIsLanguageOpen, languageTimeout)
+                  }
+                  onMouseLeave={() =>
+                    handleMouseLeave(setIsLanguageOpen, languageTimeout)
+                  }
+                >
+                  {languageOptions.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => switchLanguage(lang.code as "en" | "my")}
+                      className={`flex items-center w-full px-4 py-3 text-left ${
+                        currentLocale === lang.code
+                          ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      }`}
+                    >
+                      <span className="mr-3">{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
               )}
-            </button>
+            </div>
 
             {/* Dark Mode Toggle - Desktop Only */}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-1"
-              aria-label={darkMode ? t("lightMode") : t("darkMode")}
+              aria-label={
+                darkMode
+                  ? getNavText("Switch to light mode", "အလင်းပုံစံပြောင်းရန်")
+                  : getNavText("Switch to dark mode", "အနက်ပုံစံပြောင်းရန်")
+              }
             >
               {darkMode ? (
                 <Sun className="w-6 h-6" />
@@ -944,7 +1115,10 @@ export function MinimalHeader() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-800 dark:text-gray-300 w-4 h-4 z-10" />
                 <Input
                   type="text"
-                  placeholder={t("search")}
+                  placeholder={getNavText(
+                    "Search articles...",
+                    "စာများရှာဖွေရန်..."
+                  )}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-full pl-10 pr-8 bg-white dark:bg-gray-900 border-gray-400 dark:border-gray-700 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 transition-all group-hover:border-gray-300 dark:group-hover:border-gray-600 font-medium"
@@ -967,7 +1141,7 @@ export function MinimalHeader() {
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
-                      href={`/${locale}/articles/${article.slug}`}
+                      href={`/${currentLocale}/articles/${article.slug}`}
                       className="block px-4 py-3 text-black dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all group font-medium"
                       onClick={handleClear}
                     >
@@ -1017,7 +1191,7 @@ export function MinimalHeader() {
                     onClick={handleSignInClick}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
                   >
-                    {t("writeArticle")}
+                    {getNavText("Write Article", "စာရေးရန်")}
                   </button>
                 )}
               </div>
@@ -1046,7 +1220,7 @@ export function MinimalHeader() {
           {/* Menu Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
             <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {t("menu")}
+              {getNavText("Menu", "မီနူး")}
             </span>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
@@ -1060,39 +1234,39 @@ export function MinimalHeader() {
           <div className="flex-1 overflow-y-auto py-6">
             {/* Language Switcher - Mobile Menu */}
             <div className="px-6 mb-4">
-              <button
-                onClick={() => switchLanguage(locale === "en" ? "my" : "en")}
-                className="w-full py-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 text-gray-700 dark:text-gray-300 rounded-xl hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20 transition-all shadow-sm font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
-              >
-                {locale === "en" ? (
-                  <>
-                    <span className="text-lg">🇲🇲</span>
-                    <span className="text-lg">Switch to Myanmar (မြန်မာ)</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-lg">🇺🇸</span>
-                    <span className="text-lg">Switch to English</span>
-                  </>
-                )}
-              </button>
+              <div className="space-y-2">
+                {languageOptions.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => switchLanguage(lang.code as "en" | "my")}
+                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
+                      currentLocale === lang.code
+                        ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <span className="text-lg mr-3">{lang.flag}</span>
+                    <span className="text-lg font-medium">{lang.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Dark Mode Toggle - Mobile Menu */}
             <div className="px-6 mb-6">
               <button
                 onClick={toggleDarkMode}
-                className="w-full py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/10 dark:to-gray-900/20 text-gray-700 dark:text-gray-300 rounded-xl hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-900/20 dark:hover:to-gray-900/30 transition-all shadow-sm font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
+                className="w-full py-3 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
               >
                 {darkMode ? (
                   <>
                     <Sun className="w-5 h-5" />
-                    <span>{t("lightMode")}</span>
+                    <span>{getNavText("Light Mode", "အလင်းပုံစံ")}</span>
                   </>
                 ) : (
                   <>
                     <Moon className="w-5 h-5" />
-                    <span>{t("darkMode")}</span>
+                    <span>{getNavText("Dark Mode", "အနက်ပုံစံ")}</span>
                   </>
                 )}
               </button>
@@ -1109,7 +1283,7 @@ export function MinimalHeader() {
                   className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg font-medium flex items-center justify-center gap-2"
                 >
                   <PenSquare className="w-5 h-5" />
-                  {t("writeArticle")}
+                  {getNavText("Write Article", "စာရေးရန်")}
                 </button>
               </div>
             )}
@@ -1121,9 +1295,9 @@ export function MinimalHeader() {
                 return (
                   <Link
                     key={item.href}
-                    href={`/${locale}${item.href}`}
+                    href={item.href}
                     className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-                      pathname === `/${locale}${item.href}`
+                      pathname === item.href
                         ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }`}
@@ -1144,7 +1318,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <FileText className="w-6 h-6 mr-3" />
-                  {t("articles")}
+                  {getNavText("Articles", "စာဖတ်ရန်")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1158,7 +1332,7 @@ export function MinimalHeader() {
                   {mobileArticlesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={`/${locale}${item.href}`}
+                      href={item.href}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1180,7 +1354,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <Zap className="w-6 h-6 mr-3" />
-                  {t("resources")}
+                  {getNavText("Resources", "အရင်းအမြစ်များ")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1194,7 +1368,7 @@ export function MinimalHeader() {
                   {mobileResourcesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={`/${locale}${item.href}`}
+                      href={item.href}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1216,7 +1390,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <Server className="w-6 h-6 mr-3" />
-                  {t("services")}
+                  {getNavText("Services", "ဝန်ဆောင်မှုများ")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1230,7 +1404,7 @@ export function MinimalHeader() {
                   {mobileServicesItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={`/${locale}${item.href}`}
+                      href={item.href}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -1252,7 +1426,7 @@ export function MinimalHeader() {
               >
                 <div className="flex items-center">
                   <HelpCircle className="w-6 h-6 mr-3" />
-                  {t("others")}
+                  {getNavText("Others", "အခြားများ")}
                 </div>
                 <ChevronDown
                   className={`w-5 h-5 transition-transform ${
@@ -1266,7 +1440,7 @@ export function MinimalHeader() {
                   {mobileOthersItems.map((item) => (
                     <Link
                       key={item.href}
-                      href={`/${locale}${item.href}`}
+                      href={item.href}
                       className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
                       onClick={() => {
                         setIsMobileMenuOpen(false);

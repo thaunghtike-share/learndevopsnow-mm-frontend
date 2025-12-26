@@ -4,8 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
-import { useAuth } from "@/app/auth/hooks/use-auth";
-import AuthModal from "@/app/auth/auth-modal";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
+import AuthModal from "@/app/[locale]/auth/auth-modal";
 import {
   FileText,
   Eye,
