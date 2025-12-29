@@ -7,8 +7,11 @@ import { useState } from "react";
 
 interface RoadmapItem {
   title: string;
+  titleMy: string;
   description: string;
+  descriptionMy: string;
   tags: string[];
+  tagsMy: string[];
   image?: string;
   officialLink?: string;
 }
@@ -16,132 +19,198 @@ interface RoadmapItem {
 interface RoadmapStage {
   key: string;
   label: string;
+  labelMy: string;
   description: string[];
+  descriptionMy: string[];
   items: RoadmapItem[];
 }
 
 interface ProgrammingLanguage {
   name: string;
+  nameMy: string;
   icon: string;
   description: string;
+  descriptionMy: string;
   fullDescription: string;
+  fullDescriptionMy: string;
   officialLink: string;
   frameworks: string[];
+  frameworksMy: string[];
 }
 
 const programmingLanguages: Record<string, ProgrammingLanguage[]> = {
   beginner: [
     {
       name: "Python",
+      nameMy: "Python",
       icon: "python.png",
       description: "Scripting & Automation",
+      descriptionMy: "Scripting & Automation",
       fullDescription:
         "Python is a high-level, interpreted programming language known for its simplicity and readability. In DevOps, Python is extensively used for automation scripts, infrastructure management, and building CI/CD tools. Its rich ecosystem of libraries makes it perfect for system administration tasks.",
+      fullDescriptionMy:
+        "Python သည် အဆင့်မြင့်၊ လွယ်ကူပြီး ဖတ်ရလွယ်ကူသော Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Python ကို Automation Scripts များ၊ Infrastructure Management နှင့် CI/CD Tools များတည်ဆောက်ရာတွင် ကျယ်ပြန့်စွာအသုံးပြုပါသည်။ ၎င်း၏ ကြွယ်ဝသော Libraries Ecosystem သည် System Administration လုပ်ငန်းများအတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://www.python.org",
       frameworks: ["Django", "Flask", "Ansible", "Fabric"],
+      frameworksMy: ["Django", "Flask", "Ansible", "Fabric"],
     },
     {
       name: "JavaScript",
+      nameMy: "JavaScript",
       icon: "javascript.png",
       description: "Web & Node.js",
+      descriptionMy: "Web & Node.js",
       fullDescription:
         "JavaScript is a versatile programming language that powers both frontend and backend development. In DevOps, JavaScript (via Node.js) is used for building automation tools, serverless functions, and real-time monitoring dashboards. Its event-driven architecture makes it ideal for handling asynchronous operations.",
+      fullDescriptionMy:
+        "JavaScript သည် Frontend နှင့် Backend Development နှစ်ခုလုံးအတွက် အသုံးပြုသော Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် JavaScript (Node.js မှတစ်ဆင့်) ကို Automation Tools များ၊ Serverless Functions များနှင့် Real-time Monitoring Dashboards များတည်ဆောက်ရာတွင် အသုံးပြုပါသည်။ ၎င်း၏ Event-driven Architecture သည် Asynchronous Operations များကို ကိုင်တွယ်ရန်အတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
       frameworks: ["Node.js", "Express.js", "React", "Next.js"],
+      frameworksMy: ["Node.js", "Express.js", "React", "Next.js"],
     },
     {
       name: "Go",
+      nameMy: "Go",
       icon: "go.png",
       description: "Cloud Native Tools",
+      descriptionMy: "Cloud Native Tools",
       fullDescription:
         "Go (Golang) is a statically typed, compiled language designed by Google for building efficient and reliable software. In DevOps, Go is the language of choice for cloud-native tools like Docker, Kubernetes, and Terraform. Its fast compilation, built-in concurrency, and small binary sizes make it perfect for microservices and CLI tools.",
+      fullDescriptionMy:
+        "Go (Golang) သည် Google မှဒီဇိုင်းထုတ်ထားသော Statically Typed, Compiled Language တစ်ခုဖြစ်ပြီး ထိရောက်ပြီးယုံကြည်စိတ်ချရသော Software များတည်ဆောက်ရန်အတွက်ဖြစ်ပါသည်။ DevOps တွင် Go သည် Docker, Kubernetes, နှင့် Terraform ကဲ့သို့သော Cloud-native Tools များအတွက် ရွေးချယ်မှုအဓိကပြုသော Language ဖြစ်ပါသည်။ ၎င်း၏ မြန်ဆန်သော Compilation, Built-in Concurrency နှင့် Binary Sizes ငယ်မားခြင်းတို့သည် Microservices နှင့် CLI Tools များအတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://go.dev",
       frameworks: ["Gin", "Echo", "Cobra", "Viper"],
+      frameworksMy: ["Gin", "Echo", "Cobra", "Viper"],
     },
   ],
   intermediate: [
     {
       name: "Python",
+      nameMy: "Python",
       icon: "python.png",
       description: "Advanced Automation",
+      descriptionMy: "Advanced Automation",
       fullDescription:
         "At the intermediate level, Python is used for complex automation workflows, infrastructure orchestration, and building custom DevOps tools. You'll leverage advanced libraries for API integrations, data processing, and creating sophisticated deployment pipelines.",
+      fullDescriptionMy:
+        "Intermediate အဆင့်တွင် Python ကို Complex Automation Workflows, Infrastructure Orchestration နှင့် Custom DevOps Tools များတည်ဆောက်ရာတွင် အသုံးပြုပါသည်။ API Integrations, Data Processing နှင့် Sophisticated Deployment Pipelines များဖန်တီးရန်အတွက် Advanced Libraries များကို အသုံးပြုပါမည်။",
       officialLink: "https://www.python.org",
       frameworks: ["Ansible", "SaltStack", "Fabric", "Boto3"],
+      frameworksMy: ["Ansible", "SaltStack", "Fabric", "Boto3"],
     },
     {
       name: "Node.js",
+      nameMy: "Node.js",
       icon: "nodejs.png",
       description: "Backend Services",
+      descriptionMy: "Backend Services",
       fullDescription:
         "Node.js is a JavaScript runtime built on Chrome's V8 engine that enables server-side JavaScript execution. In DevOps, Node.js powers backend services, API gateways, and real-time monitoring systems. Its non-blocking I/O model makes it excellent for building scalable network applications.",
+      fullDescriptionMy:
+        "Node.js သည် Chrome ၏ V8 Engine အပေါ်တွင်တည်ဆောက်ထားသော JavaScript Runtime တစ်ခုဖြစ်ပြီး Server-side JavaScript Execution ကိုခွင့်ပြုပါသည်။ DevOps တွင် Node.js သည် Backend Services, API Gateways နှင့် Real-time Monitoring Systems များအတွက် အဓိကအသုံးပြုပါသည်။ ၎င်း၏ Non-blocking I/O Model သည် Scalable Network Applications များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://nodejs.org",
       frameworks: ["Express.js", "NestJS", "Fastify", "Koa"],
+      frameworksMy: ["Express.js", "NestJS", "Fastify", "Koa"],
     },
     {
       name: "Go",
+      nameMy: "Go",
       icon: "go.png",
       description: "Microservices",
+      descriptionMy: "Microservices",
       fullDescription:
         "Go excels at building microservices due to its lightweight nature and excellent concurrency support. At this level, you'll use Go to create scalable, distributed systems with efficient resource utilization and fast response times.",
+      fullDescriptionMy:
+        "Go သည် ၎င်း၏ Lightweight Nature နှင့် Excellent Concurrency Support တို့ကြောင့် Microservices များတည်ဆောက်ရာတွင် ထူးချွန်ပါသည်။ ဤအဆင့်တွင် Go ကို အသုံးပြု၍ Efficient Resource Utilization နှင့် Fast Response Times ရှိသော Scalable, Distributed Systems များဖန်တီးပါမည်။",
       officialLink: "https://go.dev",
       frameworks: ["Gin", "Echo", "gRPC", "Fiber"],
+      frameworksMy: ["Gin", "Echo", "gRPC", "Fiber"],
     },
     {
       name: "Java",
+      nameMy: "Java",
       icon: "java.png",
       description: "Enterprise Apps",
+      descriptionMy: "Enterprise Apps",
       fullDescription:
         "Java is a robust, object-oriented programming language widely used in enterprise environments. In DevOps, Java is essential for managing and deploying large-scale enterprise applications. Its platform independence and mature ecosystem make it ideal for building reliable, high-performance systems.",
+      fullDescriptionMy:
+        "Java သည် Enterprise Environments များတွင်ကျယ်ပြန့်စွာအသုံးပြုသော Robust, Object-oriented Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Java သည် Large-scale Enterprise Applications များကို စီမံခန့်ခွဲရန်နှင့် Deploy လုပ်ရန်အတွက် အဓိကလိုအပ်ပါသည်။ ၎င်း၏ Platform Independence နှင့် Mature Ecosystem တို့သည် Reliable, High-performance Systems များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://www.java.com",
       frameworks: ["Spring Boot", "Maven", "Gradle", "Jenkins"],
+      frameworksMy: ["Spring Boot", "Maven", "Gradle", "Jenkins"],
     },
   ],
   advanced: [
     {
       name: "Go",
+      nameMy: "Go",
       icon: "go.png",
       description: "K8s Operators",
+      descriptionMy: "K8s Operators",
       fullDescription:
         "At the advanced level, Go is used to build Kubernetes operators and custom controllers. These extend Kubernetes functionality to automate complex application management tasks. Go's performance and the official Kubernetes client libraries make it the standard for cloud-native infrastructure development.",
+      fullDescriptionMy:
+        "Advanced အဆင့်တွင် Go ကို Kubernetes Operators နှင့် Custom Controllers များတည်ဆောက်ရာတွင်အသုံးပြုပါသည်။ ၎င်းတို့သည် Complex Application Management Tasks များကို အလိုအလျောက်လုပ်ဆောင်ရန် Kubernetes Functionality ကိုတိုးချဲ့ပေးပါသည်။ Go ၏ Performance နှင့် Official Kubernetes Client Libraries တို့သည် Cloud-native Infrastructure Development အတွက် Standard ဖြစ်စေပါသည်။",
       officialLink: "https://go.dev",
       frameworks: ["Operator SDK", "Kubebuilder", "client-go", "Helm"],
+      frameworksMy: ["Operator SDK", "Kubebuilder", "client-go", "Helm"],
     },
     {
       name: "Python",
+      nameMy: "Python",
       icon: "python.png",
       description: "ML Ops & Automation",
+      descriptionMy: "ML Ops & Automation",
       fullDescription:
         "Python dominates the MLOps space, bridging machine learning and DevOps practices. You'll use Python to build ML pipelines, automate model deployment, and create sophisticated monitoring systems for AI applications.",
+      fullDescriptionMy:
+        "Python သည် MLOps Space တွင်ထင်ရှားပြီး Machine Learning နှင့် DevOps Practices ကိုဆက်သွယ်ပေးပါသည်။ ML Pipelines များတည်ဆောက်ရန်၊ Model Deployment ကိုအလိုအလျောက်လုပ်ဆောင်ရန်နှင့် AI Applications များအတွက် Sophisticated Monitoring Systems များဖန်တီးရန် Python ကိုအသုံးပြုပါမည်။",
       officialLink: "https://www.python.org",
       frameworks: ["Kubeflow", "MLflow", "Airflow", "TensorFlow"],
+      frameworksMy: ["Kubeflow", "MLflow", "Airflow", "TensorFlow"],
     },
     {
       name: "Java",
+      nameMy: "Java",
       icon: "java.png",
       description: "Distributed Systems",
+      descriptionMy: "Distributed Systems",
       fullDescription:
         "Java's maturity and robustness make it ideal for building distributed systems at scale. In advanced DevOps, Java is used for creating resilient microservices architectures, message queuing systems, and high-throughput data processing pipelines.",
+      fullDescriptionMy:
+        "Java ၏ Maturity နှင့် Robustness တို့သည် Scale ကြီးမားသော Distributed Systems များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။ Advanced DevOps တွင် Java ကို Resilient Microservices Architectures, Message Queuing Systems နှင့် High-throughput Data Processing Pipelines များဖန်တီးရာတွင်အသုံးပြုပါသည်။",
       officialLink: "https://www.java.com",
       frameworks: ["Spring Cloud", "Apache Kafka", "Apache Camel", "Quarkus"],
+      frameworksMy: ["Spring Cloud", "Apache Kafka", "Apache Camel", "Quarkus"],
     },
     {
       name: "Node.js",
+      nameMy: "Node.js",
       icon: "nodejs.png",
       description: "Real-time Services",
+      descriptionMy: "Real-time Services",
       fullDescription:
         "Node.js excels at building real-time services like monitoring dashboards, log streaming, and event-driven architectures. Its event loop and WebSocket support make it perfect for applications requiring instant data updates and high concurrency.",
+      fullDescriptionMy:
+        "Node.js သည် Real-time Services များဖြစ်သော Monitoring Dashboards, Log Streaming နှင့် Event-driven Architectures များတည်ဆောက်ရာတွင်ထူးချွန်ပါသည်။ ၎င်း၏ Event Loop နှင့် WebSocket Support တို့သည် Instant Data Updates နှင့် High Concurrency လိုအပ်သော Applications များအတွက် ကောင်းမွန်ပါသည်။",
       officialLink: "https://nodejs.org",
       frameworks: ["Socket.io", "NestJS", "Express.js", "PM2"],
+      frameworksMy: ["Socket.io", "NestJS", "Express.js", "PM2"],
     },
     {
       name: "Laravel",
+      nameMy: "Laravel",
       icon: "laravel.png",
       description: "PHP Deployments",
+      descriptionMy: "PHP Deployments",
       fullDescription:
         "Laravel is a modern PHP framework that simplifies web application development. In DevOps, understanding Laravel is crucial for deploying and managing PHP applications at scale. It includes built-in tools for queue management, caching, and database migrations.",
+      fullDescriptionMy:
+        "Laravel သည် Web Application Development ကိုလွယ်ကူစေသော Modern PHP Framework တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Laravel ကိုနားလည်ခြင်းသည် Scale ကြီးမားသော PHP Applications များကို Deploy လုပ်ရန်နှင့် စီမံခန့်ခွဲရန်အတွက် အရေးကြီးပါသည်။ ၎င်းတွင် Queue Management, Caching နှင့် Database Migrations များအတွက် Built-in Tools များပါဝင်ပါသည်။",
       officialLink: "https://laravel.com",
       frameworks: ["Laravel", "Symfony", "Composer", "PHPUnit"],
+      frameworksMy: ["Laravel", "Symfony", "Composer", "PHPUnit"],
     },
   ],
 };
@@ -150,16 +219,31 @@ const roadmap: RoadmapStage[] = [
   {
     key: "beginner",
     label: "Beginner",
+    labelMy: "Beginner",
     description: [
       "Start your DevOps journey with foundational tools and concepts",
       "Best for absolute beginners and career switchers",
     ],
+    descriptionMy: [
+      "devops ခရီးစတင်ရန် အခြေခံ tools များနဲ့ concepts များကို လေ့လာပါ",
+      "devops ကို စတင် လေ့လာသူများနဲ့ career ပြောင်းလဲလိုသူများအတွက် အကောင်းဆုံးဖြစ်ပါသည်",
+    ],
     items: [
       {
         title: "Linux Fundamentals",
+        titleMy: "Linux အခြေခံများ",
         description:
           "Master command line, file systems, and shell scripting fundamentals",
+        descriptionMy:
+          "Linux OS အကြောင်း နဲ့ command line အခြေခံများကို ကျွမ်းကျင်စွာလေ့လာပါ",
         tags: [
+          "command-line",
+          "file-system",
+          "permissions",
+          "processes",
+          "networking",
+        ],
+        tagsMy: [
           "command-line",
           "file-system",
           "permissions",
@@ -171,25 +255,43 @@ const roadmap: RoadmapStage[] = [
       },
       {
         title: "Bash Scripting",
+        titleMy: "Bash Scripting",
         description:
           "Automate tasks with Bash scripting and command-line tools",
+        descriptionMy:
+          "Bash Scripting ကိုအသုံးပြုပြီး အလုပ်များကို automate လုပ်ဆောင်ပါ",
         tags: ["variables", "loops", "functions", "automation", "debugging"],
+        tagsMy: ["variables", "loops", "functions", "automation", "debugging"],
         image: "bash.png",
         officialLink: "https://www.w3schools.com/bash/",
       },
       {
         title: "CCNA",
+        titleMy: "CCNA",
         description:
           "Understand networking basics, protocols, and infrastructure",
+        descriptionMy:
+          "Networking အခြေခံများ protocols များနဲ့ infrastructure design ကို နားလည်အောင်လေ့လာပါ",
         tags: ["tcp-ip", "subnetting", "routing", "switching", "vlans"],
+        tagsMy: ["tcp-ip", "subnetting", "routing", "switching", "vlans"],
         image: "ccna.png",
         officialLink: "https://learningnetwork.cisco.com/s/ccna",
       },
       {
         title: "AWS Fundamentals",
+        titleMy: "AWS အခြေခံများ",
         description:
           "AWS cloud fundamentals, services overview, and basic architecture",
+        descriptionMy:
+          "cloud အခြေခံများ အသုံးများတဲ့ services များနဲ့ architecture ကို လေ့လာပါ",
         tags: [
+          "cloud-concepts",
+          "pricing",
+          "support",
+          "architecture",
+          "security",
+        ],
+        tagsMy: [
           "cloud-concepts",
           "pricing",
           "support",
@@ -202,9 +304,13 @@ const roadmap: RoadmapStage[] = [
       },
       {
         title: "Virtualization",
+        titleMy: "Virtualization",
         description:
           "Introduction to virtualization concepts using VMware or VirtualBox",
+        descriptionMy:
+          "VMware သို့မဟုတ် VirtualBox အသုံးပြု၍ Virtualization အခြေခံများကို လေ့လာပါ",
         tags: ["virtualbox", "vmware", "vsphere", "hypervisor"],
+        tagsMy: ["virtualbox", "vmware", "vsphere", "hypervisor"],
         image: "vmware.png",
         officialLink: "https://www.vmware.com",
       },
@@ -213,48 +319,79 @@ const roadmap: RoadmapStage[] = [
   {
     key: "intermediate",
     label: "Intermediate",
+    labelMy: "Intermediate",
     description: [
       "Build real DevOps workflows and automation",
-      "Infrastructure as code and CI/CD pipelines",
+      "Fundamentals of Infrastructure as code and CICD pipelines",
+    ],
+    descriptionMy: [
+      "တကယ့် real world မှာသုံးကြတဲ့ DevOps workflows တွေနဲ့ automation အကြောင်းတွေကိုလေ့လာပါ။",
+      "Ansible, Packer တို့လို Infrastructure as Code အခြေခံတွေ နဲ့ CICD Pipelines တွေကို နားလည်အောင်လေ့လာပါ။",
     ],
     items: [
       {
         title: "Docker Essentials",
+        titleMy: "Docker Essentials",
         description:
           "Containerize applications and manage container lifecycles",
+        descriptionMy:
+          "Applications များကို Containerize လုပ်ခြင်းနှင့် Container Lifecycles များကို စီမံခန့်ခွဲခြင်း",
         tags: ["containers", "images", "dockerfile", "volumes", "networking"],
+        tagsMy: ["containers", "images", "dockerfile", "volumes", "networking"],
         image: "docker.png",
         officialLink: "https://www.docker.com",
       },
       {
         title: "Git & GitHub",
+        titleMy: "Git & GitHub",
         description:
           "Version control, branching strategies, and collaborative workflows",
+        descriptionMy:
+          "Git ကိုအသုံးပြုပြီး code တွေရဲ့ version control, branching strategies များကို လေ့လာပါ",
         tags: ["branches", "merge", "rebase", "pull-requests", "workflows"],
+        tagsMy: ["branches", "merge", "rebase", "pull-requests", "workflows"],
         image: "git.png",
         officialLink: "https://github.com",
       },
       {
         title: "CI/CD Pipelines",
+        titleMy: "CI/CD Pipelines",
         description:
           "Build automated testing and deployment pipelines with Jenkins or GitLab",
+        descriptionMy:
+          "Github Action or GitLab CI ဖြင့် automated deployment pipelines များတည်ဆောက်ပါ",
         tags: ["jenkins", "gitlab-ci", "stages", "artifacts", "testing"],
+        tagsMy: ["jenkins", "gitlab-ci", "stages", "artifacts", "testing"],
         image: "cicd.png",
         officialLink: "https://www.jenkins.io",
       },
       {
         title: "Ansible Automation",
+        titleMy: "Ansible Automation",
         description:
           "Automate configuration management and application deployment",
+        descriptionMy:
+          "Ansible ကိုအသုံးပြုပြီး Configuration Management အကြောင်းကို လေ့လာပါ။",
         tags: ["playbooks", "inventory", "roles", "variables", "modules"],
+        tagsMy: ["playbooks", "inventory", "roles", "variables", "modules"],
         image: "ansible.png",
         officialLink: "https://www.ansible.com",
       },
       {
         title: "Packer",
+        titleMy: "Packer",
         description:
           "Create machine images for multiple platforms from a single source configuration",
+        descriptionMy:
+          "Packer ကိုအသုံးပြုပြီး Multiple Platforms များအတွက် Machine Images များဖန်တီးပါ",
         tags: [
+          "images",
+          "automation",
+          "multi-platform",
+          "provisioners",
+          "builders",
+        ],
+        tagsMy: [
           "images",
           "automation",
           "multi-platform",
@@ -269,48 +406,73 @@ const roadmap: RoadmapStage[] = [
   {
     key: "advanced",
     label: "Advanced",
+    labelMy: "Advanced",
     description: [
       "Master production-grade DevOps and GitOps",
       "Kubernetes, infrastructure as code, and security",
     ],
+    descriptionMy: [
+      "Production အဆင့် သုံးကြတဲ့ DevOps သဘောတရားများ နဲ့ GitOps အကြောင်းကို ကျွမ်းကျင်စွာလေ့လာပါ",
+      "Kubernetes, Infrastructure as Code နဲ့ Security အကြောင်းတွေ ပါဝင်ပါတယ်။",
+    ],
     items: [
       {
         title: "Kubernetes",
+        titleMy: "Kubernetes",
         description:
           "Orchestrate containers at scale with K8s clusters and deployments",
+        descriptionMy:
+          "Kubernetes ကိုအသုံးပြုပြီး Cluters, Applications များကို စီမံခန့်ခွဲခြင်းနှင့် Deploy လုပ်ခြင်း",
         tags: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
+        tagsMy: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
         image: "kubernetes.png",
         officialLink: "https://kubernetes.io",
       },
       {
         title: "Terraform",
+        titleMy: "Terraform",
         description:
           "Infrastructure as Code for multi-cloud provisioning and management",
+        descriptionMy:
+          "Cloud Infrastructure များကို Code ဖြင့် Provisioning , Management လုပ်ခြင်း",
         tags: ["modules", "state", "providers", "workspaces", "cdktf"],
+        tagsMy: ["modules", "state", "providers", "workspaces", "cdktf"],
         image: "terraform.png",
         officialLink: "https://www.terraform.io",
       },
       {
         title: "Monitoring & Observability",
+        titleMy: "Monitoring & Observability",
         description:
           "Implement Prometheus, Grafana, and ELK stack for system insights",
+        descriptionMy:
+          "Application Performance အတွက် Prometheus, Grafana နှင့် ELK Stack ကိုအသုံးပြုပြီး monitoring လုပ်ပါ",
         tags: ["metrics", "logs", "alerts", "dashboards", "tracing"],
+        tagsMy: ["metrics", "logs", "alerts", "dashboards", "tracing"],
         image: "monitoring.png",
         officialLink: "https://prometheus.io",
       },
       {
         title: "GitOps",
+        titleMy: "GitOps",
         description:
           "Declarative infrastructure with ArgoCD and Flux for automated deployments",
+        descriptionMy:
+          "Kubernetes Cluster တွေပေါ်မှာ Automated Deployments လုပ်ဖို့ အတွက် ArgoCD နှင့် Flux CD ကိုလေ့လာပါ။",
         tags: ["argocd", "flux", "sync", "rollback", "automation"],
+        tagsMy: ["argocd", "flux", "sync", "rollback", "automation"],
         image: "gitops.png",
         officialLink: "https://argo-cd.readthedocs.io",
       },
       {
         title: "Hashicorp Vault",
+        titleMy: "Hashicorp Vault",
         description:
           "Secure sensitive data with Vault, secrets management, and encryption",
+        descriptionMy:
+          "Secret, Sensitive Data များကို လုံခြုံစိတ်ချစွာ သိမ်းဖို့ Vault ကိုလေ့လာပါ",
         tags: ["vault", "secrets", "encryption", "pki", "authentication"],
+        tagsMy: ["vault", "secrets", "encryption", "pki", "authentication"],
         image: "vault.png",
         officialLink: "https://www.vaultproject.io",
       },
@@ -360,7 +522,11 @@ const stageConfig = {
   },
 };
 
-export function MinimalDevopsRoadmap() {
+interface MinimalDevopsRoadmapProps {
+  locale?: string;
+}
+
+export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProps) {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
 
   const nextStage = () => {
@@ -409,9 +575,9 @@ export function MinimalDevopsRoadmap() {
                 transition={{ delay: 0.1 }}
                 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 leading-tight"
               >
-                DevOps Roadmap with
+                {locale === 'en' ? 'DevOps Roadmap with' : 'DevOps Roadmap with'}
                 <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                  Structured Learning Path
+                  {locale === 'en' ? 'Structured Learning Path' : 'Structured Learning Path'}
                 </span>
               </motion.h2>
 
@@ -421,9 +587,9 @@ export function MinimalDevopsRoadmap() {
                 transition={{ delay: 0.2 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed"
               >
-                Follow our comprehensive DevOps roadmap designed to take you
-                from complete beginner to advanced practitioner with hands-on
-                projects and real-world scenarios
+                {locale === 'en' 
+                  ? 'Follow our comprehensive DevOps roadmap designed to take you from complete beginner to advanced practitioner with hands-on projects and real-world scenarios'
+                  : 'beginner level မှ စတင်ပြီး advanced အထိ level တစ်ခုချင်းစီအလိုက် လေ့လာရမည့် topics များကို စုစည်းထားသော DevOps Roadmap တစ်ခုဖြစ်ပါသည်။'}
               </motion.p>
             </div>
           </motion.div>
@@ -450,17 +616,17 @@ export function MinimalDevopsRoadmap() {
                   >
                     <div>
                       <span className="text-xs font-mono text-black-500 dark:text-gray-400 tracking-wider uppercase hidden md:block">
-                        Stage {currentStageIndex + 1} of {roadmap.length}
+                        {locale === 'en' ? 'Stage' : 'အဆင့်'} {currentStageIndex + 1} {locale === 'en' ? 'of' : '/'} {roadmap.length}
                       </span>
                       <h3
                         className={`text-2xl md:text-4xl font-bold mt-1 md:mt-2 tracking-tight bg-gradient-to-r ${currentConfig.gradient} bg-clip-text text-transparent`}
                       >
-                        {currentStage.label}
+                        {locale === 'en' ? currentStage.label : currentStage.labelMy}
                       </h3>
                     </div>
 
                     <div className="space-y-3 md:space-y-4">
-                      {currentStage.description.map((desc, index) => (
+                      {(locale === 'en' ? currentStage.description : currentStage.descriptionMy).map((desc, index) => (
                         <p
                           key={index}
                           className="text-base text-black dark:text-gray-300 leading-relaxed"
@@ -472,7 +638,7 @@ export function MinimalDevopsRoadmap() {
 
                     {/* Technology Logos with Links */}
                     <div className="flex flex-wrap gap-3 md:gap-4 pt-3 md:pt-4">
-                      {currentStage.items.map((item, index) => (
+                      {visibleItems.map((item, index) => (
                         <motion.div
                           key={`logo-${index}`}
                           initial={{ opacity: 0, scale: 0.8 }}
@@ -488,7 +654,7 @@ export function MinimalDevopsRoadmap() {
                           >
                             <img
                               src={`/${item.image}`}
-                              alt={item.title}
+                              alt={locale === 'en' ? item.title : item.titleMy}
                               className="w-8 h-8 md:w-12 md:h-12 object-contain"
                               onError={handleImageError}
                             />
@@ -499,7 +665,7 @@ export function MinimalDevopsRoadmap() {
                             rel="noopener noreferrer"
                             className="text-xs text-gray-700 dark:text-gray-300 text-center font-medium max-w-[60px] md:max-w-[70px] leading-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
                           >
-                            {item.title}
+                            {locale === 'en' ? item.title : item.titleMy}
                           </a>
                         </motion.div>
                       ))}
@@ -511,7 +677,7 @@ export function MinimalDevopsRoadmap() {
                   <button
                     onClick={prevStage}
                     className="p-2 md:p-3 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
-                    aria-label="Previous stage"
+                    aria-label={locale === 'en' ? "Previous stage" : "ယခင်အဆင့်"}
                   >
                     <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -524,7 +690,7 @@ export function MinimalDevopsRoadmap() {
                           setCurrentStageIndex(index);
                         }}
                         className="group"
-                        aria-label={`Go to stage ${index + 1}`}
+                        aria-label={locale === 'en' ? `Go to stage ${index + 1}` : `အဆင့် ${index + 1} သို့သွားရန်`}
                       >
                         <div
                           className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
@@ -544,7 +710,7 @@ export function MinimalDevopsRoadmap() {
                   <button
                     onClick={nextStage}
                     className="p-2 md:p-3 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
-                    aria-label="Next stage"
+                    aria-label={locale === 'en' ? "Next stage" : "နောက်အဆင့်"}
                   >
                     <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -605,16 +771,16 @@ export function MinimalDevopsRoadmap() {
                                 rel="noopener noreferrer"
                                 className="text-base font-semibold text-sky-700 dark:text-sky-400 leading-tight mb-1 md:mb-2 hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200 cursor-pointer block"
                               >
-                                {item.title}
+                                {locale === 'en' ? item.title : item.titleMy}
                               </a>
 
                               <p className="text-sm text-black-700 dark:text-gray-300 leading-relaxed mb-2 md:mb-3">
-                                {item.description}
+                                {locale === 'en' ? item.description : item.descriptionMy}
                               </p>
 
                               {/* Compact Tags */}
                               <div className="flex flex-wrap gap-1 md:gap-1.5">
-                                {item.tags.map((tag, tagIndex) => (
+                                {(locale === 'en' ? item.tags : item.tagsMy).map((tag, tagIndex) => (
                                   <span
                                     key={tagIndex}
                                     className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-medium ${currentConfig.tagBg} dark:bg-gray-700 border ${currentConfig.tagBorder} dark:border-gray-600 text-orange-600 dark:text-orange-400 transition-all duration-200 hover:scale-105 ${currentConfig.tagHover} dark:hover:bg-gray-600`}

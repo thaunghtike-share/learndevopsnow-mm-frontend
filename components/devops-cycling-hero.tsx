@@ -233,7 +233,7 @@ const DevOpsCyclingHero = () => {
                   </div>
 
                   <h1
-                    className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight bg-gradient-to-r ${currentSlideData.iconGradient} bg-clip-text text-transparent`}
+                    className={`md:mb-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight bg-gradient-to-r ${currentSlideData.iconGradient} bg-clip-text text-transparent`}
                   >
                     {locale === 'en' ? currentSlideData.title : currentSlideData.titleMy}
                   </h1>
