@@ -82,7 +82,7 @@ export default function HomeClient() {
             id="youtube"
             className="bg-white dark:bg-[#000000] -mt-10 md:-mt-10"
           >
-            <YouTubePlaylists />
+            <YouTubePlaylists locale={locale} />
           </section>
 
           <section

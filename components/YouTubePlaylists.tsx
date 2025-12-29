@@ -25,42 +25,57 @@ const youtubePlaylists = [
   {
     id: 5,
     title: "Linux Essentials",
+    titleMy: "Linux Essentials", // Keep English title
     videoId: "Wgi-OfbP2Gw",
     playlistUrl:
       "https://www.youtube.com/watch?v=Wgi-OfbP2Gw&list=PL9ooVrP1hQOH3SvcgkC4Qv2cyCebvs0Ik",
     channel: "Edureka",
+    channelMy: "Edureka",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Essential Linux commands and system administration",
+    descriptionMy: "Linux အခြေခံ commands များနှင့် စနစ်စီမံခန့်ခွဲမှု",
     order: 1,
   },
   {
     id: 6,
     title: "Linux Server Administration",
+    titleMy: "Linux Server Administration", // Keep English title
     videoId: "acv0fUTDK3g",
     playlistUrl:
       "https://www.youtube.com/watch?v=acv0fUTDK3g&list=PLS0spxc8nUsDro6iDvLzeC8iDv5y1gDXa",
     channel: "Shesh Chauhan IT Trainer",
+    channelMy: "Shesh Chauhan IT Trainer",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Practical Linux server management skills",
+    descriptionMy: "Linux server စီမံခန့်ခွဲမှု လက်တွေ့ကျွမ်းကျင်မှုများ",
     order: 1,
   },
   {
     id: 35,
     title: "Bash Scripting",
+    titleMy: "Bash Scripting", // Keep English title
     videoId: "e7BufAVwDiM",
     playlistUrl: "https://www.youtube.com/watch?v=e7BufAVwDiM",
     channel: "LinuxHint",
+    channelMy: "LinuxHint",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: true,
     recommended: false,
     description: "Bash scripting basics",
+    descriptionMy: "Bash scripting အခြေခံများ",
     order: 1,
   },
 
@@ -68,29 +83,39 @@ const youtubePlaylists = [
   {
     id: 28,
     title: "CCNA Free Course",
+    titleMy: "CCNA Free Course", // Keep English title
     videoId: "H8W9oMNSuwo",
     playlistUrl:
       "https://www.youtube.com/watch?v=H8W9oMNSuwo&list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ",
     channel: "Jeremy's IT Lab",
+    channelMy: "Jeremy's IT Lab",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "8 weeks",
+    estDurationMy: "၈ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Complete networking fundamentals for DevOps",
+    descriptionMy: "DevOps အတွက် အပြည့်အစုံ Network အခြေခံများ",
     order: 2,
   },
   {
     id: 30,
     title: "CCNA (Burmese)",
+    titleMy: "CCNA (Burmese)", // Keep English title
     videoId: "iutsJfATykg",
     playlistUrl:
       "https://www.youtube.com/watch?v=iutsJfATykg&list=PLOFIpcUzu6dWs4DjtrVUA2SRwiWOPSCeJ",
     channel: "ACH Network Pro",
+    channelMy: "ACH Network Pro",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "8 weeks",
+    estDurationMy: "၈ ပတ်",
     is_burmese: true,
     recommended: false,
     description: "Networking basics in Burmese language",
+    descriptionMy: "မြန်မာလို Network အခြေခံများ",
     order: 2,
   },
 
@@ -98,16 +123,21 @@ const youtubePlaylists = [
   {
     id: 1,
     title: "Cloud Fundamentals",
+    titleMy: "Cloud Fundamentals", // Keep English title
     videoId: "3XFODda6YXo",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLEiEAq2VkUULlNtIFhEQHo8gacvme35rz",
     channel: "Simplilearn",
+    channelMy: "Simplilearn",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: true,
     description:
       "Perfect starting point for understanding cloud computing basics",
+    descriptionMy: "Cloud computing အခြေခံများ နားလည်ဖို့ အကောင်းဆုံးစတင်နေရာ",
     order: 3,
   },
 
@@ -115,28 +145,38 @@ const youtubePlaylists = [
   {
     id: 2,
     title: "AWS Course Certification",
+    titleMy: "AWS Course Certification", // Keep English title
     videoId: "YqWuL3an-5o",
     playlistUrl: "https://www.youtube.com/watch?v=YqWuL3an-5o",
     channel: "Intellipaat",
+    channelMy: "Intellipaat",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Comprehensive AWS fundamentals for beginners",
+    descriptionMy: "စသင်မယ့်သူများအတွက် အပြည့်အစုံ AWS အခြေခံများ",
     order: 4,
   },
   {
     id: 34,
     title: "AWS Basic (Burmese)",
+    titleMy: "AWS Basic (Burmese)", // Keep English title
     videoId: "Dn5B-qliqyk",
     playlistUrl:
       "https://www.youtube.com/watch?v=Dn5B-qliqyk&list=PLfFA9b_Mlfz4H8wn2KnPI-u5a3F9UNNVz",
     channel: "Myanmar Tech Academy",
+    channelMy: "Myanmar Tech Academy",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "4 weeks",
+    estDurationMy: "၄ ပတ်",
     is_burmese: true,
     recommended: false,
     description: "AWS introduction in Burmese",
+    descriptionMy: "မြန်မာလို AWS မိတ်ဆက်",
     order: 4,
   },
 
@@ -144,15 +184,20 @@ const youtubePlaylists = [
   {
     id: 3,
     title: "Azure (AZ-900) Full Course",
+    titleMy: "Azure (AZ-900) Full Course", // Keep English title
     videoId: "NPEsD6n9A_I",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLGjZwEtPN7j-Q59JYso3L4_yoCjj2syrM",
     channel: "Adam Marczak - Azure for Everyone",
+    channelMy: "Adam Marczak - Azure for Everyone",
     difficulty: "Beginner",
+    difficultyMy: "စသင်မယ့်သူ",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Master Azure fundamentals with clear explanations",
+    descriptionMy: "ရှင်းလင်းတဲ့ရှင်းပြချက်တွေနဲ့ Azure အခြေခံများ ကျွမ်းကျင်ပါ",
     order: 5,
   },
 
@@ -160,28 +205,38 @@ const youtubePlaylists = [
   {
     id: 7,
     title: "Docker Crash Course Tutorial",
+    titleMy: "Docker Crash Course Tutorial", // Keep English title
     videoId: "31ieHmcTUOk",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7",
     channel: "Net Ninja",
+    channelMy: "Net Ninja",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "1 weeks",
+    estDurationMy: "၁ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Quick and practical Docker containerization",
+    descriptionMy: "မြန်မြန်ဆန်ဆန်နဲ့ လက်တွေ့သုံးတဲ့ Docker containerization",
     order: 1,
   },
   {
     id: 8,
     title: "Docker Tutorial",
+    titleMy: "Docker Tutorial", // Keep English title
     videoId: "zJ6WbK9zFpI",
     playlistUrl: "https://www.youtube.com/watch?v=zJ6WbK9zFpI&t=11s",
     channel: "Kode Kloud",
+    channelMy: "Kode Kloud",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Comprehensive Docker with hands-on labs",
+    descriptionMy: "လက်တွေ့လုပ်ဆောင်ချက်တွေနဲ့ အပြည့်အစုံ Docker",
     order: 1,
   },
 
@@ -189,28 +244,38 @@ const youtubePlaylists = [
   {
     id: 12,
     title: "Git – Full Course for Beginners",
+    titleMy: "Git – Full Course for Beginners", // Keep English title
     videoId: "zTjRZNkhiEU",
     playlistUrl: "https://www.youtube.com/watch?v=zTjRZNkhiEU",
     channel: "freeCodeCamp.org",
+    channelMy: "freeCodeCamp.org",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Complete Git version control mastery",
+    descriptionMy: "Git version control အပြည့်အစုံ ကျွမ်းကျင်မှု",
     order: 2,
   },
   {
     id: 36,
     title: "Git Basic (Burmese)",
+    titleMy: "Git Basic (Burmese)", // Keep English title
     videoId: "DB_MEZZdiIs",
     playlistUrl:
       "https://www.youtube.com/watch?v=DB_MEZZdiIs&list=PLD_eiqVVLZDge73nM5J-LyPgbfVL6vnDc",
     channel: "Myanmar Data Science",
+    channelMy: "Myanmar Data Science",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: true,
     recommended: false,
     description: "Git version control in Burmese",
+    descriptionMy: "မြန်မာလို Git version control",
     order: 2,
   },
 
@@ -218,29 +283,39 @@ const youtubePlaylists = [
   {
     id: 10,
     title: "CICD Tutorials",
+    titleMy: "CICD Tutorials", // Keep English title
     videoId: "R8_veQiYBjI",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLy7NrYWoggjzSIlwxeBbcgfAdYoxCIrM2",
     channel: "TechWorld with Nana",
+    channelMy: "TechWorld with Nana",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Modern CI/CD pipelines explained clearly",
+    descriptionMy: "ခေတ်မီ CI/CD pipelines တွေကို ရှင်းရှင်းလင်းလင်းရှင်းပြထားတယ်",
     order: 3,
   },
   {
     id: 11,
     title: "CICD (Github Action)",
+    titleMy: "CICD (Github Action)", // Keep English title
     videoId: "-hVG9z0fCac",
     playlistUrl:
       "https://www.youtube.com/watch?v=-hVG9z0fCac&list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY",
     channel: "glich stream",
+    channelMy: "glich stream",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "GitHub Actions for automation workflows",
+    descriptionMy: "Automation workflows တွေအတွက် GitHub Actions",
     order: 3,
   },
 
@@ -248,29 +323,39 @@ const youtubePlaylists = [
   {
     id: 14,
     title: "Ansible Tutorials",
+    titleMy: "Ansible Tutorials", // Keep English title
     videoId: "3RiVKs8GHYQ",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHlbhuq9V02n9AMLPySoEQ",
     channel: "Learn Linux TV",
+    channelMy: "Learn Linux TV",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "4 weeks",
+    estDurationMy: "၄ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Infrastructure automation with Ansible",
+    descriptionMy: "Ansible နဲ့ Infrastructure automation",
     order: 4,
   },
   {
     id: 15,
     title: "Ansible Zero to Hero",
+    titleMy: "Ansible Zero to Hero", // Keep English title
     videoId: "aT69WlNi8EA",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PL0lvsZ5ieQicXHPMNNg7qXJJoO2AnE8ej",
     channel: "TechWorld with Murali",
+    channelMy: "TechWorld with Murali",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "3-4 weeks",
+    estDurationMy: "၃-၄ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "From basics to advanced Ansible concepts",
+    descriptionMy: "အခြေခံကနေ အဆင့်မြင့် Ansible concepts အထိ",
     order: 4,
   },
 
@@ -278,28 +363,38 @@ const youtubePlaylists = [
   {
     id: 39,
     title: "AWS Security Full Course",
+    titleMy: "AWS Security Full Course", // Keep English title
     videoId: "oGS9FhCT91g",
     playlistUrl: "https://www.youtube.com/watch?v=oGS9FhCT91g",
     channel: "Maruchin tech",
+    channelMy: "Maruchin tech",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "3-5 weeks",
+    estDurationMy: "၃-၅ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "AWS security best practices and implementation",
+    descriptionMy: "AWS security အကောင်းဆုံးအလေ့အကျင့်များနှင့် အကောင်အထည်ဖော်မှု",
     order: 5,
   },
   {
     id: 40,
     title: "AWS Security",
+    titleMy: "AWS Security", // Keep English title
     videoId: "2pEp1mcf3jU",
     playlistUrl:
       "https://www.youtube.com/watch?v=2pEp1mcf3jU&list=PLTCuRW0ikUdP5OrEUckFdQPHeE05ZeS5z",
     channel: "MLOps School",
+    channelMy: "MLOps School",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "6 weeks",
+    estDurationMy: "၆ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Comprehensive AWS security course",
+    descriptionMy: "အပြည့်အစုံ AWS security သင်တန်း",
     order: 5,
   },
 
@@ -307,15 +402,20 @@ const youtubePlaylists = [
   {
     id: 38,
     title: "Hashicorp Packer",
+    titleMy: "Hashicorp Packer", // Keep English title
     videoId: "tbv1lTF1wFU",
     playlistUrl:
       "https://www.youtube.com/watch?v=tbv1lTF1wFU&list=PL8VzFQ8k4UdP5OrEUckFdQPHeE05ZeS5z",
     channel: "Sanjeev Thiyagarajan",
+    channelMy: "Sanjeev Thiyagarajan",
     difficulty: "Intermediate",
+    difficultyMy: "အလယ်အလတ်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Machine image creation with Packer",
+    descriptionMy: "Packer နဲ့ Machine image ဖန်တီးခြင်း",
     order: 6,
   },
 
@@ -323,29 +423,39 @@ const youtubePlaylists = [
   {
     id: 9,
     title: "Kubernetes Administrator Course",
+    titleMy: "Kubernetes Administrator Course", // Keep English title
     videoId: "6_gMoe7Ik8k",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLl4APkPHzsUUOkOv3i62UidrLmSB8DcGC",
     channel: "Tech Tutorials with Piyush",
+    channelMy: "Tech Tutorials with Piyush",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "5 weeks",
+    estDurationMy: "၅ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Complete Kubernetes administration guide",
+    descriptionMy: "Kubernetes administration အပြည့်အစုံလမ်းညွှန်",
     order: 1,
   },
   {
     id: 31,
     title: "Kubernetes Fundamentals",
+    titleMy: "Kubernetes Fundamentals", // Keep English title
     videoId: "2T86xAtR6Fo",
     playlistUrl:
       "https://www.youtube.com/watch?v=dfxrdoEQe00&list=PLdpzxOOAlwvJdsW6A0jCz_3VaANuFMLpc",
     channel: "Abhishek.Veeramalla",
+    channelMy: "Abhishek.Veeramalla",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "8 weeks",
+    estDurationMy: "၈ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Deep dive into Kubernetes concepts",
+    descriptionMy: "Kubernetes concepts တွေကို နက်နက်နဲနဲလေ့လာခြင်း",
     order: 1,
   },
 
@@ -353,29 +463,39 @@ const youtubePlaylists = [
   {
     id: 13,
     title: "Terraform Full Course For Beginners",
+    titleMy: "Terraform Full Course For Beginners", // Keep English title
     videoId: "j0mfH_7sR7k",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLl4APkPHzsUUHlbhuq9V02n9AMLPySoEQ",
     channel: "Tech Tutorials with Piyush",
+    channelMy: "Tech Tutorials with Piyush",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "5 weeks",
+    estDurationMy: "၅ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Infrastructure as Code with Terraform",
+    descriptionMy: "Terraform နဲ့ Infrastructure as Code",
     order: 2,
   },
   {
     id: 37,
     title: "Terraform (Burmese)",
+    titleMy: "Terraform (Burmese)", // Keep English title
     videoId: "v4X3D4YlyHc",
     playlistUrl:
       "https://www.youtube.com/watch?v=v4X3D4YlyHc&list=PLvzWOIc1IOtdufeA0ab5mKycSJgq5Bi57",
     channel: "Hello Cloud",
+    channelMy: "Hello Cloud",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "6 weeks",
+    estDurationMy: "၆ ပတ်",
     is_burmese: true,
     recommended: false,
     description: "Terraform in Burmese language",
+    descriptionMy: "မြန်မာလို Terraform",
     order: 2,
   },
 
@@ -383,15 +503,20 @@ const youtubePlaylists = [
   {
     id: 21,
     title: "DevOps Zero To Hero Course",
+    titleMy: "DevOps Zero To Hero Course", // Keep English title
     videoId: "Xrgk023l4lI",
     playlistUrl:
       "https://www.youtube.com/watch?v=Ou9j73aWgyE&list=PLdpzxOOAlwvIKMhk8WhzN1pYoJ1YU8Csa",
     channel: "Abhishek.Veeramalla",
+    channelMy: "Abhishek.Veeramalla",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "6 weeks",
+    estDurationMy: "၆ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Complete DevOps journey from zero to production",
+    descriptionMy: "သုညကနေ production အထိ DevOps ခရီးအပြည့်အစုံ",
     order: 3,
   },
 
@@ -399,15 +524,20 @@ const youtubePlaylists = [
   {
     id: 22,
     title: "GitOps with ArgoCD",
+    titleMy: "GitOps with ArgoCD", // Keep English title
     videoId: "eTR-gbIeXPw",
     playlistUrl:
       "https://www.youtube.com/watch?v=eTR-gbIeXPw&list=PLdsu0umqbb8P8dNoox7ECgOo_fJ9FBfZl",
     channel: "DevOps Hint",
+    channelMy: "DevOps Hint",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "2 weeks",
+    estDurationMy: "၂ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "GitOps implementation with ArgoCD",
+    descriptionMy: "ArgoCD နဲ့ GitOps အကောင်အထည်ဖော်ခြင်း",
     order: 4,
   },
 
@@ -415,14 +545,19 @@ const youtubePlaylists = [
   {
     id: 29,
     title: "DevSecOps Fundamentals",
+    titleMy: "DevSecOps Fundamentals", // Keep English title
     videoId: "7tcX_ndqD68",
     playlistUrl: "https://www.youtube.com/watch?v=7tcX_ndqD68",
     channel: "MartinY Tech",
+    channelMy: "MartinY Tech",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "5 weeks",
+    estDurationMy: "၅ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Security integration in DevOps pipelines",
+    descriptionMy: "DevOps pipelines တွေထဲမှာ Security ပေါင်းစပ်ခြင်း",
     order: 5,
   },
 
@@ -430,27 +565,37 @@ const youtubePlaylists = [
   {
     id: 41,
     title: "Kubernetes Logging & Monitoring",
+    titleMy: "Kubernetes Logging & Monitoring", // Keep English title
     videoId: "0POI5E7Uzjo",
     playlistUrl: "https://www.youtube.com/watch?v=0POI5E7Uzjo",
     channel: "Rayan Slim",
+    channelMy: "Rayan Slim",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "1 weeks",
+    estDurationMy: "၁ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Observability in Kubernetes clusters",
+    descriptionMy: "Kubernetes clusters တွေမှာ Observability",
     order: 6,
   },
   {
     id: 42,
     title: "Filebeat + Elk Stack Tutorial With Kubernetes",
+    titleMy: "Filebeat + Elk Stack Tutorial With Kubernetes", // Keep English title
     videoId: "SU--XMhbWoY",
     playlistUrl: "https://www.youtube.com/watch?v=SU--XMhbWoY",
     channel: "Michael Guay",
+    channelMy: "Michael Guay",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "1 weeks",
+    estDurationMy: "၁ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Log management with ELK stack",
+    descriptionMy: "ELK stack နဲ့ Log စီမံခန့်ခွဲမှု",
     order: 6,
   },
 
@@ -458,15 +603,20 @@ const youtubePlaylists = [
   {
     id: 43,
     title: "Hashicorp Vault",
+    titleMy: "Hashicorp Vault", // Keep English title
     videoId: "-sU0O82fdZs",
     playlistUrl:
       "https://www.youtube.com/watch?v=-sU0O82fdZs&list=PL7iMyoQPMtAP7XeXabzWuPumMzQRhUKC",
     channel: "Rahul Wagh",
+    channelMy: "Rahul Wagh",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "1 weeks",
+    estDurationMy: "၁ ပတ်",
     is_burmese: false,
     recommended: true,
     description: "Secrets management with HashiCorp Vault",
+    descriptionMy: "HashiCorp Vault နဲ့ Secrets စီမံခန့်ခွဲမှု",
     order: 7,
   },
 
@@ -474,14 +624,19 @@ const youtubePlaylists = [
   {
     id: 44,
     title: "Kubernetes Security Course",
+    titleMy: "Kubernetes Security Course", // Keep English title
     videoId: "d9xfB5qaOfg",
     playlistUrl: "https://www.youtube.com/watch?v=d9xfB5qaOfg",
     channel: "Killer Shell",
+    channelMy: "Killer Shell",
     difficulty: "Advanced",
+    difficultyMy: "အဆင့်မြင့်",
     estDuration: "1 weeks",
+    estDurationMy: "၁ ပတ်",
     is_burmese: false,
     recommended: false,
     description: "Kubernetes security best practices",
+    descriptionMy: "Kubernetes security အကောင်းဆုံးအလေ့အကျင့်များ",
     order: 8,
   },
 ];
@@ -518,55 +673,74 @@ const difficultyConfig = {
 
 const learningPaths = {
   Beginner: {
-    title: "Start Your DevOps Journey",
+    title: "Start Your DevOps Journey", // Keep English title
+    titleMy: "Start Your DevOps Journey", // Keep English
     description:
       "Begin with foundational concepts and essential tools. Master Linux, networking, and cloud basics to build a solid foundation for your DevOps career.",
+    descriptionMy:
+      "linux၊ network နဲ့ cloud တို့လို အခြေခံတွေကို လေ့လာသင်ယူပြီး devops ကိုစတင်လေ့လာလိုက်ပါ။",
     learningPath: [
-      { title: "Linux", icon: "🐧" },
-      { title: "Bash", icon: "💻" },
-      { title: "CCNA", icon: "🌐" },
-      { title: "AWS", icon: "🔶" },
-      { title: "Azure", icon: "🔷" },
+      { title: "Linux", titleMy: "Linux", icon: "🐧" },
+      { title: "Bash", titleMy: "Bash", icon: "💻" },
+      { title: "CCNA", titleMy: "CCNA", icon: "🌐" },
+      { title: "AWS", titleMy: "AWS", icon: "🔶" },
+      { title: "Azure", titleMy: "Azure", icon: "🔷" },
     ],
     duration: "8-12 weeks",
+    durationMy: "၈-၁၂ ပတ်",
     skills: [
       "Linux CLI",
       "Networking",
       "Cloud Basics",
       "Container Fundamentals",
     ],
+    skillsMy: ["Linux CLI", "Network", "Cloud အခြေခံ", "Container အခြေခံ"],
   },
   Intermediate: {
-    title: "Build DevOps Workflows",
+    title: "Build DevOps Workflows", // Keep English title
+    titleMy: "Build DevOps Workflows", // Keep English
     description:
       "Learn to automate infrastructure and implement CI/CD pipelines. Focus on container orchestration, infrastructure as code, and deployment automation.",
+    descriptionMy:
+      "IAC တွေ CICD တွေကိုအသုံးချပြီး development lifecycle ကိုပိုမြန်ဆန်စေဖို့ infrastructure ကို automate လုပ်နိုင်ဖို့ လေ့လာပါ။",
     learningPath: [
-      { title: "Docker", icon: "🐳" },
-      { title: "Git", icon: "📦" },
-      { title: "CICD ", icon: "🔄" },
-      { title: "Ansible", icon: "⚙️" },
-      { title: "Packer", icon: "📦" },
+      { title: "Docker", titleMy: "Docker", icon: "🐳" },
+      { title: "Git", titleMy: "Git", icon: "📦" },
+      { title: "CICD ", titleMy: "CICD", icon: "🔄" },
+      { title: "Ansible", titleMy: "Ansible", icon: "⚙️" },
+      { title: "Packer", titleMy: "Packer", icon: "📦" },
     ],
     duration: "12-16 weeks",
+    durationMy: "၁၂-၁၆ ပတ်",
     skills: ["Docker", "CI/CD", "Git", "Ansible", "AWS Security"],
+    skillsMy: ["Docker", "CI/CD", "Git", "Ansible", "AWS Security"],
   },
   Advanced: {
-    title: "Master Production DevOps",
+    title: "Master Production DevOps", // Keep English title
+    titleMy: "Master Production DevOps", // Keep English
     description:
       "Advanced topics including Kubernetes, Terraform, GitOps, and security. Learn to manage complex infrastructure and implement enterprise-grade DevOps practices.",
+    descriptionMy:
+      "real world မှာသုံးကြတဲ့ kubernetes , terraform , gitops နဲ့ security တို့လို အဆင့်မြင့် DevOps concepts တွေကို လေ့လာပါ။",
     learningPath: [
-      { title: "Kubernetes", icon: "☸️" },
-      { title: "Terraform", icon: "🏗️" },
-      { title: "GitOps", icon: "🔄" }, // Added GitOps
-      { title: "Monitoring", icon: "📊" },
-      { title: "Vault", icon: "🔐" },
+      { title: "Kubernetes", titleMy: "Kubernetes", icon: "☸️" },
+      { title: "Terraform", titleMy: "Terraform", icon: "🏗️" },
+      { title: "GitOps", titleMy: "GitOps", icon: "🔄" },
+      { title: "Monitoring", titleMy: "Monitoring", icon: "📊" },
+      { title: "Vault", titleMy: "Vault", icon: "🔐" },
     ],
     duration: "16-20 weeks",
+    durationMy: "၁၆-၂၀ ပတ်",
     skills: ["Kubernetes", "Terraform", "GitOps", "Security", "Monitoring"],
+    skillsMy: ["Kubernetes", "Terraform", "GitOps", "Security", "Monitoring"],
   },
 };
 
-export function YouTubePlaylists() {
+interface YouTubePlaylistsProps {
+  locale?: string;
+}
+
+export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [completedPlaylists, setCompletedPlaylists] = useState<Set<number>>(
     new Set()
@@ -631,7 +805,6 @@ export function YouTubePlaylists() {
       Advanced: [],
     };
 
-    // Sort courses by order within each difficulty
     groups.Beginner = youtubePlaylists
       .filter((p) => p.difficulty === "Beginner")
       .sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -647,26 +820,20 @@ export function YouTubePlaylists() {
     return groups;
   }, []);
 
-  // Don't render until client-side to avoid hydration issues
   if (!isClient) {
     return (
       <section className="max-w-7xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="animate-pulse dark:text-gray-300">
-          Loading YouTube courses...
+          {locale === 'en' ? "Loading YouTube courses..." : "YouTube သင်ခန်းစာများ ဖွင့်နေသည်..."}
         </div>
       </section>
     );
   }
 
-  // Get the current config for selected difficulty
-  const currentConfig =
-    difficultyConfig[selectedDifficulty as keyof typeof difficultyConfig];
-  const IconComponent = currentConfig.icon;
-
   return (
     <section className="relative min-h-screen bg-white/95 dark:bg-[#000000] overflow-hidden">
       <div className="py-8 md:py-12 px-4 md:px-11">
-        {/* Header Section - Keep original design */}
+        {/* Header Section */}
         <div className="text-center mb-8 md:mb-12 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -686,9 +853,9 @@ export function YouTubePlaylists() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight"
               >
-                Master DevOps with
+                {locale === 'en' ? "Master DevOps with" : "Master DevOps with"}
                 <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                  YouTube Courses
+                  {locale === 'en' ? "YouTube Courses" : "YouTube Courses"}
                 </span>
               </motion.h1>
 
@@ -698,9 +865,10 @@ export function YouTubePlaylists() {
                 transition={{ delay: 0.1 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 mb-6 leading-relaxed max-w-2xl"
               >
-                Curated learning paths from fundamentals to advanced production
-                skills. Follow structured roadmaps with the best YouTube
-                content.
+                {locale === 'en' 
+                  ? "Curated learning paths from fundamentals to advanced production skills. Follow structured roadmaps with the best YouTube content."
+                  : "Youtube မှာ အခြေခံကနေ စတင်ပြီး devops နဲ့ဆိုင်တဲ့ သင်ခန်းစာ တွေကို level အလိုက် စနစ်တကျ လေ့လာပါ။"
+                }
               </motion.p>
 
               {/* Search Bar */}
@@ -713,7 +881,10 @@ export function YouTubePlaylists() {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search courses by topic, technology, or channel..."
+                  placeholder={locale === 'en' 
+                    ? "Search courses by topic, technology, or channel..."
+                    : "ခေါင်းစဉ်၊ နည်းပညာ သို့မဟုတ် channel အလိုက် သင်ခန်းစာများ ရှာရန်..."
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-lg"
@@ -775,16 +946,16 @@ export function YouTubePlaylists() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                              {path.title}
+                              {path.title} {/* Always show English title */}
                             </h2>
                             <span className="text-sm font-medium text-sky-600 dark:text-sky-400 mt-1 block">
-                              {difficulty} Level • {playlists.length} courses
+                              {locale === 'en' ? `${difficulty} Level` : difficulty === 'Beginner' ? 'Beginner' : difficulty === 'Intermediate' ? 'Intermediate' : 'Advanced'} • {playlists.length} {locale === 'en' ? 'courses' : 'courses'}
                             </span>
                           </div>
                         </div>
 
                         <p className="text-black dark:text-gray-300 text-base leading-relaxed mb-4 md:mb-6">
-                          {path.description}
+                          {locale === 'en' ? path.description : path.descriptionMy}
                         </p>
 
                         {/* Learning Path - Made scrollable on mobile */}
@@ -793,8 +964,8 @@ export function YouTubePlaylists() {
                             isLeft ? "" : "items-end"
                           }`}
                         >
-                          <span className="text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
-                            Recommended Learning Path
+                          <span className="text-sm md:mb-4 font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
+                            {locale === 'en' ? "Recommended Learning Path" : "Recommended Learning Path"}
                           </span>
                           <div
                             className="w-full overflow-x-auto pb-2 
@@ -813,10 +984,7 @@ export function YouTubePlaylists() {
                                   >
                                     <span className="text-lg">{step.icon}</span>
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                      {step.title
-                                        .split(" ")
-                                        .slice(0, 2)
-                                        .join(" ")}
+                                      {step.title} {/* Always show English title */}
                                     </span>
                                   </div>
                                   {index < path.learningPath.length - 1 && (
@@ -835,6 +1003,7 @@ export function YouTubePlaylists() {
                       config={config}
                       completedPlaylists={completedPlaylists}
                       toggleComplete={toggleComplete}
+                      locale={locale}
                     />
                   </motion.section>
                 );
@@ -847,7 +1016,7 @@ export function YouTubePlaylists() {
               className="mb-12 md:mb-16"
             >
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 md:mb-8">
-                Found {filteredPlaylists.length} courses
+                {locale === 'en' ? `Found ${filteredPlaylists.length} courses` : `သင်ခန်းစာ ${filteredPlaylists.length} ခု တွေ့ရှိပါသည်`}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPlaylists.map((playlist, index) => {
@@ -863,6 +1032,7 @@ export function YouTubePlaylists() {
                       index={index + 1}
                       isCompleted={completedPlaylists.has(playlist.id)}
                       toggleComplete={toggleComplete}
+                      locale={locale}
                     />
                   );
                 })}
@@ -876,16 +1046,16 @@ export function YouTubePlaylists() {
             >
               <Search className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                No courses found
+                {locale === 'en' ? "No courses found" : "သင်ခန်းစာ မတွေ့ပါ"}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Try different keywords
+                {locale === 'en' ? "Try different keywords" : "မတူညီတဲ့ keyword တွေ စမ်းကြည့်ပါ"}
               </p>
               <button
                 onClick={() => setSearchQuery("")}
                 className="px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
               >
-                Clear Search
+                {locale === 'en' ? "Clear Search" : "ရှာဖွေမှုကို ရှင်းလင်းရန်"}
               </button>
             </motion.div>
           )}
@@ -895,17 +1065,21 @@ export function YouTubePlaylists() {
   );
 }
 
+interface HorizontalScrollSectionProps {
+  playlists: typeof youtubePlaylists;
+  config: (typeof difficultyConfig)[keyof typeof difficultyConfig];
+  completedPlaylists: Set<number>;
+  toggleComplete: (id: number) => void;
+  locale?: string;
+}
+
 function HorizontalScrollSection({
   playlists,
   config,
   completedPlaylists,
   toggleComplete,
-}: {
-  playlists: typeof youtubePlaylists;
-  config: (typeof difficultyConfig)[keyof typeof difficultyConfig];
-  completedPlaylists: Set<number>;
-  toggleComplete: (id: number) => void;
-}) {
+  locale = 'en'
+}: HorizontalScrollSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -942,7 +1116,7 @@ function HorizontalScrollSection({
         <button
           onClick={() => scroll("left")}
           className="absolute -left-4 md:-left-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
-          aria-label="Scroll left"
+          aria-label={locale === 'en' ? "Scroll left" : "ဘယ်ဘက်သို့ ရွှေ့ရန်"}
         >
           <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
@@ -952,7 +1126,7 @@ function HorizontalScrollSection({
         <button
           onClick={() => scroll("right")}
           className="absolute -right-4 md:-right-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
-          aria-label="Scroll right"
+          aria-label={locale === 'en' ? "Scroll right" : "ညာဘက်သို့ ရွှေ့ရန်"}
         >
           <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
@@ -982,6 +1156,7 @@ function HorizontalScrollSection({
               index={index + 1}
               isCompleted={completedPlaylists.has(playlist.id)}
               toggleComplete={toggleComplete}
+              locale={locale}
             />
           </motion.div>
         ))}
@@ -990,19 +1165,23 @@ function HorizontalScrollSection({
   );
 }
 
+interface PlaylistCardProps {
+  playlist: typeof youtubePlaylists[0];
+  config: (typeof difficultyConfig)[keyof typeof difficultyConfig];
+  index: number;
+  isCompleted?: boolean;
+  toggleComplete?: (id: number) => void;
+  locale?: string;
+}
+
 function PlaylistCard({
   playlist,
   config,
   index,
   isCompleted,
   toggleComplete,
-}: {
-  playlist: (typeof youtubePlaylists)[0];
-  config: (typeof difficultyConfig)[keyof typeof difficultyConfig];
-  index: number;
-  isCompleted?: boolean;
-  toggleComplete?: (id: number) => void;
-}) {
+  locale = 'en'
+}: PlaylistCardProps) {
   return (
     <motion.div
       className="block group"
@@ -1052,7 +1231,7 @@ function PlaylistCard({
 
             <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {playlist.estDuration}
+              {locale === 'en' ? playlist.estDuration : playlist.estDurationMy}
             </div>
           </div>
         </a>
@@ -1064,7 +1243,10 @@ function PlaylistCard({
               toggleComplete(playlist.id);
             }}
             className="absolute top-3 right-3 z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110 transition-transform border-2 border-gray-300 dark:border-gray-600"
-            aria-label={isCompleted ? "Mark as incomplete" : "Mark as complete"}
+            aria-label={isCompleted ? 
+              (locale === 'en' ? "Mark as incomplete" : "မပြီးဆုံးသေးဟု မှတ်သားရန်") : 
+              (locale === 'en' ? "Mark as complete" : "ပြီးဆုံးပြီဟု မှတ်သားရန်")
+            }
           >
             {isCompleted ? (
               <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -1088,20 +1270,22 @@ function PlaylistCard({
                 : "text-gray-900 dark:text-gray-100"
             }`}
           >
-            {index}. {playlist.title}
+            {index}. {playlist.title} {/* Always show English title */}
           </h3>
         </a>
 
         <div className="flex mt-3 items-center justify-between">
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span className="text-sm font-medium">{playlist.channel}</span>
+            <Users className="w-4 h-4 text-sky-400 dark:text-sky-500" />
+            <span className="text-sm text-sky-400 font-medium">
+              {playlist.channel} {/* Always show English channel name */}
+            </span>
           </div>
 
           {isCompleted && (
             <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              Completed
+              {locale === 'en' ? "Completed" : "ပြီးဆုံးပြီ"}
             </span>
           )}
         </div>
