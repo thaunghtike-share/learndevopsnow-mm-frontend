@@ -75,7 +75,7 @@ export default function HomeClient() {
           </section>
 
           <section id="" className="bg-white dark:bg-[#000000]">
-            <ProgrammingLanguagesRoadmap />
+            <ProgrammingLanguagesRoadmap locale={locale} />
           </section>
 
           <section

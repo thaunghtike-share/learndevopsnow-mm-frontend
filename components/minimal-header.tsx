@@ -786,29 +786,12 @@ export function MinimalHeader() {
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="h-37 w-35 relative z-10 transition-transform group-hover:scale-105"
+                className="h-35 w-34 relative z-10 transition-transform group-hover:scale-105"
               />
             </div>
           </Link>
-
-          {/* Navigation */}
-          <nav className="flex items-center space-x-1 -ml-1">
-            <Link
-              href={`/${currentLocale}`}
-              className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
-                pathname === `/${currentLocale}` ||
-                pathname === `/${currentLocale}/` ||
-                pathname === "/" ||
-                pathname === ""
-                  ? "bg-blue-600 dark:bg-blue-700 text-white"
-                  : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
-              }`}
-            >
-              <span className="relative z-10">
-                {getNavText("Home", "ပင်မ")}
-              </span>
-            </Link>
-
+          
+          <nav className="flex items-center space-x-1 -ml-12">
             {/* Articles Dropdown */}
             <div
               className="relative"
@@ -820,13 +803,13 @@ export function MinimalHeader() {
               }
             >
               <button
-                className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
+                className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/articles") ||
                   pathname.includes("/100-days-cloud-challenge") ||
                   pathname.includes("/learn-linux-basic") ||
                   pathname.includes("/categories")
-                    ? "bg-blue-600 dark:bg-blue-700 text-white"
-                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">
@@ -846,28 +829,25 @@ export function MinimalHeader() {
                 >
                   <Link
                     href={`/${currentLocale}/articles`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Read Articles", "စာဖတ်ရန်")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/100-days-cloud-challenge`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText(
-                      "Learn 100 Days of Azure",
-                      "Azure လေ့လာရန်"
-                    )}
+                    {getNavText("Learn 100 Days of Azure", "Azure လေ့လာရန်")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/learn-linux-basic`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Learn Linux Essentials", "Linux အခြေခံများ")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/categories`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
                   >
                     {getNavText("Explore All Categories", "အမျိုးအစားများ")}
                   </Link>
@@ -886,16 +866,16 @@ export function MinimalHeader() {
               }
             >
               <button
-                className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
+                className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/learn-devops-on-youtube") ||
                   pathname.includes("/free-courses") ||
                   pathname.includes("/devops-playgrounds")
-                    ? "bg-blue-600 dark:bg-blue-700 text-white"
-                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">
-                  {getNavText("Resources", "အရင်းအမြစ်")}
+                  {getNavText("Resources", "အရင်းအမြစ်များ")}
                 </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
@@ -911,7 +891,7 @@ export function MinimalHeader() {
                 >
                   <Link
                     href={`/${currentLocale}/learn-devops-on-youtube`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText(
                       "Learn DevOps on YouTube",
@@ -920,13 +900,13 @@ export function MinimalHeader() {
                   </Link>
                   <Link
                     href={`/${currentLocale}/free-courses`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Learn Free Courses", "အခမဲ့ သင်ခန်းစာများ")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/devops-playgrounds`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
                   >
                     {getNavText(
                       "Explore DevOps Playgrounds",
@@ -948,14 +928,14 @@ export function MinimalHeader() {
               }
             >
               <button
-                className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
+                className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/services")
-                    ? "bg-blue-600 dark:bg-blue-700 text-white"
-                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">
-                  {getNavText("Services", "ဝန်ဆောင်မှု")}
+                  {getNavText("Services", "ဝန်ဆောင်မှုများ")}
                 </span>
                 <ChevronDown className="ml-2 w-4 h-4 relative z-10 transition-transform group-hover:rotate-180" />
               </button>
@@ -971,13 +951,16 @@ export function MinimalHeader() {
                 >
                   <Link
                     href={`/${currentLocale}/services/cloud-migration`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText("Cloud Migration", "Cloud ကိုပြောင်းရွှေ့ခြင်း")}
+                    {getNavText(
+                      "Cloud Migration",
+                      "Cloud ကိုပြောင်းရွှေ့ခြင်း"
+                    )}
                   </Link>
                   <Link
                     href={`/${currentLocale}/services/infrastructure-automation`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText(
                       "Infrastructure as Code",
@@ -986,7 +969,7 @@ export function MinimalHeader() {
                   </Link>
                   <Link
                     href={`/${currentLocale}/services/part-time-devops-support`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
                   >
                     {getNavText("DevOps Support", "အချိန်ပိုင်း DevOps အကူအညီ")}
                   </Link>
@@ -1005,12 +988,12 @@ export function MinimalHeader() {
               }
             >
               <button
-                className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
+                className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/about") ||
                   pathname.includes("/faqs") ||
                   pathname.includes("/user-guide")
-                    ? "bg-blue-600 dark:bg-blue-700 text-white"
-                    : "text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
               >
                 <span className="relative z-10">
@@ -1030,19 +1013,19 @@ export function MinimalHeader() {
                 >
                   <Link
                     href={`/${currentLocale}/about`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("About", "ကျွန်ုပ်တို့အကြောင်း")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/faqs`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("FAQs", "အမေးများသောမေးခွန်းများ")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/user-guide`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
                   >
                     {getNavText("User Guide", "အသုံးပြုနည်း")}
                   </Link>
@@ -1050,7 +1033,6 @@ export function MinimalHeader() {
               )}
             </div>
           </nav>
-
           {/* Right Section - Language, Dark Mode, Search + Auth */}
           <div className="flex items-center space-x-6">
             {/* Language Switcher Dropdown - Desktop */}

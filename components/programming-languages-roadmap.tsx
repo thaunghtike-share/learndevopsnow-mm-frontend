@@ -7,10 +7,14 @@ interface ProgrammingLanguage {
   name: string;
   icon: string;
   description: string;
+  descriptionMy: string;
   fullDescription: string;
+  fullDescriptionMy: string;
   officialLink: string;
   frameworks: string[];
+  frameworksMy: string[];
   level: string;
+  levelMy: string;
   youtubeVideoId: string;
   color: string;
   tagColor: string;
@@ -21,11 +25,16 @@ const programmingLanguages: ProgrammingLanguage[] = [
     name: "Python",
     icon: "python.png",
     description: "Scripting & Automation",
+    descriptionMy: "Scripting & Automation",
     fullDescription:
       "Python is a high-level, interpreted programming language known for its simplicity and readability. In DevOps, Python is extensively used for automation scripts, infrastructure management, and building CI/CD tools. Its rich ecosystem of libraries makes it perfect for system administration tasks, configuration management, and creating custom DevOps utilities.",
+    fullDescriptionMy:
+      "Python ဆိုတာ အဆင့်မြင့် ပရိုဂရမ်မင်း ဘာသာစကားတစ်ခုဖြစ်သည်။ Python ကို Automation Scripts များ၊ Infrastructure Management နှင့် CICD Tools များတည်ဆောက်ရာတွင် ကျယ်ပြန့်စွာအသုံးပြုပါသည်။ သူ့မှာ Administration Tasks၊ Configuration Management နှင့် Custom DevOps Utilities တွေ ရေးရန်အတွက် libraries တွေလည်း အများကြီးရှိပါသည်။",
     officialLink: "https://www.python.org",
     frameworks: ["Django", "Flask", "FastAPI"],
+    frameworksMy: ["Django", "Flask", "FastAPI"],
     level: "Beginner to Advanced",
+    levelMy: "အစပြုသူမှ အဆင့်မြင့်",
     youtubeVideoId: "QXeEoD0pB3E",
     color: "from-sky-600 to-blue-600",
     tagColor: "bg-sky-100 text-sky-800 border-sky-200",
@@ -34,11 +43,16 @@ const programmingLanguages: ProgrammingLanguage[] = [
     name: "JavaScript",
     icon: "javascript.webp",
     description: "Web & Node.js Development",
+    descriptionMy: "Web & Node.js Development",
     fullDescription:
       "JavaScript is a versatile programming language that powers both frontend and backend development. In DevOps, JavaScript (via Node.js) is used for building automation tools, serverless functions, and real-time monitoring dashboards. Its event-driven architecture makes it ideal for handling asynchronous operations, API integrations, and creating interactive DevOps tools.",
+    fullDescriptionMy:
+      "တကယ်တော့ JavaScript က Frontend ရော Backend ပါ အကုန်လုပ်လို့ရတဲ့ All-rounder တစ်ခုပါ။ အခုနောက်ပိုင်း DevOps လောကမှာလည်း Node.js နဲ့တွဲပြီး နေရာတော်တော်ယူလာတယ်။ Automation tool တွေ၊ Serverless function တွေနဲ့ Monitoring dashboard တွေဆောက်တဲ့နေရာမှာ JS က တော်တော်လေး အဆင်ပြေတယ်။ သူ့ရဲ့ Event-driven ဖြစ်တဲ့ သဘာဝကြောင့် Asynchronous လုပ်ငန်းစဉ်တွေနဲ့ API ချိတ်ဆက်တဲ့နေရာမှာ တခြားဘာသာစကားတွေထက် ပိုသွက်လက်ပြီး Interactive ဖြစ်တဲ့ tool တွေ ဖန်တီးဖို့ အကောင်းဆုံးပဲလို့ ပြောလို့ရပါတယ်။",
     officialLink: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
     frameworks: ["Node.js", "React", "Next.js", "Express.js", "NestJS"],
+    frameworksMy: ["Node.js", "React", "Next.js", "Express.js", "NestJS"],
     level: "Beginner to Advanced",
+    levelMy: "အစပြုသူမှ အဆင့်မြင့်",
     youtubeVideoId: "EerdGm-ehJQ",
     color: "from-amber-500 to-yellow-500",
     tagColor: "bg-amber-100 text-amber-800 border-amber-200",
@@ -47,24 +61,34 @@ const programmingLanguages: ProgrammingLanguage[] = [
     name: "Go",
     icon: "go.png",
     description: "Cloud Native & Microservices",
+    descriptionMy: "Cloud Native & Microservices",
     fullDescription:
       "Go (Golang) is a statically typed, compiled language designed by Google for building efficient and reliable software. In DevOps, Go is the language of choice for cloud-native tools like Docker, Kubernetes, and Terraform. Its fast compilation, built-in concurrency support, and small binary sizes make it perfect for microservices, CLI tools, and high-performance system utilities.",
+    fullDescriptionMy:
+      "Go (Golang) က Google ကိုယ်တိုင် Performance ကောင်းဖို့နဲ့ Reliable ဖြစ်ဖို့ သေချာတွက်ချက်ပြီး ထုတ်ထားတဲ့ Language တစ်ခုပါ။ အခုခေတ် DevOps လောကမှာဆိုရင် Go က King ပဲလို့ ပြောလို့ရတယ်။ ကျွန်တော်တို့ သုံးနေတဲ့ Docker, Kubernetes နဲ့ Terraform တွေကလည်း Go နဲ့ပဲ ရေးထားတာလေ။ သူက Compile လုပ်တာ တအားမြန်တဲ့အပြင် Concurrency ကိုလည်း Built-in ပံ့ပိုးပေးထားတော့ Microservices တွေ၊ CLI tool တွေနဲ့ Performance ကောင်းဖို့လိုတဲ့ System utilities တွေအတွက်တော့ အကြိုက်ဆုံးပဲ",
     officialLink: "https://go.dev",
     frameworks: ["Gin", "Echo", "Cobra"],
+    frameworksMy: ["Gin", "Echo", "Cobra"],
     level: "Intermediate to Advanced",
+    levelMy: "အလယ်အလတ်မှ အဆင့်မြင့်",
     youtubeVideoId: "un6ZyFkqFKo",
-    color: "from-gray-500 to-gray-700",
-    tagColor: "bg-gray-400 text-gray-800 border-gray-300",
+    color: "from-purple-500 to-pink-700",
+    tagColor: "bg-purple-400 text-pink-800 border-purple-300",
   },
   {
     name: "Java",
     icon: "java.png",
     description: "Enterprise Applications",
+    descriptionMy: "Enterprise Applications",
     fullDescription:
       "Java is a robust, object-oriented programming language widely used in enterprise environments. In DevOps, Java is essential for managing and deploying large-scale enterprise applications, building CI/CD tools like Jenkins, and creating distributed systems. Its platform independence, mature ecosystem, and strong typing make it ideal for building reliable, high-performance systems.",
+    fullDescriptionMy:
+      "Java ဆိုတာ Enterprise နယ်ပယ်မှာ အခိုင်အမာ နေရာယူထားတဲ့ Robust ဖြစ်တဲ့ ဘာသာစကားတစ်ခုပါ။ DevOps လောကမှာဆိုရင်လည်း Jenkins လို CI/CD tool တွေအပြင် အကြီးစား Distributed System တွေ တည်ဆောက်တဲ့နေရာမှာ Java က အဓိကပဲ။ သူ့ရဲ့ Platform Independence ဖြစ်မှု (ဘယ်နေရာမှာမဆို run လို့ရတာ) နဲ့ ရင့်ကျက်ပြီးသား Ecosystem ရှိနေတာကြောင့် စွမ်းဆောင်ရည်မြင့်ပြီး စိတ်ချရတဲ့ System တွေအတွက် Java က အမြဲတမ်း ထိပ်တန်းက ရှိနေပါတယ်။",
     officialLink: "https://www.java.com",
     frameworks: ["Spring Boot", "Maven", "Gradle", "JUnit"],
+    frameworksMy: ["Spring Boot", "Maven", "Gradle", "JUnit"],
     level: "Intermediate to Advanced",
+    levelMy: "အလယ်အလတ်မှ အဆင့်မြင့်",
     youtubeVideoId: "xTtL8E4LzTQ",
     color: "from-red-500 to-orange-500",
     tagColor: "bg-red-100 text-red-800 border-red-200",
@@ -73,18 +97,29 @@ const programmingLanguages: ProgrammingLanguage[] = [
     name: "PHP",
     icon: "php.png",
     description: "PHP Web Applications",
+    descriptionMy: "PHP Web Applications",
     fullDescription:
       "PHP is a popular server-side scripting language primarily used for web development. In DevOps, PHP is crucial for deploying and managing web applications, automating server configurations, and integrating with various web services. Its ease of use, extensive documentation, and large community support make it a go-to choice for building dynamic websites and web-based DevOps tools.",
+    fullDescriptionMy:
+      "PHP ဆိုတာ Web Development လောကမှာတော့ ဝါရင့် လူကြိုက်များတဲ့ Server-side ဘာသာစကားတစ်ခုပါ။ အခုခေတ် DevOps ပိုင်းမှာဆိုရင်လည်း Web app တွေကို Deploy လုပ်ဖို့၊ Server configuration တွေနဲ့ Web service တွေကို တစ်ခုနဲ့တစ်ခု ချိတ်ဆက်ဖို့အတွက် PHP ကို တော်တော်လေး သုံးဖြစ်ကြတယ်။ သူက လေ့လာရတာ လွယ်ကူတဲ့အပြင် Community ကလည်း တအားကြီးတော့ တစ်ခုခုဆို အဖြေရှာရတာ အရမ်းအဆင်ပြေတယ်။ Dynamic ဖြစ်တဲ့ Website တွေနဲ့ Web-based DevOps tool တွေ တည်ဆောက်မယ်ဆိုရင် PHP က အခုထိ အားကိုးရတဲ့ ရွေးချယ်မှုပါပဲ။",
     officialLink: "https://laravel.com",
     frameworks: ["Laravel", "Symfony", "Composer"],
+    frameworksMy: ["Laravel", "Symfony", "Composer"],
     level: "Intermediate",
+    levelMy: "အလယ်အလတ်",
     youtubeVideoId: "l4_Vn-sTBL8",
     color: "from-rose-500 to-pink-500",
     tagColor: "bg-rose-100 text-rose-800 border-rose-200",
   },
 ];
 
-export function ProgrammingLanguagesRoadmap() {
+interface ProgrammingLanguagesRoadmapProps {
+  locale?: string;
+}
+
+export function ProgrammingLanguagesRoadmap({
+  locale = "en",
+}: ProgrammingLanguagesRoadmapProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(0);
 
@@ -126,7 +161,7 @@ export function ProgrammingLanguagesRoadmap() {
   return (
     <section className="relative bg-white dark:bg-[#000000] py-12 md:py-16">
       <div className="px-4 md:px-11">
-        {/* Header Section */}
+        {/* Header Section - English titles kept as requested */}
         <div className="mb-12 md:mb-16">
           <div className="max-w-3xl">
             <div className="h-1 w-20 md:w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4 md:mb-6" />
@@ -137,10 +172,9 @@ export function ProgrammingLanguagesRoadmap() {
               </span>
             </h2>
             <p className="text-base md:text-lg text-black-400 dark:text-gray-300 leading-relaxed">
-              Before diving into DevOps tools and automation, it's important to
-              have a solid understanding of programming. Coding skills help you
-              write scripts, automate tasks, and understand how software is
-              built and deployed.
+              {locale === "en"
+                ? "Before diving into DevOps tools and automation, it's important to have a solid understanding of programming. Coding skills help you write scripts, automate tasks, and understand how software is built and deployed."
+                : "DevOps ကိုမလေ့လာခင်မှာ programming ကို သေချာ နားလည်ထားရန် လိုအပ်ပါသည်။ Coding ကျွမ်းကျင်မှုက bash script or IAC တွေရေးဖို့၊ tasks တွေ automate လုပ်ဖို့နဲ့ application တွေ deploy လုပ်ဖို့ အများကြီး အထောက်ကူပြုပေးပါသည်။"}
             </p>
           </div>
         </div>
@@ -223,7 +257,9 @@ export function ProgrammingLanguagesRoadmap() {
                     </a>
                   </div>
                   <p className="text-base md:text-lg font-semibold text-black-500 dark:text-gray-400">
-                    {currentLanguage.description}
+                    {locale === "en"
+                      ? currentLanguage.description
+                      : currentLanguage.descriptionMy}
                   </p>
                 </div>
               </div>
@@ -231,17 +267,24 @@ export function ProgrammingLanguagesRoadmap() {
               {/* Description */}
               <div className="space-y-3 md:space-y-4">
                 <p className="text-black-600 dark:text-gray-300 leading-relaxed text-base md:text-lg">
-                  {currentLanguage.fullDescription}
+                  {locale === "en"
+                    ? currentLanguage.fullDescription
+                    : currentLanguage.fullDescriptionMy}
                 </p>
               </div>
 
               {/* Frameworks */}
               <div className="space-y-3 md:space-y-4">
                 <h4 className="text-lg md:text-xl font-bold text-black-500 dark:text-gray-300">
-                  Popular Frameworks & Tools
+                  {locale === "en"
+                    ? "Popular Frameworks & Tools"
+                    : "အသုံးများသော Frameworks များ"}
                 </h4>
                 <div className="flex flex-wrap gap-2 md:gap-3">
-                  {currentLanguage.frameworks.map((framework, idx) => (
+                  {(locale === "en"
+                    ? currentLanguage.frameworks
+                    : currentLanguage.frameworksMy
+                  ).map((framework, idx) => (
                     <span
                       key={idx}
                       className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-medium ${currentLanguage.tagColor} border-2 transition-all hover:scale-105 hover:shadow-md dark:border-gray-600`}
@@ -259,7 +302,7 @@ export function ProgrammingLanguagesRoadmap() {
                 rel="noopener noreferrer"
                 className={`inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 rounded-xl md:rounded-2xl bg-gradient-to-r ${currentLanguage.color} text-white font-semibold text-base md:text-lg hover:shadow-xl transition-all hover:scale-105 shadow-lg`}
               >
-                Read Official Docs
+                {locale === "en" ? "Read Official Docs" : "Read Official Docs"}
                 <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
               </a>
             </div>
@@ -296,7 +339,10 @@ export function ProgrammingLanguagesRoadmap() {
                 </div>
               </div>
               <p className="text-xs md:text-sm text-black-600 dark:text-gray-400 text-center flex items-center justify-center gap-1">
-                💡 Click to watch full tutorial on YouTube
+                💡{" "}
+                {locale === "en"
+                  ? "Click to watch full tutorial on YouTube"
+                  : "YouTube တွင် tutorial ကြည့်ရန် နှိပ်ပါ"}
               </p>
             </div>
           </div>
@@ -308,7 +354,9 @@ export function ProgrammingLanguagesRoadmap() {
               className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-semibold transition-all hover:gap-3 md:hover:gap-4 group"
             >
               <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline">Previous</span>
+              <span className="hidden sm:inline">
+                {locale === "en" ? "Previous" : "Previous"}
+              </span>
             </button>
 
             <div className="flex items-center gap-4 md:gap-6">
@@ -338,7 +386,9 @@ export function ProgrammingLanguagesRoadmap() {
               onClick={nextLanguage}
               className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-semibold transition-all hover:gap-3 md:hover:gap-4 group"
             >
-              <span className="hidden sm:inline">Next</span>
+              <span className="hidden sm:inline">
+                {locale === "en" ? "Next" : "Next"}
+              </span>
               <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
             </button>
           </div>
