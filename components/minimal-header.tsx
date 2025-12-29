@@ -792,7 +792,7 @@ export function MinimalHeader() {
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center space-x-1 -ml-12">
+          <nav className="flex items-center space-x-1 -ml-1">
             <Link
               href={`/${currentLocale}`}
               className={`flex items-center px-5 py-2.5 rounded-xl transition-all duration-200 relative group font-medium ${
@@ -856,7 +856,7 @@ export function MinimalHeader() {
                   >
                     {getNavText(
                       "Learn 100 Days of Azure",
-                      "Azure 100 ရက်စိန်ခေါ်မှု"
+                      "Azure လေ့လာရန်"
                     )}
                   </Link>
                   <Link
@@ -915,14 +915,14 @@ export function MinimalHeader() {
                   >
                     {getNavText(
                       "Learn DevOps on YouTube",
-                      "YouTube တွင် DevOps သင်ယူရန်"
+                      "YouTube သင်ခန်းစာများ"
                     )}
                   </Link>
                   <Link
                     href={`/${currentLocale}/free-courses`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText("Learn Free Courses", "အခမဲ့သင်တန်းများ")}
+                    {getNavText("Learn Free Courses", "အခမဲ့ သင်ခန်းစာများ")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/devops-playgrounds`}
@@ -973,7 +973,7 @@ export function MinimalHeader() {
                     href={`/${currentLocale}/services/cloud-migration`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText("Cloud Migration", "Cloud Migration")}
+                    {getNavText("Cloud Migration", "Cloud ကိုပြောင်းရွှေ့ခြင်း")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/services/infrastructure-automation`}
@@ -981,14 +981,14 @@ export function MinimalHeader() {
                   >
                     {getNavText(
                       "Infrastructure as Code",
-                      "Infrastructure as Code"
+                      "IAC အဖြစ် ပြောင်းလဲခြင်း"
                     )}
                   </Link>
                   <Link
                     href={`/${currentLocale}/services/part-time-devops-support`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-black dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium"
                   >
-                    {getNavText("DevOps Support", "DevOps အကူအညီ")}
+                    {getNavText("DevOps Support", "အချိန်ပိုင်း DevOps အကူအညီ")}
                   </Link>
                 </div>
               )}
@@ -1052,7 +1052,7 @@ export function MinimalHeader() {
           </nav>
 
           {/* Right Section - Language, Dark Mode, Search + Auth */}
-          <div className="flex items-center space-x-5">
+          <div className="flex items-center space-x-6">
             {/* Language Switcher Dropdown - Desktop */}
             <div
               className="relative"
@@ -1100,7 +1100,7 @@ export function MinimalHeader() {
             {/* Dark Mode Toggle - Desktop Only */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-1"
+              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-4"
               aria-label={
                 darkMode
                   ? getNavText("Switch to light mode", "အလင်းပုံစံပြောင်းရန်")
