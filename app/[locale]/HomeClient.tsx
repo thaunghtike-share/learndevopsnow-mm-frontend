@@ -96,7 +96,7 @@ export default function HomeClient() {
             id="cert"
             className="bg-white dark:bg-[#000000] -mt-18 md:-mt-18"
           >
-            <CertificationRoadmap />
+            <CertificationRoadmap locale={locale} />
           </div>
 
           <div className="bg-white dark:bg-[#000000] md:-mt-30">

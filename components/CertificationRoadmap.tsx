@@ -296,7 +296,11 @@ const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   target.src = "/devops.png";
 };
 
-export function CertificationRoadmap() {
+interface CertificationRoadmapProps {
+  locale?: string;
+}
+
+export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProps) {
   const [hoveredCert, setHoveredCert] = useState<string | null>(null);
 
   const handleCertClick = (examLink: string) => {
@@ -339,8 +343,10 @@ export function CertificationRoadmap() {
               transition={{ delay: 0.1 }}
               className="text-black dark:text-gray-300 mt-4 text-base md:text-lg max-w-2xl"
             >
-              Validate your skills with industry-recognized certifications that
-              showcase your DevOps expertise and boost your career prospects.
+              {locale === 'en' 
+                ? "Validate your skills with industry-recognized certifications that showcase your DevOps expertise and boost your career prospects."
+                : "beginner level မှစတင်ပြီး ဖြေသင့်တဲ့ certificate တွေကို ဖော်ပြ ပေးထားပါတယ်။ ​Certifiacte တွေကို ပိုင်ဆိုင်ထားတာကလည်း အလုပ်အကိုင်အခွင့်အလမ်းကောင်းတွေကို ပိုမိုရရှိစေပါတယ်။"
+              }
             </motion.p>
           </div>
         </motion.div>
@@ -490,8 +496,11 @@ export function CertificationRoadmap() {
           transition={{ delay: 1 }}
           className="text-center mt-6 md:mt-8"
         >
-          <p className="text-black dark:text-gray-300 text-sm md:text-base hidden md:block">
-            💡 Click on any certification to visit the official exam page
+          <p className="text-black dark:text-gray-300 text-sm md:text-base">
+            {locale === 'en' 
+              ? "💡 Click on any certification to visit the official exam page"
+              : "💡 exam ရဲ့ official စာမျက်နှာကို သွားဖို့ Certificate ပေါ်ကို နှိပ်ပါ"
+            }
           </p>
         </motion.div>
       </div>
