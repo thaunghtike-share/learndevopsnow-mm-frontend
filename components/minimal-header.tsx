@@ -513,7 +513,7 @@ export function MinimalHeader() {
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <LayoutDashboard className="w-4 h-4 mr-3" />
-            {getNavText("Dashboard", "ဒက်ရှ်ဘုတ်")}
+            {getNavText("Dashboard", "Dashboard")}
           </Link>
 
           <Link
@@ -522,7 +522,7 @@ export function MinimalHeader() {
             onClick={() => setIsUserDropdownOpen(false)}
           >
             <Crown className="w-4 h-4 mr-3" />
-            {getNavText("Public Profile View", "အများသိပရိုဖိုင်ကြည့်ရန်")}
+            {getNavText("Public View", "Public View")}
           </Link>
 
           <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
@@ -607,7 +607,7 @@ export function MinimalHeader() {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <LayoutDashboard className="w-6 h-6 mr-3" />
-          {getNavText("Dashboard", "ဒက်ရှ်ဘုတ်")}
+          {getNavText("Dashboard", "Dashboard")}
         </Link>
 
         <Link
@@ -620,7 +620,7 @@ export function MinimalHeader() {
           onClick={() => setIsMobileMenuOpen(false)}
         >
           <Crown className="w-6 h-6 mr-3" />
-          {getNavText("Public Profile View", "အများသိပရိုဖိုင်ကြည့်ရန်")}
+          {getNavText("Public Profile View", "Public Profile View")}
         </Link>
 
         <button
@@ -775,7 +775,7 @@ export function MinimalHeader() {
         </div>
 
         {/* DESKTOP HEADER */}
-        <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-5">
+        <div className="hidden md:flex items-center justify-between h-25 relative z-10 px-6 md:px-4">
           {/* Logo Section */}
           <Link
             href={`/${currentLocale}`}
@@ -1082,7 +1082,7 @@ export function MinimalHeader() {
             {/* Dark Mode Toggle - Desktop Only */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-4"
+              className="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:scale-105 transition-colors hidden md:flex ml-၇"
               aria-label={
                 darkMode
                   ? getNavText("Switch to light mode", "အလင်းပုံစံပြောင်းရန်")

@@ -678,7 +678,7 @@ const learningPaths = {
     description:
       "Begin with foundational concepts and essential tools. Master Linux, networking, and cloud basics to build a solid foundation for your DevOps career.",
     descriptionMy:
-      "linux၊ network နဲ့ cloud တို့လို အခြေခံတွေကို လေ့လာသင်ယူပြီး devops ကိုစတင်လေ့လာလိုက်ပါ။",
+      "ဒီအဆင့်မှာတော့ devops အတွက် မဖြစ်နေလိုအပ်တဲ့ အခြေခံ knowledge တွေကို လေ့လာရပါမယ်။ devops career ကို စတင် ပြောင်းလဲလိုသူများအတွက် အရေးကြီးဆုံးအဆင့် ဖြစ်ပါသည်။",
     learningPath: [
       { title: "Linux", titleMy: "Linux", icon: "🐧" },
       { title: "Bash", titleMy: "Bash", icon: "💻" },
@@ -702,7 +702,7 @@ const learningPaths = {
     description:
       "Learn to automate infrastructure and implement CI/CD pipelines. Focus on container orchestration, infrastructure as code, and deployment automation.",
     descriptionMy:
-      "IAC တွေ CICD တွေကိုအသုံးချပြီး development lifecycle ကိုပိုမြန်ဆန်စေဖို့ infrastructure ကို automate လုပ်နိုင်ဖို့ လေ့လာပါ။",
+      "လက်တွေ့မှာ သုံးကြတဲ့ cicd pipleline တွေနဲ့ automation အကြောင်းတွေကိုလေ့လာရပါမယ်။ Infrastructure as Code ရဲ့ အခြေခံဖြစ်တဲ့ Ansible, Packer နဲ့ CICD Pipelines တွေအကြောင်းကို နားလည်အောင် လေ့လာပါ။",
     learningPath: [
       { title: "Docker", titleMy: "Docker", icon: "🐳" },
       { title: "Git", titleMy: "Git", icon: "📦" },
@@ -721,7 +721,7 @@ const learningPaths = {
     description:
       "Advanced topics including Kubernetes, Terraform, GitOps, and security. Learn to manage complex infrastructure and implement enterprise-grade DevOps practices.",
     descriptionMy:
-      "real world မှာသုံးကြတဲ့ kubernetes , terraform , gitops နဲ့ security တို့လို အဆင့်မြင့် DevOps concepts တွေကို လေ့လာပါ။",
+      "Production အဆင့် သုံးကြတဲ့ Kubernetes, Terraform တို့လို tools တွေနဲ့ GitOps အကြောင်းကို ကျွမ်းကျင်စွာလေ့လာရပါမယ်။ Kubernetes, Infrastructure as Code နဲ့ Security အကြောင်းတွေ ပါဝင်ပါတယ်။ Montioring & Logging အကြောင်းတွေကိုလည်း လေ့လာရပါမယ်။",
     learningPath: [
       { title: "Kubernetes", titleMy: "Kubernetes", icon: "☸️" },
       { title: "Terraform", titleMy: "Terraform", icon: "🏗️" },

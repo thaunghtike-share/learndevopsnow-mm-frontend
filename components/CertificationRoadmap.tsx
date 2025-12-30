@@ -345,7 +345,7 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
             >
               {locale === 'en' 
                 ? "Validate your skills with industry-recognized certifications that showcase your DevOps expertise and boost your career prospects."
-                : "beginner level မှစတင်ပြီး ဖြေသင့်တဲ့ certificate တွေကို ဖော်ပြ ပေးထားပါတယ်။ ​Certifiacte တွေကို ပိုင်ဆိုင်ထားတာကလည်း အလုပ်အကိုင်အခွင့်အလမ်းကောင်းတွေကို ပိုမိုရရှိစေပါတယ်။"
+                : "beginner level မှစတင်ပြီး ဖြေဆိုသင့်တဲ့ certificate တွေကို ဖော်ပြ ပေးထားပါတယ်။ ​Certifiacte တွေ ပိုင်ဆိုင်ထားတာကလည်း အလုပ်အကိုင် အခွင့်အလမ်းကောင်းတွေကို ပိုမိုရရှိစေနိုင်ပါတယ်။"
               }
             </motion.p>
           </div>
@@ -499,7 +499,7 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
           <p className="text-black dark:text-gray-300 text-sm md:text-base">
             {locale === 'en' 
               ? "💡 Click on any certification to visit the official exam page"
-              : "💡 exam ရဲ့ official စာမျက်နှာကို သွားဖို့ Certificate ပေါ်ကို နှိပ်ပါ"
+              : "💡 exam ရဲ့  တရားဝင် စာမျက်နှာကို သွားဖို့ icon ပေါ်ကို နှိပ်ပါ"
             }
           </p>
         </motion.div>

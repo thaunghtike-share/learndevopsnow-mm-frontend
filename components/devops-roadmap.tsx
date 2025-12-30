@@ -225,8 +225,8 @@ const roadmap: RoadmapStage[] = [
       "Best for absolute beginners and career switchers",
     ],
     descriptionMy: [
-      "devops ခရီးစတင်ရန် အခြေခံ tools များနဲ့ concepts များကို လေ့လာပါ",
-      "devops ကို စတင် လေ့လာသူများနဲ့ career ပြောင်းလဲလိုသူများအတွက် အကောင်းဆုံးဖြစ်ပါသည်",
+      "ဒီအဆင့်မှာတော့ devops အတွက် မဖြစ်နေလိုအပ်တဲ့ အခြေခံ knowledge တွေကို လေ့လာရပါမယ်။",
+      "devops career ကို စတင် ပြောင်းလဲလိုသူများအတွက် အရေးကြီးဆုံးအဆင့် ဖြစ်ပါသည်",
     ],
     items: [
       {
@@ -325,8 +325,8 @@ const roadmap: RoadmapStage[] = [
       "Fundamentals of Infrastructure as code and CICD pipelines",
     ],
     descriptionMy: [
-      "တကယ့် real world မှာသုံးကြတဲ့ DevOps workflows တွေနဲ့ automation အကြောင်းတွေကိုလေ့လာပါ။",
-      "Ansible, Packer တို့လို Infrastructure as Code အခြေခံတွေ နဲ့ CICD Pipelines တွေကို နားလည်အောင်လေ့လာပါ။",
+      "လက်တွေ့မှာ သုံးကြတဲ့ cicd pipleline တွေနဲ့ automation အကြောင်းတွေကိုလေ့လာရပါမယ်။",
+      "Infrastructure as Code ရဲ့ အခြေခံဖြစ်တဲ့ Ansible, Packer နဲ့ CICD Pipelines တွေအကြောင်းကို နားလည်အောင် လေ့လာပါ။",
     ],
     items: [
       {
@@ -335,7 +335,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Containerize applications and manage container lifecycles",
         descriptionMy:
-          "Applications များကို Containerize လုပ်ခြင်းနှင့် Container Lifecycles များကို စီမံခန့်ခွဲခြင်း",
+          "Containerize applications and manage container lifecycles",
         tags: ["containers", "images", "dockerfile", "volumes", "networking"],
         tagsMy: ["containers", "images", "dockerfile", "volumes", "networking"],
         image: "docker.png",
@@ -347,7 +347,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Version control, branching strategies, and collaborative workflows",
         descriptionMy:
-          "Git ကိုအသုံးပြုပြီး code တွေရဲ့ version control, branching strategies များကို လေ့လာပါ",
+          "Version control, branching strategies, and collaborative workflows",
         tags: ["branches", "merge", "rebase", "pull-requests", "workflows"],
         tagsMy: ["branches", "merge", "rebase", "pull-requests", "workflows"],
         image: "git.png",
@@ -412,8 +412,8 @@ const roadmap: RoadmapStage[] = [
       "Kubernetes, infrastructure as code, and security",
     ],
     descriptionMy: [
-      "Production အဆင့် သုံးကြတဲ့ DevOps သဘောတရားများ နဲ့ GitOps အကြောင်းကို ကျွမ်းကျင်စွာလေ့လာပါ",
-      "Kubernetes, Infrastructure as Code နဲ့ Security အကြောင်းတွေ ပါဝင်ပါတယ်။",
+      "Production အဆင့် သုံးကြတဲ့ Kubernetes, Terraform တို့လို tools တွေနဲ့ GitOps အကြောင်းကို ကျွမ်းကျင်စွာလေ့လာရပါမယ်",
+      "Kubernetes, Infrastructure as Code နဲ့ Security အကြောင်းတွေ ပါဝင်ပါတယ်။ Montioring & Logging အကြောင်းတွေကိုလည်း လေ့လာရပါမယ်။",
     ],
     items: [
       {
@@ -422,7 +422,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Orchestrate containers at scale with K8s clusters and deployments",
         descriptionMy:
-          "Kubernetes ကိုအသုံးပြုပြီး Cluters, Applications များကို စီမံခန့်ခွဲခြင်းနှင့် Deploy လုပ်ခြင်း",
+          "Orchestrate containers at scale with K8s clusters and deployments",
         tags: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
         tagsMy: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
         image: "kubernetes.png",
@@ -434,7 +434,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Infrastructure as Code for multi-cloud provisioning and management",
         descriptionMy:
-          "Cloud Infrastructure များကို Code ဖြင့် Provisioning , Management လုပ်ခြင်း",
+          "Infrastructure as Code for multi-cloud provisioning and management",
         tags: ["modules", "state", "providers", "workspaces", "cdktf"],
         tagsMy: ["modules", "state", "providers", "workspaces", "cdktf"],
         image: "terraform.png",
@@ -446,7 +446,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Implement Prometheus, Grafana, and ELK stack for system insights",
         descriptionMy:
-          "Application Performance အတွက် Prometheus, Grafana နှင့် ELK Stack ကိုအသုံးပြုပြီး monitoring လုပ်ပါ",
+          "Implement Prometheus, Grafana, and ELK stack for system insights",
         tags: ["metrics", "logs", "alerts", "dashboards", "tracing"],
         tagsMy: ["metrics", "logs", "alerts", "dashboards", "tracing"],
         image: "monitoring.png",
@@ -458,7 +458,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Declarative infrastructure with ArgoCD and Flux for automated deployments",
         descriptionMy:
-          "Kubernetes Cluster တွေပေါ်မှာ Automated Deployments လုပ်ဖို့ အတွက် ArgoCD နှင့် Flux CD ကိုလေ့လာပါ။",
+          "Declarative infrastructure with ArgoCD and Flux for automated deployments",
         tags: ["argocd", "flux", "sync", "rollback", "automation"],
         tagsMy: ["argocd", "flux", "sync", "rollback", "automation"],
         image: "gitops.png",
@@ -470,7 +470,7 @@ const roadmap: RoadmapStage[] = [
         description:
           "Secure sensitive data with Vault, secrets management, and encryption",
         descriptionMy:
-          "Secret, Sensitive Data များကို လုံခြုံစိတ်ချစွာ သိမ်းဖို့ Vault ကိုလေ့လာပါ",
+          "Secure sensitive data with Vault, secrets management, and encryption",
         tags: ["vault", "secrets", "encryption", "pki", "authentication"],
         tagsMy: ["vault", "secrets", "encryption", "pki", "authentication"],
         image: "vault.png",

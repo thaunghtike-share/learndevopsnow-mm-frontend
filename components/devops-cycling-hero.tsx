@@ -19,7 +19,7 @@ const DevOpsCyclingHero = () => {
       title: "What is DevOps?",
       titleMy: "What is DevOps?",
       description: "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle and provide continuous delivery with high software quality.",
-      descriptionMy: "DevOps ဆိုတာ ထပ်တလဲလဲလုပ်နေရတဲ့ အလုပ်တွေကို Automation စနစ်နဲ့ လျှော့ချပစ်ပြီး Software တစ်ခု စရေးတာကနေ အဆုံးထိ Development Cycle တစ်ခုလုံးကို အမြန်ဆုံးဖြစ်အောင် လုပ်ပေးတဲ့ နည်းပညာ ဖြစ်ပါတယ်။",
+      descriptionMy: "DevOps ဆိုသည်မှာ Software Development နှင့် IT Operations တို့ကို ပေါင်းစည်းထားခြင်းဖြစ်ပြီး၊ Software Development Lifecycle တစ်ခုလုံး ပိုမိုမြန်ဆန်၊ ထိရောက်စေရန် Automation နှင့် Security တို့ကို အဓိကထား လုပ်ဆောင်ပေးသည့် နည်းပညာဖြစ်ပါသည်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
       tagsMy: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
@@ -29,7 +29,7 @@ const DevOpsCyclingHero = () => {
       title: "Master Linux",
       titleMy: "Master Linux",
       description: "Build your foundation with Linux - the operating system that powers most servers, containers, and cloud infrastructure in modern DevOps environments.",
-      descriptionMy: "Linux OS ကိုသေချာသုံးတတ်ရပါမယ်။ Linux Command Line တွေကိုလည်း ကျွမ်းကျင်ဖို့ လိုအပ်ပါတယ်။",
+      descriptionMy: "Linux ကို ကျွမ်းကျင်စွာ သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ devops နဲ့ဆိုင်တဲ့ အလုပ်တွေမှာ အများဆုံး အသုံးပြုသော Operating System ဖြစ်ပြီး Servers, Containers, Cloud Infrastructure များအတွက် အရေးကြီးဆုံး အခြေခံဖြစ်ပါတယ်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Command Line", "File System", "Permissions", "Shell Scripting"],
       tagsMy: ["Command Line", "File System", "Permissions", "Shell Scripting"]
@@ -39,7 +39,7 @@ const DevOpsCyclingHero = () => {
       title: "Learn Network Basics",
       titleMy: "Learn Network Basics",
       description: "Understand networking basics - the protocols, architectures, and tools that enable communication between computers, servers, and cloud services in DevOps.",
-      descriptionMy: "CCNA level လောက်အထိ networking သဘောတရားတွေကို နားလည်ဖို့ လိုအပ်ပါတယ်။ ဒါမှလည်း cloud ကိုလေ့လာတဲ့အခါ အထောက်အကူဖြစ်မယ်။",
+      descriptionMy: "CCNA level လောက်အထိ networking သဘောတရားတွေကို နားလည်ဖို့ လိုအပ်ပါတယ်။ ဒါမှလည်း နောက်တစ်ဆင့်ဖြစ်တဲ့ AWS VPC, Azure Vnet, DNS, Kubernetes တို့ကိုလေ့လာတဲ့အခါ အထောက်အကူပြုမှာ ဖြစ်မယ်။",
       iconGradient: "from-sky-600 to-blue-600",
       tags: ["TCP/IP", "DNS", "Subnet", "Routing", "Switching"],
       tagsMy: ["TCP/IP", "DNS", "Subnet", "Routing", "Switching"]
@@ -59,7 +59,7 @@ const DevOpsCyclingHero = () => {
       title: "Master Version Control",
       titleMy: "Master Version Control",      
       description: "Learn Git - the distributed version control system that enables collaboration, branching, and code management in modern software development and DevOps workflows.",
-      descriptionMy: "Git ကို ကျွမ်းကျင်စွာ သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ GitHub, GitLab, Bitbucket စသည့် Git Repository Hosting Service များကိုလည်း သုံးတတ်ဖို့ လိုအပ်ပါတယ်။",
+      descriptionMy: "git ကိုလည်း မဖြစ်မနေ သုံးတတ်ဖို့လိုအပ်ပါတယ်။ နောက်ပိုင်းလေ့လာရမယ့် CICD Pipeline တွေမှာ Git Repository တွေနဲ့ ပတ်သက်တဲ့ အလုပ်တွေ တွေ့လာပါလိမ့်မယ်။",
       iconGradient: "from-blue-600 to-cyan-600",
       tags: ["Branches", "Merge", "Pull Requests", "GitHub"],
       tagsMy: ["Branches", "Merge", "Pull Requests", "GitHub"]
@@ -69,7 +69,7 @@ const DevOpsCyclingHero = () => {
       title: "Learn Containerization",
       titleMy: "Learn Containerization",
       description: "Understand containerization - how to package applications and dependencies into lightweight, portable containers that run consistently across different environments.",
-      descriptionMy: "Containerization ကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Applications တွေကို Containers အဖြစ် package လုပ်ပြီး Environment မျိုးစုံမှာ တူညီစွာ run နိုင်ဖို့ ဖြစ်ပါတယ်။",
+      descriptionMy: "Containerization ကို သေချာနားလည်ဖို့လိုအပ်ပါတယ်။ Docker , Kubernetes စသည့် နည်းပညာများကို သုံးပြီး Application တွေကို Lightweight, Portable Containers အဖြစ် Package လုပ်နိုင်ဖို့ ဖြစ်ပါတယ်။",
       iconGradient: "from-pink-600 to-purple-600",
       tags: ["Docker", "Images", "Containers", "Podman"],
       tagsMy: ["Docker", "Images", "Containers", "Podman"]
@@ -79,7 +79,7 @@ const DevOpsCyclingHero = () => {
       title: "Understand CI/CD",
       titleMy: "Understand CI/CD",
       description: "Explore Continuous Integration and Continuous Deployment - the practices that enable teams to deliver code changes more frequently and reliably through automated pipelines.",
-      descriptionMy: "Continuous Integration (CI) နှင့် Continuous Deployment (CD) ကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Automated Pipelines တွေကနေတစ်ဆင့် Code Changes တွေကို လျှင်မြန် ထိရောက်စွာ deliver လုပ်နိုင်ဖို့ ဖြစ်ပါတယ်။",
+      descriptionMy: "Continuous Integration (CI) နှင့် Continuous Deployment (CD) ကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Automated Pipelines တွေကနေတစ်ဆင့် Code Changes တွေကို user တွေဆီ လျှင်မြန် ထိရောက်စွာ deliver လုပ်နိုင်ဖို့ ဖြစ်ပါတယ်။",
       iconGradient: "from-orange-600 to-yellow-600",
       tags: ["Jenkins", "GitLab CI", "Github Actions", "CircleCI"],
       tagsMy: ["Jenkins", "GitLab CI", "Github Actions", "CircleCI"]
@@ -89,7 +89,7 @@ const DevOpsCyclingHero = () => {
       title: "Master Kubernetes",
       titleMy: "Master Kubernetes",
       description: "Learn container orchestration with Kubernetes - the industry standard for automating deployment, scaling, and management of containerized applications.",
-      descriptionMy: "Kubernetes ကို ကျွမ်းကျင်စွာ သုံးတတ်ဖို့ လိုအပ်ပါတယ်။ Containerized Applications တွေကို Deployment, Scaling, Management စသည့် အလုပ်တွေကို Automation လုပ်ပေးနိုင်ပါတယ်။",
+      descriptionMy: "DevOps လုပ်မယ်ဆို kubernetes ကိုမဖြစ်မနေ သုံးတတ်ဖို့လိုအပ်ပါတယ်။ ယနေ့ခတ် လုပ်ငန်းအများစုဟာ kubernetes cluster တွေပေါ်မှာ run ထားကြတာဖြစ်ပါတယ်။",
       iconGradient: "from-blue-600 to-cyan-600",
       tags: ["Pods", "Rancher", "Microk8s", "Helm", "Kubeadm"],
       tagsMy: ["Pods", "Rancher", "Microk8s", "Helm", "Kubeadm"]
@@ -99,7 +99,7 @@ const DevOpsCyclingHero = () => {
       title: "Explore Observability",
       titleMy: "Explore Observability",
       description: "Understand the importance of monitoring and logging in DevOps - how to track application performance, detect issues, and gain insights through tools like Prometheus, Grafana, and ELK Stack.",
-      descriptionMy: "DevOps မှာ Monitoring နှင့် Logging ရဲ့ အရေးပါမှုကို နားလည်ဖို့ လိုအပ်ပါတယ်။ Application Performance ကို ချက်ချင်းသိရှိနိုင်ဖို့  issue ပြဿနာများကို ရှာဖွေနိုင်ဖို့ ဖြစ်ပါတယ်။ Prometheus, Grafana, ELK Stack စသည့် Tools များကို သုံးနိုင်ဖို့ လိုအပ်ပါတယ်။",
+      descriptionMy: "promethues, grafa , ELK stack တို့လို tools တွေသုံးပြီး ကျွန်တော်တို့ application တွေရဲ့ performance ကို စောင့်ကြည့်နိုင်ပါတယ်။ issue တစ်ခုခုဖြစ်ရင်လည်း alerting system တွေကနေ သိရှိနိုင်ပါတယ်။",
       iconGradient: "from-pink-600 to-purple-600",
       tags: ["Prometheus", "Loki", "Kibana", "Logs", "Alerts", "Grafana"],
       tagsMy: ["Prometheus", "Loki", "Kibana", "Logs", "Alerts", "Grafana"]
@@ -109,7 +109,7 @@ const DevOpsCyclingHero = () => {
       title: "Discover IAC",
       titleMy: "Discover IAC",
       description: "Master Infrastructure as Code (IaC) - learn to manage and provision computing infrastructure through code for version control and automated deployment.",
-      descriptionMy: "Infrastructure as Code (IaC) ကို ကျွမ်းကျင်စွာ ရေးနိုင်ဖို့ လိုအပ်ပါတယ်။ Infrastructure ကို Code မှတစ်ဆင့် စီမံခန့်ခွဲပြီး Automated Deployment အတွက် ဖြစ်ပါတယ်။",
+      descriptionMy: "Terraform, CloudFormation, Pulumi စသည့် IaC tools တွေကို သုံးပြီး  ကျွန်တော်တို့ရဲ့ Infrastructure တွေကို Code အဖြစ်ရေးသားနိုင်ဖို့ ဖြစ်ပါတယ်။ ဒါမှတစ်ဆင့် Version Control နဲ့ Automated Deployment တွေကို လုပ်ဆောင်နိုင်ပါတယ်။",
       iconGradient: "from-sky-600 to-purple-600",
       tags: ["Terraform", "CloudFormation", "Pulumi", "Boto3", "Packer"],
       tagsMy: ["Terraform", "CloudFormation", "Pulumi", "Boto3", "Packer"]
