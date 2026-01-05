@@ -8,19 +8,17 @@ import {
   Mail,
   MapPin,
   Phone,
-  Moon,
-  Sun,
-  Monitor,
   ArrowRight,
   Cloud,
   Code,
   Server,
   Send,
   Loader2,
-  CheckCircle,
-  X,
   Bell,
   BellOff,
+  X,
+  Star,
+  Contact,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
@@ -41,7 +39,6 @@ export function MinimalFooter() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  // Check subscription status for authenticated users
   useEffect(() => {
     if (isAuthenticated) {
       checkSubscription();
@@ -82,11 +79,6 @@ export function MinimalFooter() {
   };
 
   const toggleSubscription = async () => {
-    console.log("Toggle clicked, current state:", {
-      isSubscribed,
-      isAuthenticated,
-    });
-
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
@@ -102,8 +94,6 @@ export function MinimalFooter() {
       }
 
       if (isSubscribed) {
-        // Unsubscribe
-        console.log("Unsubscribing...");
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "DELETE",
           headers: {
@@ -118,8 +108,6 @@ export function MinimalFooter() {
           showMessage("error", "Failed to unsubscribe");
         }
       } else {
-        // Subscribe
-        console.log("Subscribing...");
         const response = await fetch(`${API_BASE_URL}/subscribe/`, {
           method: "POST",
           headers: {
@@ -194,7 +182,7 @@ export function MinimalFooter() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
-            <p className="text-black dark:text-gray-300 text-sm md:text-lg leading-relaxed max-w-xl font-base">
+            <p className="text-black dark:text-gray-300 text-base md:text-lg leading-relaxed max-w-xl font-base">
               Your go-to resource for mastering DevOps, cloud-native
               technologies, and automation. Practical guides, tutorials, and
               real-world projects.
@@ -240,52 +228,68 @@ export function MinimalFooter() {
               ))}
             </div>
 
-            {/* Subscribe Section */}
+            {/* NEW ENHANCED Subscribe Section */}
             <div className="pt-4 md:pt-6">
-              <div className="bg-white dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 rounded-xl md:rounded-2xl p-4 md:p-6 border border-blue-100 dark:border-gray-700">
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 md:mb-3 flex items-center">
-                  <Send className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-500" />
-                  Stay Updated
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-3 md:mb-4 text-xs md:text-sm">
-                  Get email notifications when new articles are published.
-                </p>
-
-                <div className="space-y-3">
-                  <button
-                    onClick={toggleSubscription}
-                    disabled={loading}
-                    className={`w-full px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium flex items-center justify-center space-x-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
-                      isSubscribed
-                        ? "bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 focus:ring-red-500"
-                        : "bg-gradient-to-r from-sky-600 to-blue-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-blue-500"
-                    }`}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Processing...</span>
-                      </>
-                    ) : isSubscribed ? (
-                      <>
-                        <BellOff className="h-4 w-4" />
-                        <span>Unsubscribe from Notifications</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        <span>Subscribe to Notifications</span>
-                      </>
-                    )}
-                  </button>
-
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {isAuthenticated
-                      ? isSubscribed
-                        ? "You'll receive email notifications for new articles."
-                        : "Click to get notified about new articles."
-                      : "Sign in to subscribe to article notifications."}
+              <div className="relative">
+                <div className="absolute -top-2 -right-2">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur-sm"></div>
+                    <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-full">
+                      <Star className="h-4 w-4 text-white fill-white" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl md:rounded-2xl p-4 md:p-6 border border-blue-100 dark:border-gray-700 shadow-lg">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-sky-600 to-blue-600 rounded-lg blur-sm opacity-70"></div>
+                      <div className="relative bg-gradient-to-r from-sky-600 to-blue-600 p-2 rounded-lg">
+                        <Send className="h-5 w-5 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg md:text-xl font-bold text-black dark:text-gray-100">
+                        Stay Updated
+                      </h3>
+                      <p className="text-sm text-black dark:text-gray-300">
+                        Never miss new content
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-black dark:text-gray-300 mb-4 md:mb-6 text-sm md:text-sm leading-relaxed">
+                    Get instant email notifications when new DevOps articles are published. Be the first to learn!
                   </p>
+
+                  <div className="space-y-4">
+                    <button
+                      onClick={toggleSubscription}
+                      disabled={loading}
+                      className={`w-full px-6 py-3 md:py-4 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 font-medium md:font-semibold flex items-center justify-center gap-2 md:gap-3 text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                        isSubscribed
+                          ? "bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white shadow-lg shadow-red-500/30"
+                          : "bg-gradient-to-r from-sky-600 to-blue-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/30"
+                      }`}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                          <span>Processing...</span>
+                        </>
+                      ) : isSubscribed ? (
+                        <>
+                          <BellOff className="h-4 w-4 md:h-5 md:w-5" />
+                          <span>Unsubscribe</span>
+                        </>
+                      ) : (
+                        <>
+                          <Bell className="h-4 w-4 md:h-5 md:w-5" />
+                          <span>Subscribe Now</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -296,7 +300,7 @@ export function MinimalFooter() {
             {/* Quick Links & Resources */}
             <div className="space-y-6 md:space-y-10">
               <div>
-                <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 flex items-center">
+                <h3 className="text-base md:text-lg font-bold text-black dark:text-gray-100 mb-4 md:mb-6 flex items-center">
                   <Code className="h-4 w-4 md:h-5 md:w-5 mr-2 text-blue-500" />
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Quick Links
@@ -323,7 +327,7 @@ export function MinimalFooter() {
               </div>
 
               <div>
-                <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 flex items-center">
+                <h3 className="text-base md:text-lg font-bold text-black dark:text-gray-100 mb-4 md:mb-6 flex items-center">
                   <Cloud className="h-4 w-4 md:h-5 md:w-5 mr-2 text-green-500" />
                   <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                     Resources
@@ -358,7 +362,7 @@ export function MinimalFooter() {
             {/* Services & Contact */}
             <div className="space-y-6 md:space-y-8">
               <div>
-                <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 flex items-center">
+                <h3 className="text-base md:text-lg font-bold text-black dark:text-gray-100 mb-4 md:mb-6 flex items-center">
                   <Server className="h-4 w-4 md:h-5 md:w-5 mr-2 text-orange-500" />
                   <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                     Services
@@ -393,8 +397,8 @@ export function MinimalFooter() {
               </div>
 
               <div>
-                <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 flex items-center">
-                  <Mail className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-500" />
+                <h3 className="text-base md:text-lg font-bold text-black dark:text-gray-100 mb-4 md:mb-6 flex items-center">
+                  <Contact className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-500" />
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Contact
                   </span>
@@ -432,13 +436,13 @@ export function MinimalFooter() {
         <div className="border-t border-gray-200 dark:border-gray-800 pt-6 md:pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 md:space-y-6 lg:space-y-0">
             {/* Copyright */}
-            <p className="text-black text-xs md:text-sm dark:text-gray-300 text-center lg:text-left font-medium">
+            <p className="text-black text-sm md:text-base dark:text-gray-300 text-center lg:text-left font-medium">
               &copy; {new Date().getFullYear()} Learn DevOps Now. All rights
               reserved.
             </p>
 
             {/* Legal Links */}
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-xs md:text-sm">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-sm md:text-base">
               {[
                 { href: "/privacy", label: "Privacy Policy" },
                 { href: "/terms-of-service", label: "Terms of Service" },
@@ -463,32 +467,38 @@ export function MinimalFooter() {
           <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full shadow-2xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <Send className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-lg font-bold text-black dark:text-gray-100">
                     Sign In Required
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-black dark:text-gray-400">
                     To subscribe to notifications
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className="p-1 hover:bg-sky-600 bg-sky-600 hover:scale-100 border-sky-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-white dark:text-gray-400" />
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
 
-            <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
+            <p className="text-black dark:text-gray-400 mb-6 text-center">
               Sign in to get email notifications when new articles are
               published.
             </p>
 
             <div className="flex gap-3">
+              <Button
+                onClick={handleSignIn}
+                className="flex-1 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
+                Sign In
+              </Button>
               <Button
                 onClick={() => setShowAuthModal(false)}
                 variant="outline"

@@ -760,7 +760,7 @@ export function MinimalHeader() {
               />
             </div>
           </Link>
-          
+
           <nav className="flex items-center space-x-1 -ml-12">
             {/* Articles Dropdown */}
             <div
@@ -994,8 +994,9 @@ export function MinimalHeader() {
               )}
             </div>
           </nav>
+
           {/* Right Section - Language, Dark Mode, Search + Auth */}
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-8">
             {/* Language Switcher Dropdown - Desktop */}
             <div
               className="relative"
@@ -1135,12 +1136,17 @@ export function MinimalHeader() {
                     {isUserDropdownOpen && <UserDropdown />}
                   </div>
                 ) : (
-                  <button
-                    onClick={handleSignInClick}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl hover:from-sky-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-blue-500/25 font-medium"
-                  >
-                    {getNavText("Write Article", "စာရေးရန်")}
-                  </button>
+                  <div className="flex items-center">
+                    <button
+                      onClick={handleSignInClick}
+                      className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium"
+                    >
+                      <PenSquare className="w-5 h-5" />
+                      <span className="text-sm font-medium">
+                        {getNavText("Write", "ရေးရန်")}
+                      </span>
+                    </button>
+                  </div>
                 )}
               </div>
             )}
