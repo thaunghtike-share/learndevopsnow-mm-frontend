@@ -275,7 +275,7 @@ export default function FAQPage() {
     <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="px-11 sm:px-6 md:px-11 py-8">
         {/* Header Section */}
         <div className="mb-16">
           <div className="max-w-3xl">

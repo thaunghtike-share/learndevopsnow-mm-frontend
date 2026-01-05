@@ -944,7 +944,7 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                           >
                             <DifficultyIcon className="w-6 h-6" />
                           </div>
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 mb-5">
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
                               {path.title} {/* Always show English title */}
                             </h2>
@@ -954,7 +954,7 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                           </div>
                         </div>
 
-                        <p className="text-black dark:text-gray-300 text-base leading-relaxed mb-4 md:mb-6">
+                        <p className="text-black dark:text-gray-300 text-base leading-relaxed mb-4 md:mb-8">
                           {locale === 'en' ? path.description : path.descriptionMy}
                         </p>
 

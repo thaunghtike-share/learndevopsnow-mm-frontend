@@ -683,36 +683,6 @@ export function MinimalHeader() {
               />
             </Link>
 
-            {/* Language Switcher Button - Mobile */}
-            <button
-              onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-              className="p-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium flex items-center gap-1"
-            >
-              <span className="text-sm">
-                {currentLocale === "en" ? "🇺🇸" : "🇲🇲"}
-              </span>
-            </button>
-
-            {/* Language Dropdown - Mobile */}
-            {isLanguageOpen && (
-              <div className="absolute top-16 right-6 w-40 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50">
-                {languageOptions.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => switchLanguage(lang.code as "en" | "my")}
-                    className={`flex items-center w-full px-4 py-3 text-left ${
-                      currentLocale === lang.code
-                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    <span className="mr-3">{lang.flag}</span>
-                    <span>{lang.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
             {/* Search Bar - WIDER */}
             <div className="flex-1 relative max-w-[200px] ml-2">
               <div className="relative">
@@ -954,17 +924,8 @@ export function MinimalHeader() {
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText(
-                      "Cloud Migration",
-                      "Cloud ကိုပြောင်းရွှေ့ခြင်း"
-                    )}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/services/infrastructure-automation`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText(
-                      "Infrastructure as Code",
-                      "IAC အဖြစ် ပြောင်းလဲခြင်း"
+                      "Cloud Native Migration",
+                      "Cloud Native အဖြစ် ပြောင်းလဲပေးခြင်း"
                     )}
                   </Link>
                   <Link

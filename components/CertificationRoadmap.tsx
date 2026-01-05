@@ -494,7 +494,7 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="text-center mt-6 md:mt-8"
+          className="text-center mt-6 md:block hidden md:mt-8"
         >
           <p className="text-black dark:text-gray-300 text-sm md:text-base">
             {locale === 'en' 
