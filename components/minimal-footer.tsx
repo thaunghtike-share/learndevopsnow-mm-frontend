@@ -494,12 +494,6 @@ export function MinimalFooter() {
 
             <div className="flex gap-3">
               <Button
-                onClick={handleSignIn}
-                className="flex-1 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-blue-700 hover:to-purple-700 text-white"
-              >
-                Sign In
-              </Button>
-              <Button
                 onClick={() => setShowAuthModal(false)}
                 variant="outline"
                 className="flex-1 border-gray-300 dark:border-gray-600"
