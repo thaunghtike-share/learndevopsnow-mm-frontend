@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import {
   Dock,
   ShieldCheck,
@@ -41,6 +42,9 @@ import {
   Key,
   Search,
   Eye,
+  Calendar,
+  Clock,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,9 +63,35 @@ import { useEffect, useState } from "react";
 export default function MonolithicToCloudNativePage() {
   // Get current locale from URL params
   const params = useParams();
-  const currentLocale = params.locale as "en" | "my" || "en";
-  
+  const currentLocale = (params.locale as "en" | "my") || "en";
+
   const [mounted, setMounted] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    current_environment: "",
+    project_goals: "",
+    preferred_time: "",
+  });
+
+  // Update state declarations
+  const [alertState, setAlertState] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "success" | "error" | "info";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+  });
 
   // Fix Hydration Error: Ensure component only renders after mounting on client
   useEffect(() => {
@@ -73,50 +103,159 @@ export default function MonolithicToCloudNativePage() {
     return currentLocale === "en" ? enText : myText;
   };
 
+  // Handle form input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Update handleSubmit function - remove the alerts and form status messages
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    console.log("Submitting form data:", formData);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      console.log("API URL:", `${apiUrl}/api/consultations/book/`);
+
+      const response = await fetch(`${apiUrl}/api/consultations/book/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log("Response status:", response.status);
+      const responseText = await response.text();
+      console.log("Response text:", responseText);
+
+      if (response.ok) {
+        // Show success alert
+        setAlertState({
+          isOpen: true,
+          title: t("Success", "အောင်မြင်ပါသည်"),
+          message: t(
+            "Thank you! Your consultation request has been submitted successfully. We'll contact you within 24 hours.",
+            "ကျေးဇူးတင်ပါသည်! သင်၏ ဆွေးနွေးတိုင်ပင်မှု တောင်းဆိုချက်ကို အောင်မြင်စွာ လက်ခံရရှိပါသည်။ ကျွန်ုပ်တို့သည် ၂၄ နာရီအတွင်း သင့်ထံ ဆက်သွယ်ပါမည်။"
+          ),
+          type: "success",
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          current_environment: "",
+          project_goals: "",
+          preferred_time: "",
+        });
+
+        // Close modal after 1 second
+        setTimeout(() => {
+          setIsBookingModalOpen(false);
+        }, 1000);
+      } else {
+        // Show error alert
+        setAlertState({
+          isOpen: true,
+          title: t("Error", "အမှား"),
+          message: t(
+            "Failed to submit booking. Please try again or contact us directly.",
+            "အာဏာပိုင်သို့ မပေးပို့နိုင်ပါ။ ကျေးဇူးပြု၍ ထပ်မံကြိုးစားကြည့်ပါ သို့မဟုတ် တိုက်ရိုက်ဆက်သွယ်ပါ။"
+          ),
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      setAlertState({
+        isOpen: true,
+        title: t("Network Error", "Network အမှား"),
+        message: t(
+          "Network error. Please check your connection and try again.",
+          "Network error. ကျေးဇူးပြု၍ သင့်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားကြည့်ပါ။"
+        ),
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const features = [
     {
       icon: Workflow,
       title: "End-to-End DevOps",
-      description: t("Complete automation from code to production", "Code စတင်ရေးချိန်မှစပြီး Production အဆင့်အထိ automation စနစ်ဖြင့် ချိတ်ဆက်ဆောင်ရွက်ပေးခြင်း"),
+      description: t(
+        "Complete automation from code to production",
+        "Code စတင်ရေးချိန်မှစပြီး Production အဆင့်အထိ automation စနစ်ဖြင့် ချိတ်ဆက်ဆောင်ရွက်ပေးခြင်း"
+      ),
     },
     {
       icon: ShieldCheck,
       title: "Enterprise Security",
-      description: t("Built-in security at every layer", "Infrastructure အလွှာတိုင်းတွင် စိတ်ချရသော လုပ်ငန်းသုံးအဆင့် လုံခြုံရေးစနစ်များ ထည့်သွင်းတည်ဆောက်ခြင်း"),
+      description: t(
+        "Built-in security at every layer",
+        "Infrastructure အလွှာတိုင်းတွင် စိတ်ချရသော လုပ်ငန်းသုံးအဆင့် လုံခြုံရေးစနစ်များ ထည့်သွင်းတည်ဆောက်ခြင်း"
+      ),
     },
     {
       icon: Scale,
       title: "Auto Scaling",
-      description: t("Intelligent resource optimization", "user အသုံးပြုမှုအပေါ် မူတည်ပြီး application များကို အလိုအလျောက် စီမံခန့်ခွဲပေးခြင်း"),
+      description: t(
+        "Intelligent resource optimization",
+        "user အသုံးပြုမှုအပေါ် မူတည်ပြီး application များကို အလိုအလျောက် စီမံခန့်ခွဲပေးခြင်း"
+      ),
     },
     {
       icon: Zap,
       title: "High Performance",
-      description: t("10x faster deployment cycles", "Deployment Lifecycle ကို ၁၀ ဆ ပိုမိုမြန်ဆန်သွက်လက်စေခြင်း"),
+      description: t(
+        "10x faster deployment cycles",
+        "Deployment Lifecycle ကို ၁၀ ဆ ပိုမိုမြန်ဆန်သွက်လက်စေခြင်း"
+      ),
     },
   ];
 
   const stats = [
-    { value: "99.9%", label: t("Uptime SLA", "application အသုံးပြုနိုင်မှု"), icon: CheckCircle2 },
-    { value: "50%", label: t("Cost Reduction", "ကုန်ကျစရိတ် လျှော့ချနိုင်မှု"), icon: ArrowRight },
-    { value: "10x", label: t("Faster Deployments", "Deployment ပိုမိုမြန်ဆန်မှု"), icon: Zap },
-    { value: "24/7", label: t("Monitoring", "အချိန်နှင့်တပြေးညီ စောင့်ကြည့်ပေးခြင်း"), icon: Activity },
+    {
+      value: "99.9%",
+      label: t("Uptime SLA", "application အသုံးပြုနိုင်မှု"),
+      icon: CheckCircle2,
+    },
+    {
+      value: "50%",
+      label: t("Cost Reduction", "ကုန်ကျစရိတ် လျှော့ချနိုင်မှု"),
+      icon: ArrowRight,
+    },
+    {
+      value: "10x",
+      label: t("Faster Deployments", "Deployment ပိုမိုမြန်ဆန်မှု"),
+      icon: Zap,
+    },
+    {
+      value: "24/7",
+      label: t("Monitoring", "အချိန်နှင့်တပြေးညီ စောင့်ကြည့်ပေးခြင်း"),
+      icon: Activity,
+    },
   ];
 
-  const handleEmailClick = () => {
-    const subject = t(
-      "Free Consultation - Cloud Native Transformation",
-      "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန် - Cloud Native ပြောင်းလဲမှု"
-    );
-    const body = t(
-      "Hi, I'm interested in learning more about your cloud native transformation services.",
-      "မင်္ဂလာပါ၊ Cloud Native ပြောင်းလဲမှု ဝန်ဆောင်မှုများအကြောင်း အသေးစိတ် သိရှိလိုပါသည်။"
-    );
-    window.location.href = `mailto:thaunghtikeoo.tho1234@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
   const handleCaseStudiesClick = () => {
-    window.open("https://github.com/thaunghtike-share/DevOps-Projects", "_blank");
+    window.open(
+      "https://github.com/thaunghtike-share/DevOps-Projects",
+      "_blank"
+    );
   };
 
   if (!mounted) {
@@ -163,7 +302,7 @@ export default function MonolithicToCloudNativePage() {
             <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
 
             <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
-                From Monolithic to
+              From Monolithic to
               <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 Cloud Native
               </span>
@@ -200,7 +339,7 @@ export default function MonolithicToCloudNativePage() {
 
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-start items-start">
               <Button
-                onClick={handleEmailClick}
+                onClick={() => setIsBookingModalOpen(true)}
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
                 <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -245,7 +384,7 @@ export default function MonolithicToCloudNativePage() {
             <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
 
             <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
-                Infrastructure Design
+              Infrastructure Design
               <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 For Our Client
               </span>
@@ -279,10 +418,16 @@ export default function MonolithicToCloudNativePage() {
                 <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
                   <Zap className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                {t("Understanding the Architecture", "Understanding the Architecture")}
+                {t(
+                  "Understanding the Architecture",
+                  "Understanding the Architecture"
+                )}
               </CardTitle>
               <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                {t("A detailed breakdown of our cloud-native solution", "ကျွန်ုပ်တို့၏ Cloud Native ပုံစံကို အသေးစိတ် ရှင်းလင်းချက်")}
+                {t(
+                  "A detailed breakdown of our cloud-native solution",
+                  "ကျွန်ုပ်တို့၏ Cloud Native ပုံစံကို အသေးစိတ် ရှင်းလင်းချက်"
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
@@ -388,7 +533,10 @@ export default function MonolithicToCloudNativePage() {
                   Infrastructure as Code
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t("Automated cloud infrastructure provisioning", "Cloud Infrastructure များကို အလိုအလျောက် တည်ဆောက်ခြင်း")}
+                  {t(
+                    "Automated cloud infrastructure provisioning",
+                    "Cloud Infrastructure များကို အလိုအလျောက် တည်ဆောက်ခြင်း"
+                  )}
                 </p>
               </div>
             </div>
@@ -401,10 +549,16 @@ export default function MonolithicToCloudNativePage() {
                   <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
                     <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  {t("Why Choose Terraform?", "Terraform ကို ဘာကြောင့် ရွေးချယ်သင့်သလဲ?")}
+                  {t(
+                    "Why Choose Terraform?",
+                    "Terraform ကို ဘာကြောင့် ရွေးချယ်သင့်သလဲ?"
+                  )}
                 </CardTitle>
                 <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                  {t("The industry standard for Infrastructure as Code", "ခေတ်မီ Infrastructure များအတွက် ကမ္ဘာ့အဆင့်မီ စံသတ်မှတ်ချက်")}
+                  {t(
+                    "The industry standard for Infrastructure as Code",
+                    "ခေတ်မီ Infrastructure များအတွက် ကမ္ဘာ့အဆင့်မီ စံသတ်မှတ်ချက်"
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -481,7 +635,10 @@ export default function MonolithicToCloudNativePage() {
                   Production Terraform Modules
                 </CardTitle>
                 <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                  {t("Enterprise-grade infrastructure modules", "လုပ်ငန်းသုံး အဆင့် Infrastructure Modules များ")}
+                  {t(
+                    "Enterprise-grade infrastructure modules",
+                    "လုပ်ငန်းသုံး အဆင့် Infrastructure Modules များ"
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 md:space-y-6">
@@ -502,16 +659,29 @@ export default function MonolithicToCloudNativePage() {
                           )}
                         </p>
                         <div className="flex flex-wrap gap-1 md:gap-2">
-                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">AKS</Badge>
-                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">ACR</Badge>
-                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">VNet</Badge>
-                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">{t("Monitoring", "စောင့်ကြည့်ခြင်း")}</Badge>
+                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">
+                            AKS
+                          </Badge>
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">
+                            ACR
+                          </Badge>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">
+                            VNet
+                          </Badge>
+                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">
+                            {t("Monitoring", "စောင့်ကြည့်ခြင်း")}
+                          </Badge>
                         </div>
                       </div>
                     </div>
                     <Button
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl font-semibold transition-all duration-300 hover:scale-105 mt-3 lg:mt-0 w-full lg:w-auto"
-                      onClick={() => window.open("https://github.com/thaunghtike-share/terraform-azure", "_blank")}
+                      onClick={() =>
+                        window.open(
+                          "https://github.com/thaunghtike-share/terraform-azure",
+                          "_blank"
+                        )
+                      }
                     >
                       <ExternalLink className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                       View Module
@@ -536,16 +706,29 @@ export default function MonolithicToCloudNativePage() {
                           )}
                         </p>
                         <div className="flex flex-wrap gap-1 md:gap-2">
-                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">EKS</Badge>
-                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">Spot Instances</Badge>
-                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">Auto-scaling</Badge>
-                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">Cost Optimized</Badge>
+                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">
+                            EKS
+                          </Badge>
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">
+                            Spot Instances
+                          </Badge>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">
+                            Auto-scaling
+                          </Badge>
+                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">
+                            Cost Optimized
+                          </Badge>
                         </div>
                       </div>
                     </div>
                     <Button
                       className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl font-semibold transition-all duration-300 hover:scale-105 mt-3 lg:mt-0 w-full lg:w-auto"
-                      onClick={() => window.open("https://github.com/thaunghtike-share/terraform-aws-kubespot", "_blank")}
+                      onClick={() =>
+                        window.open(
+                          "https://github.com/thaunghtike-share/terraform-aws-kubespot",
+                          "_blank"
+                        )
+                      }
                     >
                       <ExternalLink className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                       View Module
@@ -569,7 +752,10 @@ export default function MonolithicToCloudNativePage() {
                   CI/CD Pipeline
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t("Automated build, test, and deployment workflows", "test, build , deploy အဆင့်တိုင်းကို အလိုအလျောက် လုပ်ဆောင်ခြင်း")}
+                  {t(
+                    "Automated build, test, and deployment workflows",
+                    "test, build , deploy အဆင့်တိုင်းကို အလိုအလျောက် လုပ်ဆောင်ခြင်း"
+                  )}
                 </p>
               </div>
             </div>
@@ -581,31 +767,99 @@ export default function MonolithicToCloudNativePage() {
                 <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg md:rounded-xl">
                   <Zap className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
                 </div>
-                {t("Complete CI/CD Workflow", "ပြီးပြည့်စုံသော CI/CD လုပ်ငန်းစဉ်")}
+                {t(
+                  "Complete CI/CD Workflow",
+                  "ပြီးပြည့်စုံသော CI/CD လုပ်ငန်းစဉ်"
+                )}
               </CardTitle>
               <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                {t("From code commit to production deployment", "Code ရေးသားမှုမှ Production သို့ ရောက်ရှိသည်အထိ")}
+                {t(
+                  "From code commit to production deployment",
+                  "Code ရေးသားမှုမှ Production သို့ ရောက်ရှိသည်အထိ"
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {[
-                  { step: "1", title: "Code Push", desc: t("Developer pushes code to Git repository", "Developer က Code ကို Git Repository ထဲသို့ ထည့်လိုက်ခြင်း"), icon: Code, color: "blue" },
-                  { step: "2", title: "Docker Build", desc: t("Multi-platform container builds", "platform အမျိုးစားအားလုံးတွင် အလုပ်လုပ်နိုင်သော Container Image များ တည်ဆောက်ခြင်း"), icon: Dock, color: "indigo" },
-                  { step: "3", title: "Push to Registry", desc: t("Secure image storage with automated tagging", "Image များကို လုံခြုံစွာ သိမ်းဆည်းပြီး Tagging စနစ်ဖြင့် စီမံခြင်း"), icon: Database, color: "green" },
-                  { step: "4", title: "Security Scan", desc: t("Trivy vulnerability scanning", "Trivy ကို အသုံးပြုပြီး Image အတွင်းရှိ ချို့ယွင်းချက်များကို စစ်ဆေးခြင်း"), icon: ShieldCheck, color: "red" },
-                  { step: "5", title: "ArgoCD Deploy", desc: t("GitOps-based deployment", "GitOps စနစ်ဖြင့် Code ပြောင်းလဲမှုများကို Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးခြင်း"), icon: Rocket, color: "purple" },
-                  { step: "6", title: "Health Verify", desc: t("Automated verification and rollback", "application ကို လိုအပ်ပါက အရင် version တွေသို့ ပြန်ပြောင်းနိုင်ခြင်း"), icon: CheckCircle2, color: "orange" },
+                  {
+                    step: "1",
+                    title: "Code Push",
+                    desc: t(
+                      "Developer pushes code to Git repository",
+                      "Developer က Code ကို Git Repository ထဲသို့ ထည့်လိုက်ခြင်း"
+                    ),
+                    icon: Code,
+                    color: "blue",
+                  },
+                  {
+                    step: "2",
+                    title: "Docker Build",
+                    desc: t(
+                      "Multi-platform container builds",
+                      "platform အမျိုးစားအားလုံးတွင် အလုပ်လုပ်နိုင်သော Container Image များ တည်ဆောက်ခြင်း"
+                    ),
+                    icon: Dock,
+                    color: "indigo",
+                  },
+                  {
+                    step: "3",
+                    title: "Push to Registry",
+                    desc: t(
+                      "Secure image storage with automated tagging",
+                      "Image များကို လုံခြုံစွာ သိမ်းဆည်းပြီး Tagging စနစ်ဖြင့် စီမံခြင်း"
+                    ),
+                    icon: Database,
+                    color: "green",
+                  },
+                  {
+                    step: "4",
+                    title: "Security Scan",
+                    desc: t(
+                      "Trivy vulnerability scanning",
+                      "Trivy ကို အသုံးပြုပြီး Image အတွင်းရှိ ချို့ယွင်းချက်များကို စစ်ဆေးခြင်း"
+                    ),
+                    icon: ShieldCheck,
+                    color: "red",
+                  },
+                  {
+                    step: "5",
+                    title: "ArgoCD Deploy",
+                    desc: t(
+                      "GitOps-based deployment",
+                      "GitOps စနစ်ဖြင့် Code ပြောင်းလဲမှုများကို Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးခြင်း"
+                    ),
+                    icon: Rocket,
+                    color: "purple",
+                  },
+                  {
+                    step: "6",
+                    title: "Health Verify",
+                    desc: t(
+                      "Automated verification and rollback",
+                      "application ကို လိုအပ်ပါက အရင် version တွေသို့ ပြန်ပြောင်းနိုင်ခြင်း"
+                    ),
+                    icon: CheckCircle2,
+                    color: "orange",
+                  },
                 ].map((item, index) => (
                   <div
                     key={index}
                     className="text-center p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
                   >
-                    <div className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl mb-3 md:mb-4 mx-auto w-12 h-12 md:w-16 md:h-16 flex items-center justify-center`}>
-                      <item.icon className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`} />
+                    <div
+                      className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl mb-3 md:mb-4 mx-auto w-12 h-12 md:w-16 md:h-16 flex items-center justify-center`}
+                    >
+                      <item.icon
+                        className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`}
+                      />
                     </div>
-                    <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">{item.title}</h4>
-                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">{item.desc}</p>
+                    <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                      {item.title}
+                    </h4>
+                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">
+                      {item.desc}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -624,16 +878,43 @@ export default function MonolithicToCloudNativePage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {[
-                  { icon: Zap, title: "Faster Builds", desc: t("Utilize powerful machines for build cycles.", "ပိုကောင်းသော server များကို အသုံးပြုပြီး build လုပ်ချိန်ကို သိသိသာသာ လျှော့ချခြင်း။"), color: "blue" },
-                  { icon: ShieldCheck, title: "Security", desc: t("Keep sensitive data within your network.", "ဒေတာများကို မိမိတို့ network အတွင်း၌သာ လုံခြုံစွာ ထိန်းသိမ်းထားခြင်း။"), color: "orange" },
+                  {
+                    icon: Zap,
+                    title: "Faster Builds",
+                    desc: t(
+                      "Utilize powerful machines for build cycles.",
+                      "ပိုကောင်းသော server များကို အသုံးပြုပြီး build လုပ်ချိန်ကို သိသိသာသာ လျှော့ချခြင်း။"
+                    ),
+                    color: "blue",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: "Security",
+                    desc: t(
+                      "Keep sensitive data within your network.",
+                      "ဒေတာများကို မိမိတို့ network အတွင်း၌သာ လုံခြုံစွာ ထိန်းသိမ်းထားခြင်း။"
+                    ),
+                    color: "orange",
+                  },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700">
-                    <div className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl flex-shrink-0`}>
-                      <item.icon className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`} />
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700"
+                  >
+                    <div
+                      className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl flex-shrink-0`}
+                    >
+                      <item.icon
+                        className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`}
+                      />
                     </div>
                     <div>
-                      <h4 className="font-bold text-black dark:text-white mb-1 text-base md:text-lg">{item.title}</h4>
-                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">{item.desc}</p>
+                      <h4 className="font-bold text-black dark:text-white mb-1 text-base md:text-lg">
+                        {item.title}
+                      </h4>
+                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -654,7 +935,10 @@ export default function MonolithicToCloudNativePage() {
                   GitOps with ArgoCD
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t("Declarative, automated deployments to Kubernetes", "Code ပြောင်းလဲမှုကို အခြေခံပြီး Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးသော စနစ်")}
+                  {t(
+                    "Declarative, automated deployments to Kubernetes",
+                    "Code ပြောင်းလဲမှုကို အခြေခံပြီး Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးသော စနစ်"
+                  )}
                 </p>
               </div>
             </div>
@@ -692,17 +976,52 @@ export default function MonolithicToCloudNativePage() {
               <CardContent>
                 <div className="space-y-3 md:space-y-4">
                   {[
-                    { icon: CheckCircle2, title: "Declarative State", desc: t("Ensures cluster matches Git definition.", "Cluster ၏ အခြေအနေသည် Git ထဲရှိ setting နှင့် အမြဲ တူညီနေစေခြင်း။"), color: "blue" },
-                    { icon: RefreshCw, title: "Automated Sync", desc: t("Continuously monitors and syncs changes.", "Git ထဲရှိ ပြောင်းလဲမှုများကို စောင့်ကြည့်ပြီး အလိုအလျောက် Update လုပ်ခြင်း။"), color: "green" },
-                    { icon: ArrowRight, title: "Instant Rollback", desc: t("Roll back to any version instantly.", "ယခင် Version များသို့ ချက်ချင်း ပြန်ပြောင်းနိုင်ခြင်း။"), color: "orange" },
+                    {
+                      icon: CheckCircle2,
+                      title: "Declarative State",
+                      desc: t(
+                        "Ensures cluster matches Git definition.",
+                        "Cluster ၏ အခြေအနေသည် Git ထဲရှိ setting နှင့် အမြဲ တူညီနေစေခြင်း။"
+                      ),
+                      color: "blue",
+                    },
+                    {
+                      icon: RefreshCw,
+                      title: "Automated Sync",
+                      desc: t(
+                        "Continuously monitors and syncs changes.",
+                        "Git ထဲရှိ ပြောင်းလဲမှုများကို စောင့်ကြည့်ပြီး အလိုအလျောက် Update လုပ်ခြင်း။"
+                      ),
+                      color: "green",
+                    },
+                    {
+                      icon: ArrowRight,
+                      title: "Instant Rollback",
+                      desc: t(
+                        "Roll back to any version instantly.",
+                        "ယခင် Version များသို့ ချက်ချင်း ပြန်ပြောင်းနိုင်ခြင်း။"
+                      ),
+                      color: "orange",
+                    },
                   ].map((item, index) => (
-                    <div key={index} className="flex items-start gap-2 md:gap-3">
-                      <div className={`p-1 md:p-2 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded md:rounded-lg flex-shrink-0 mt-1`}>
-                        <item.icon className={`w-3 h-3 md:w-4 md:h-4 text-${item.color}-600 dark:text-${item.color}-400`} />
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 md:gap-3"
+                    >
+                      <div
+                        className={`p-1 md:p-2 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded md:rounded-lg flex-shrink-0 mt-1`}
+                      >
+                        <item.icon
+                          className={`w-3 h-3 md:w-4 md:h-4 text-${item.color}-600 dark:text-${item.color}-400`}
+                        />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm md:text-base">{item.title}</h4>
-                        <p className="text-black dark:text-gray-300 text-xs md:text-sm">{item.desc}</p>
+                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm md:text-base">
+                          {item.title}
+                        </h4>
+                        <p className="text-black dark:text-gray-300 text-xs md:text-sm">
+                          {item.desc}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -724,7 +1043,10 @@ export default function MonolithicToCloudNativePage() {
                   Security & Compliance
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t("DevSecOps at every stage of the lifecycle", "အဆင့်တိုင်းတွင် Security ကို ထည့်သွင်းစဥ်းစားခြင်း")}
+                  {t(
+                    "DevSecOps at every stage of the lifecycle",
+                    "အဆင့်တိုင်းတွင် Security ကို ထည့်သွင်းစဥ်းစားခြင်း"
+                  )}
                 </p>
               </div>
             </div>
@@ -741,16 +1063,23 @@ export default function MonolithicToCloudNativePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
-                  {t("Security is baked into the pipeline, not added as an afterthought. We implement automated vulnerability scanning at every stage.", "လုံခြုံရေး ကို နောက်မှထည့်သွင်းခြင်းမျိုးမဟုတ်ဘဲ Pipeline တစ်ခုလုံး၏ အဆင့်တိုင်းတွင် အလိုအလျောက် စစ်ဆေးနိုင်ရန် တည်ဆောက်ထားပါသည်။")}
+                  {t(
+                    "Security is baked into the pipeline, not added as an afterthought. We implement automated vulnerability scanning at every stage.",
+                    "လုံခြုံရေး ကို နောက်မှထည့်သွင်းခြင်းမျိုးမဟုတ်ဘဲ Pipeline တစ်ခုလုံး၏ အဆင့်တိုင်းတွင် အလိုအလျောက် စစ်ဆေးနိုင်ရန် တည်ဆောက်ထားပါသည်။"
+                  )}
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm md:text-base">Container Scanning (Trivy)</span>
+                    <span className="text-sm md:text-base">
+                      Container Scanning (Trivy)
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm md:text-base">Static Analysis (SonarQube)</span>
+                    <span className="text-sm md:text-base">
+                      Static Analysis (SonarQube)
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -767,16 +1096,23 @@ export default function MonolithicToCloudNativePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
-                  {t("Zero Trust architecture with fine-grained access control using Kubernetes RBAC and secure secret management.", "Zero Trust ပုံစံကို အခြေခံပြီး Kubernetes RBAC နှင့် လုံခြုံသော Secret Management စနစ်များဖြင့် ဒေတာများကို ကာကွယ်ထားပါသည်။")}
+                  {t(
+                    "Zero Trust architecture with fine-grained access control using Kubernetes RBAC and secure secret management.",
+                    "Zero Trust ပုံစံကို အခြေခံပြီး Kubernetes RBAC နှင့် လုံခြုံသော Secret Management စနစ်များဖြင့် ဒေတာများကို ကာကွယ်ထားပါသည်။"
+                  )}
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm md:text-base">RBAC & OPA Enforcement</span>
+                    <span className="text-sm md:text-base">
+                      RBAC & OPA Enforcement
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span className="text-sm md:text-base">Cloud Secret Store Integration</span>
+                    <span className="text-sm md:text-base">
+                      Cloud Secret Store Integration
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -796,7 +1132,10 @@ export default function MonolithicToCloudNativePage() {
                   Logging & Observability
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t("Total visibility into your modern infrastructure", "ခေတ်မီ Infrastructure များအတွက် အပြည့်အဝ ခြေရာခံ စောင့်ကြည့်နိုင်မှု")}
+                  {t(
+                    "Total visibility into your modern infrastructure",
+                    "ခေတ်မီ Infrastructure များအတွက် အပြည့်အဝ ခြေရာခံ စောင့်ကြည့်နိုင်မှု"
+                  )}
                 </p>
               </div>
             </div>
@@ -809,7 +1148,10 @@ export default function MonolithicToCloudNativePage() {
                 </div>
                 <h4 className="text-xl font-bold">Metrics Monitoring</h4>
                 <p className="text-sm md:text-base text-black dark:text-gray-400 leading-relaxed">
-                  {t("Real-time performance tracking with Prometheus and Grafana dashboards.", "Prometheus နှင့် Grafana တို့ကို အသုံးပြုပြီး cluster တွေ application တွေရဲ့ လုပ်ဆောင်ချက်များကို Real-time မျက်ခြေမပြတ် စောင့်ကြည့်နိုင်ပါသည်။")}
+                  {t(
+                    "Real-time performance tracking with Prometheus and Grafana dashboards.",
+                    "Prometheus နှင့် Grafana တို့ကို အသုံးပြုပြီး cluster တွေ application တွေရဲ့ လုပ်ဆောင်ချက်များကို Real-time မျက်ခြေမပြတ် စောင့်ကြည့်နိုင်ပါသည်။"
+                  )}
                 </p>
               </div>
               <div className="space-y-4">
@@ -818,7 +1160,10 @@ export default function MonolithicToCloudNativePage() {
                 </div>
                 <h4 className="text-xl font-bold">Centralized Logging</h4>
                 <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-                  {t("Consolidate logs from all microservices into one place for rapid debugging.", "ပြဿနာများကို မြန်မြန်ဆန်ဆန် ဖြေရှင်းနိုင်ရန် Logging System အဖြစ် Grafana Loki နှင့် ELK stack တို့ကိုအသုံးပြုထားပါသည်။")}
+                  {t(
+                    "Consolidate logs from all microservices into one place for rapid debugging.",
+                    "ပြဿနာများကို မြန်မြန်ဆန်ဆန် ဖြေရှင်းနိုင်ရန် Logging System အဖြစ် Grafana Loki နှင့် ELK stack တို့ကိုအသုံးပြုထားပါသည်။"
+                  )}
                 </p>
               </div>
               <div className="space-y-4">
@@ -827,7 +1172,10 @@ export default function MonolithicToCloudNativePage() {
                 </div>
                 <h4 className="text-xl font-bold">Distributed Tracing</h4>
                 <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-                  {t("Track requests across microservices to identify bottlenecks instantly.", "Service တစ်ခုနှင့်တစ်ခုကြား ချိတ်ဆက်မှုများကို ခြေရာခံပြီး issue ဖြစ်ခဲ့လျှင် ချက်ချင်း ပြင်ဆင်နိုင်ပါသည်။")}
+                  {t(
+                    "Track requests across microservices to identify bottlenecks instantly.",
+                    "Service တစ်ခုနှင့်တစ်ခုကြား ချိတ်ဆက်မှုများကို ခြေရာခံပြီး issue ဖြစ်ခဲ့လျှင် ချက်ချင်း ပြင်ဆင်နိုင်ပါသည်။"
+                  )}
                 </p>
               </div>
             </div>
@@ -840,7 +1188,10 @@ export default function MonolithicToCloudNativePage() {
             <CardContent className="p-6 md:p-12 text-center text-white">
               <div className="max-w-3xl mx-auto">
                 <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
-                  {t("Ready to Transform Your Infrastructure?", "Ready to Transform Your Infrastructure?")}
+                  {t(
+                    "Ready to Transform Your Infrastructure?",
+                    "Ready to Transform Your Infrastructure?"
+                  )}
                 </h2>
                 <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-6 md:mb-8 leading-relaxed">
                   {t(
@@ -852,7 +1203,7 @@ export default function MonolithicToCloudNativePage() {
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
                   <Button
                     size="lg"
-                    onClick={handleEmailClick}
+                    onClick={() => setIsBookingModalOpen(true)}
                     className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                   >
                     <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -870,14 +1221,39 @@ export default function MonolithicToCloudNativePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-8 md:mt-12 pt-6 md:pt-8 border-t border-blue-500">
                   {[
-                    { icon: CheckCircle2, label: t("30-Day Implementation", "ရက် ၃၀ အတွင်း အကောင်အထည်ဖော်ခြင်း"), desc: t("Rapid deployment", "မြန်ဆန်သော ပြင်ဆင်မှု") },
-                    { icon: ShieldCheck, label: t("Enterprise Grade", "လုပ်ငန်းသုံးအဆင့်"), desc: t("Production ready", "Production အတွက် အသင့်ဖြစ်မှု") },
-                    { icon: Zap, label: t("Cost Optimized", "ကုန်ကျစရိတ် အသက်သာဆုံး"), desc: t("Significant savings", "ကုန်ကျစရိတ် သိသာစွာ လျှော့ချမှု") },
+                    {
+                      icon: CheckCircle2,
+                      label: t(
+                        "30-Day Implementation",
+                        "ရက် ၃၀ အတွင်း အကောင်အထည်ဖော်ခြင်း"
+                      ),
+                      desc: t("Rapid deployment", "မြန်ဆန်သော ပြင်ဆင်မှု"),
+                    },
+                    {
+                      icon: ShieldCheck,
+                      label: t("Enterprise Grade", "လုပ်ငန်းသုံးအဆင့်"),
+                      desc: t(
+                        "Production ready",
+                        "Production အတွက် အသင့်ဖြစ်မှု"
+                      ),
+                    },
+                    {
+                      icon: Zap,
+                      label: t("Cost Optimized", "ကုန်ကျစရိတ် အသက်သာဆုံး"),
+                      desc: t(
+                        "Significant savings",
+                        "ကုန်ကျစရိတ် သိသာစွာ လျှော့ချမှု"
+                      ),
+                    },
                   ].map((item, index) => (
                     <div key={index} className="flex flex-col items-center">
                       <item.icon className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3 text-white" />
-                      <h4 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">{item.label}</h4>
-                      <p className="text-blue-200 dark:text-blue-300 text-xs md:text-sm">{item.desc}</p>
+                      <h4 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">
+                        {item.label}
+                      </h4>
+                      <p className="text-blue-200 dark:text-blue-300 text-xs md:text-sm">
+                        {item.desc}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -888,6 +1264,258 @@ export default function MonolithicToCloudNativePage() {
       </main>
 
       <MinimalFooter />
+
+      {/* Modern Alert Dialog */}
+      <AlertDialog
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+        duration={5000}
+      />
+
+      {/* Premium Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200/30 dark:border-gray-800/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute top-5 right-5 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 hover:scale-105 hover:shadow-md transition-all duration-300"
+              aria-label="Close"
+            >
+              <svg
+                className="w-5 h-5 text-gray-600 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="p-8">
+              {/* Header */}
+              <div className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-md">
+                    <MessageSquare className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-black dark:text-white">
+                      {t("Schedule Consultation", "ဆွေးနွေးပွဲ ချိန်းဆိုရန်")}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {t(
+                        "Free 30-minute cloud migration assessment",
+                        "Cloud Migration အကဲဖြတ်ခြင်း (၃၀ မိနစ်)"
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700"></div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Full Name", "အမည်")} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                      placeholder={t("John Doe", "ကျော်ဇေယျာ")}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Email Address", "အီးမေးလ်")} *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                      placeholder="email@company.com"
+                    />
+                  </div>
+                </div>
+
+                {/* Company */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    {t("Company", "ကုမ္ပဏီ")}
+                  </label>
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                    placeholder={t("Optional", "မဖြစ်မနေ မဟုတ်")}
+                  />
+                </div>
+
+                {/* Current Infrastructure & Preferred Time */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Current Infrastructure", "လက်ရှိ Infrastructure")} *
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        name="current_environment"
+                        value={formData.current_environment}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 appearance-none transition-all duration-300"
+                      >
+                        <option value="">
+                          {t("Select Infra", "Infra ရွေးချယ်ပါ")}
+                        </option>
+                        <option value="on-premise">
+                          {t("On-premise", "On-premise")}
+                        </option>
+                        <option value="aws">AWS</option>
+                        <option value="azure">Azure</option>
+                        <option value="gcp">Google Cloud</option>
+                        <option value="hybrid">
+                          {t("Hybrid / Multi-cloud", "Hybrid / Multi-cloud")}
+                        </option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Preferred Time", "နှစ်သက်ရာ အချိန်")} *
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        name="preferred_time"
+                        value={formData.preferred_time}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 appearance-none transition-all duration-300"
+                      >
+                        <option value="">
+                          {t("Select time", "အချိန် ရွေးချယ်ပါ")}
+                        </option>
+                        <option value="morning">
+                          {t("Weekday Morning", "အလုပ်ရက် မနက်ပိုင်း")}
+                        </option>
+                        <option value="afternoon">
+                          {t("Weekday Afternoon", "အလုပ်ရက် နေ့လယ်ပိုင်း")}
+                        </option>
+                        <option value="evening">
+                          {t("Weekday Evening", "အလုပ်ရက် ညနေပိုင်း")}
+                        </option>
+                        <option value="flexible">
+                          {t("Flexible Schedule", "လိုက်လျောညီထွေ")}
+                        </option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Migration Goals */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    {t("Migration Goals", "Migration ရည်မှန်းချက်များ")}
+                  </label>
+                  <textarea
+                    rows={3}
+                    name="project_goals"
+                    value={formData.project_goals}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 resize-none transition-all duration-300"
+                    placeholder={t(
+                      "Describe your migration goals or challenges...",
+                      "သင်၏ migration ရည်မှန်းချက်များ သို့မဟုတ် စိန်ခေါ်မှုများကို ရှင်းပြပါ..."
+                    )}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <span className="relative z-10 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      {t("Submitting...", "ပေးပို့နေသည်...")}
+                    </span>
+                  ) : (
+                    <span className="relative z-10 flex items-center justify-center">
+                      <Calendar className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
+                      {t(
+                        "Schedule Free Session",
+                        "အခမဲ့ ဆွေးနွေးပွဲ ချိန်းဆိုမည်"
+                      )}
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                </Button>
+
+                {/* Privacy Note */}
+                <div className="pt-6 border-t border-gray-300/30 dark:border-gray-700/30">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>
+                        {t(
+                          "We respect your privacy",
+                          "သင့်ကိုယ်ရေးကိုယ်တာကို လေးစားပါသည်"
+                        )}
+                      </span>
+                    </div>
+                    <div className="hidden sm:block text-gray-400 dark:text-gray-600">
+                      •
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {t(
+                          "24-hour response time",
+                          "၂၄ နာရီအတွင်း တုံ့ပြန်မှု"
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
