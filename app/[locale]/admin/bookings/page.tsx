@@ -161,27 +161,39 @@ export default function BookingsManagementPage() {
     }
   };
 
+  // In your updateBookingStatus function, add logic to show the date
   const updateBookingStatus = async (
     bookingId: number,
     status: Booking["status"]
   ) => {
     try {
-      console.log(`🔄 Updating booking ${bookingId} to status: ${status}`);
-
       const token = localStorage.getItem("token");
-      console.log(`🔑 Token exists: ${!!token}`);
+      const booking = bookings.find((b) => b.id === bookingId);
 
-      const url = `${API_BASE_URL}/consultations/${bookingId}/`;
-      console.log(`🌐 URL: ${url}`);
+      // Prepare update data
+      const updateData: any = { status };
 
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
-      });
+      // If confirming, add consultation date if not already set
+      if (status === "confirmed" && !booking?.consultation_date) {
+        // Set consultation date to tomorrow at 10 AM as default
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(10, 0, 0, 0);
+
+        updateData.consultation_date = tomorrow.toISOString();
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/consultations/${bookingId}/`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
 
       console.log(`📊 Response status: ${response.status}`);
 
@@ -939,10 +951,20 @@ export default function BookingsManagementPage() {
                             </span>
                           </div>
                         </div>
+                        {/* In the Booking Details Modal */}
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
-                            Booked: {formatDateTime(selectedBooking.booked_at)}
+                            {selectedBooking.consultation_date ? (
+                              <>
+                                Consultation:{" "}
+                                {formatDateTime(
+                                  selectedBooking.consultation_date
+                                )}
+                              </>
+                            ) : (
+                              "Not scheduled yet"
+                            )}
                           </div>
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -1021,24 +1043,28 @@ export default function BookingsManagementPage() {
                   Edit Booking
                 </h3>
                 <form onSubmit={handleEditSubmit} className="space-y-6">
-                  {/* Consultation Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Consultation Date
                     </label>
                     <input
                       type="datetime-local"
-                      value={editFormData.consultation_date || ""}
+                      value={
+                        editFormData.consultation_date
+                          ? new Date(editFormData.consultation_date)
+                              .toISOString()
+                              .slice(0, 16)
+                          : ""
+                      }
                       onChange={(e) =>
                         setEditFormData({
                           ...editFormData,
-                          consultation_date: e.target.value,
+                          consultation_date: e.target.value + ":00Z", // Add seconds and timezone
                         })
                       }
                       className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     />
                   </div>
-
                   {/* Status */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1060,7 +1086,6 @@ export default function BookingsManagementPage() {
                       <option value="completed">Completed</option>
                     </select>
                   </div>
-
                   {/* Notes */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1079,7 +1104,6 @@ export default function BookingsManagementPage() {
                       placeholder="Add notes..."
                     />
                   </div>
-
                   <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                       type="button"
