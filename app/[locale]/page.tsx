@@ -1,5 +1,11 @@
 import { Suspense } from "react";
 import HomeClient from "./HomeClient";
+import { setRequestLocale } from "next-intl/server";
+
+// Generate static params for SSG
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'my' }];
+}
 
 export const metadata = {
   title: "Learn DevOps Now | Free DevOps Tutorials, Tools & Labs",
@@ -38,7 +44,19 @@ export const metadata = {
   },
 };
 
-export default function HomePage() {
+interface PageProps {
+  params: Promise<{ // <-- IMPORTANT: params is now a Promise
+    locale: string;
+  }>;
+}
+
+export default async function HomePage({ params }: PageProps) { // <-- Make it async
+  // Await the params first
+  const { locale } = await params; // <-- AWAIT the params
+  
+  // Set the locale for this request
+  setRequestLocale(locale);
+
   return (
     <Suspense
       fallback={

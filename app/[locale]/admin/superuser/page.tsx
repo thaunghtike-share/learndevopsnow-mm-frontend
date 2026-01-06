@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/app/auth/hooks/use-auth";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import UserManagement from "./components/user-management";

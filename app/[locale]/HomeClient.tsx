@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation"; // Add useParams
 import { MinimalHeader } from "@/components/minimal-header";
 import DevOpsCyclingHero from "@/components/devops-cycling-hero";
 import { MinimalFooter } from "@/components/minimal-footer";
@@ -9,76 +9,19 @@ import { CertificationRoadmap } from "@/components/CertificationRoadmap";
 import { SuccessStoriesSection } from "@/components/SuccessStoriesSection";
 import { YouTubePlaylists } from "@/components/YouTubePlaylists";
 import { FreeLabs } from "@/components/FreeLabs";
-import {
-  Server,
-  Container,
-  GitBranch,
-  Terminal,
-  Zap,
-  Cloud,
-  Box,
-  Code,
-  MessageSquare,
-} from "lucide-react";
 import { MinimalDevopsRoadmap } from "@/components/devops-roadmap";
 import { ProgrammingLanguagesRoadmap } from "@/components/programming-languages-roadmap";
 
 export default function HomeClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams(); // Add this line
+  const locale = params.locale as string; // Get locale from params
+  
   const initialTag = searchParams.get("tag") || null;
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [mounted, setMounted] = useState(false);
-
-  const floatingIconPositions = [
-    { left: 5, top: 10 },
-    { left: 85, top: 15 },
-    { left: 25, top: 25 },
-    { left: 70, top: 35 },
-    { left: 10, top: 50 },
-    { left: 90, top: 45 },
-    { left: 40, top: 60 },
-    { left: 60, top: 75 },
-    { left: 15, top: 80 },
-    { left: 80, top: 85 },
-    { left: 30, top: 90 },
-    { left: 55, top: 20 },
-    { left: 20, top: 40 },
-    { left: 75, top: 55 },
-    { left: 45, top: 30 },
-    { left: 65, top: 65 },
-    { left: 35, top: 70 },
-    { left: 95, top: 25 },
-  ];
-
-  const floatingDotPositions = [
-    { left: 8, top: 12 },
-    { left: 92, top: 18 },
-    { left: 22, top: 28 },
-    { left: 78, top: 32 },
-    { left: 12, top: 48 },
-    { left: 88, top: 52 },
-    { left: 35, top: 65 },
-    { left: 65, top: 72 },
-    { left: 18, top: 85 },
-    { left: 82, top: 88 },
-    { left: 28, top: 95 },
-    { left: 58, top: 22 },
-    { left: 38, top: 38 },
-    { left: 72, top: 58 },
-    { left: 48, top: 78 },
-    { left: 15, top: 35 },
-    { left: 85, top: 42 },
-    { left: 32, top: 15 },
-    { left: 68, top: 25 },
-    { left: 52, top: 45 },
-    { left: 25, top: 68 },
-    { left: 75, top: 82 },
-    { left: 42, top: 92 },
-    { left: 62, top: 8 },
-    { left: 95, top: 65 },
-  ];
 
   useEffect(() => {
     setMounted(true);
@@ -101,6 +44,8 @@ export default function HomeClient() {
 
   // Update URL when tag changes
   useEffect(() => {
+    if (!mounted) return;
+    
     const params = new URLSearchParams(window.location.search);
     if (selectedTag) {
       params.set("tag", selectedTag);
@@ -109,7 +54,7 @@ export default function HomeClient() {
     }
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     router.replace(newUrl);
-  }, [selectedTag, router]);
+  }, [selectedTag, router, mounted]);
 
   const updateTagFilter = (tagSlug: string | null) => {
     setSelectedTag(tagSlug);
@@ -117,30 +62,27 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
-      {/* Remove the fixed background div - it's causing the issue */}
-
       <div className="relative z-10">
         <MinimalHeader />
 
         <main className="relative z-10">
-          {/* Add explicit background to each section */}
           <section className="bg-white dark:bg-[#000000]">
             <DevOpsCyclingHero />
           </section>
 
           <section id="roadmap" className="bg-white dark:bg-[#000000]">
-            <MinimalDevopsRoadmap />
+            <MinimalDevopsRoadmap locale={locale} /> {/* Pass locale here */}
           </section>
 
           <section id="" className="bg-white dark:bg-[#000000]">
-            <ProgrammingLanguagesRoadmap />
+            <ProgrammingLanguagesRoadmap locale={locale} />
           </section>
 
           <section
             id="youtube"
             className="bg-white dark:bg-[#000000] -mt-10 md:-mt-10"
           >
-            <YouTubePlaylists />
+            <YouTubePlaylists locale={locale} />
           </section>
 
           <section
@@ -154,7 +96,7 @@ export default function HomeClient() {
             id="cert"
             className="bg-white dark:bg-[#000000] -mt-18 md:-mt-18"
           >
-            <CertificationRoadmap />
+            <CertificationRoadmap locale={locale} />
           </div>
 
           <div className="bg-white dark:bg-[#000000] md:-mt-30">

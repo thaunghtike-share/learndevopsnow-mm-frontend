@@ -1,0 +1,44 @@
+{
+  "header": {
+    "home": "ပင်မစာမျက်နှာ",
+    "articles": "ဆောင်းပါးများ",
+    "readArticles": "ဆောင်းပါးများဖတ်ရန်",
+    "learn100DaysAzure": "Azure ၁၀၀ရက် စိန်ခေါ်မှု",
+    "learnLinuxEssentials": "Linux အခြေခံများလေ့လာရန်",
+    "exploreCategories": "အမျိုးအစားအားလုံးကြည့်ရန်",
+    "resources": "အရင်းအမြစ်များ",
+    "learnDevOpsYouTube": "YouTube တွင် DevOps လေ့လာရန်",
+    "freeCourses": "အခမဲ့သင်တန်းများ",
+    "devOpsPlaygrounds": "DevOps Playgrounds များ",
+    "services": "ဝန်ဆောင်မှုများ",
+    "cloudMigration": "Cloud Migration",
+    "infrastructureAsCode": "Infrastructure as Code",
+    "devOpsSupport": "DevOps Support",
+    "others": "အခြား",
+    "about": "ကျွန်ုပ်တို့အကြောင်း",
+    "faqs": "အမေးများသောမေးခွန်းများ",
+    "userGuide": "အသုံးပြုနည်း",
+    "search": "ဆောင်းပါးများရှာရန်...",
+    "writeArticle": "ဆောင်းပါးရေးရန်",
+    "hello": "မင်္ဂလာပါ {username}",
+    "editProfile": "ကိုယ်ရေးအချက်အလက်ပြင်ရန်",
+    "dashboard": "ဒက်ရှ်ဘုတ်",
+    "publicProfile": "ပြည်သူ့ပရိုဖိုင်း",
+    "signOut": "ထွက်ရန်",
+    "deleteAccount": "အကောင့်ဖျက်ရန်",
+    "darkMode": "အမှောင်မုဒ်",
+    "lightMode": "အလင်းမုဒ်",
+    "menu": "မီနူး"
+  },
+  "hero": {
+    "mission": "Our Mission for",
+    "studentsDevelopers": "Students & Developers",
+    "description": "ဤဝဘ်ဆိုက်သည် devops ကို လေ့လာလိုသော မြန်မာနိုင်ငံရှိ ကျောင်းသား ကျောင်းသူ များနှင့် developer များအတွက် အထောက်အကူပြုစေရန် ရည်ရွယ်ပါသည်။"
+  },
+  "common": {
+    "loading": "တင်နေသည်...",
+    "cancel": "မလုပ်တော့ပါ",
+    "delete": "ဖျက်ပါ",
+    "confirmDelete": "ဟုတ်ကဲ့၊ ကျွန်ုပ်၏အကောင့်ကိုဖျက်ပါ"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "header": {
+    "home": "Home",
+    "articles": "Articles",
+    "readArticles": "Read Articles",
+    "learn100DaysAzure": "Learn 100 Days of Azure",
+    "learnLinuxEssentials": "Learn Linux Essentials",
+    "exploreCategories": "Explore All Categories",
+    "resources": "Resources",
+    "learnDevOpsYouTube": "Learn DevOps on YouTube",
+    "freeCourses": "Learn Free Courses",
+    "devOpsPlaygrounds": "Explore DevOps Playgrounds",
+    "services": "Services",
+    "cloudMigration": "Cloud Migration",
+    "infrastructureAsCode": "Infrastructure as Code",
+    "devOpsSupport": "DevOps Support",
+    "others": "Others",
+    "about": "About",
+    "faqs": "FAQs",
+    "userGuide": "User Guide",
+    "search": "Search articles...",
+    "writeArticle": "Write Article",
+    "hello": "Hello, {username}!",
+    "editProfile": "Edit Your Profile",
+    "dashboard": "Dashboard",
+    "publicProfile": "Public Profile View",
+    "signOut": "Sign Out",
+    "deleteAccount": "Delete Account",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "menu": "Menu"
+  },
+  "hero": {
+    "mission": "Our Mission for",
+    "studentsDevelopers": "Students & Developers",
+    "description": "This website is for students and developers in Myanmar who want to learn DevOps and boost their careers in modern software development and cloud infrastructure."
+  },
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Yes, Delete My Account"
+  }
+}

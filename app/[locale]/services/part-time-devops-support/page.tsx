@@ -1,4 +1,5 @@
 "use client";
+
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import {
@@ -36,41 +37,57 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function PartTimeDevOpsSupportPage() {
+  const params = useParams();
+  const currentLocale = (params?.locale as "en" | "my") || "en";
+  const [mounted, setMounted] = useState(false);
+
+  // Fix Hydration Error: Ensure component only renders after mounting on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const t = (enText: string, myText: string) => {
+    return currentLocale === "en" ? enText : myText;
+  };
+
   const features = [
     {
       icon: Scale,
-      title: "Flexible Engagement",
-      description: "Custom support hours tailored to your needs",
+      title: t("Flexible Engagement", "Flexible ဖြစ်တဲ့ ဝန်ဆောင်မှု"),
+      description: t("Custom support hours tailored to your needs", "သင့်လုပ်ငန်းလိုအပ်ချက်နှင့်အညီ အချိန်ကို ညှိနှိုင်းဆောင်ရွက်ပေးခြင်း"),
     },
     {
       icon: Zap,
-      title: "Cost-Effective",
-      description: "No full-time salary expenses",
+      title: t("Cost-Effective", "ကုန်ကျစရိတ် သက်သာခြင်း"),
+      description: t("No full-time salary expenses", "လစာအပြည့်ပေးရန်မလိုဘဲ အသုံးပြုသလောက်သာ ကျသင့်ခြင်း"),
     },
     {
       icon: ShieldCheck,
-      title: "Expert Support",
-      description: "Senior DevOps professionals on demand",
+      title: t("Expert Support", "ကျွမ်းကျင်ပညာရှင်များ၏ အကူအညီ"),
+      description: t("Senior DevOps professionals on demand", "လိုအပ်သည့်အချိန်တိုင်း Senior DevOps များထံမှ အကြံဉာဏ်ရယူနိုင်ခြင်း"),
     },
     {
       icon: RefreshCw,
-      title: "Continuous Improvement",
-      description: "Ongoing optimization and maintenance",
+      title: t("Continuous Improvement", "တိုးတက်ကောင်းမွန်စေခြင်း"),
+      description: t("Ongoing optimization and maintenance", "system ကို အမြဲတမ်း အကောင်းဆုံးဖြစ်အောင် ပြုပြင်ထိန်းသိမ်းပေးခြင်း"),
     },
   ];
 
   const stats = [
-    { value: "50%", label: "Cost Savings", icon: ArrowRight },
-    { value: "24/7", label: "Support Available", icon: Activity },
-    { value: "10x", label: "Faster Resolution", icon: Zap },
-    { value: "99.9%", label: "Uptime Guarantee", icon: CheckCircle2 },
+    { value: "50%", label: t("Cost Savings", "ကုန်ကျစရိတ် လျှော့ချနိုင်မှု"), icon: ArrowRight },
+    { value: "24/7", label: t("Support Available", "အမြဲတမ်း support ပေးနိုင်မှု"), icon: Activity },
+    { value: "10x", label: t("Faster Resolution", "ပိုမိုမြန်ဆန်သော deployment"), icon: Zap },
+    { value: "99.9%", label: t("Uptime Guarantee", "သင့်လုပ်ငန်း အမြဲတမ်း အလုပ်လုပ်နိုင်မှု"), icon: CheckCircle2 },
   ];
 
   const handleEmailClick = () => {
-    window.location.href =
-      "mailto:thaunghtikeoo.tho1234@gmail.com?subject=Part-Time DevOps Support Consultation&body=Hi, I'm interested in learning more about your part-time DevOps support services.";
+    const subject = t("Part-Time DevOps Support Consultation", "Part-Time DevOps ဝန်ဆောင်မှုအတွက် ဆွေးနွေးတိုင်ပင်ရန်");
+    const body = t("Hi, I'm interested in learning more about your part-time DevOps support services.", "မင်္ဂလာပါ၊ သင်တို့၏ Part-Time DevOps support ဝန်ဆောင်မှုများအကြောင်း သိရှိလိုပါသည်။");
+    window.location.href = `mailto:thaunghtikeoo.tho1234@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleCaseStudiesClick = () => {
@@ -80,6 +97,9 @@ export default function PartTimeDevOpsSupportPage() {
     );
   };
 
+  // Prevent rendering until mounted to avoid hydration mismatch
+  if (!mounted) return null;
+
   return (
     <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative transition-colors duration-300">
       {/* Messenger Button - Hidden on mobile */}
@@ -87,7 +107,7 @@ export default function PartTimeDevOpsSupportPage() {
         href="https://m.me/learndevopsnowbytho"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Messenger Support"
+        aria-label={t("Messenger Support", "Messenger အကူအညီ")}
         className="hidden md:flex fixed top-[70%] right-4 z-50 group"
       >
         <div className="flex items-center gap-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-3 cursor-pointer transition-all duration-400 hover:scale-105 hover:shadow-xl">
@@ -98,7 +118,7 @@ export default function PartTimeDevOpsSupportPage() {
             </div>
           </div>
           <span className="text-sm font-medium text-black dark:text-white">
-            Chat Now
+            {t("Chat Now", "ချက်ချင်းစကားပြောရန်")}
           </span>
         </div>
       </a>
@@ -126,9 +146,10 @@ export default function PartTimeDevOpsSupportPage() {
 
             {/* Description - Left Aligned */}
             <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-8 md:mb-12 leading-relaxed max-w-3xl text-left">
-              Get expert DevOps assistance when you need it without the expense
-              of full-time hires. Flexible, cost-effective support tailored to
-              your specific requirements.
+              {t(
+                "Get expert DevOps assistance when you need it without the expense of full-time hires. Flexible, cost-effective support tailored to your specific requirements.",
+                "Full-time ဝန်ထမ်းခန့်ရန် မလိုအပ်ဘဲ ကျွမ်းကျင် DevOps သမားများ၏ အကူအညီကို လိုအပ်သည့်အချိန်တိုင်း ရယူလိုက်ပါ။ ကုန်ကျစရိတ် သက်သာစေမည့်အပြင် သင့်လုပ်ငန်းနှင့် အကိုက်ညီဆုံး ဝန်ဆောင်မှုကို ပေးဆောင်သွားမှာ ဖြစ်ပါသည်။"
+              )}
             </p>
 
             {/* Feature Grid - Stack on mobile */}
@@ -161,14 +182,7 @@ export default function PartTimeDevOpsSupportPage() {
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
                 <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                Start Free Consultation
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleCaseStudiesClick}
-                className="px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 text-black dark:text-white w-full sm:w-auto"
-              >
-                View Case Studies
+                {t("Start Free Consultation", "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန်")}
               </Button>
             </div>
           </motion.div>
@@ -208,10 +222,10 @@ export default function PartTimeDevOpsSupportPage() {
               </div>
               <div>
                 <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  What is Part-Time DevOps Support?
+                  {t("What is Part-Time DevOps Support?", "What is Part-Time DevOps Support?")}
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  Expert DevOps assistance whenever you need it
+                  {t("Expert DevOps assistance whenever you need it", "ကျွမ်းကျင် DevOps Engineer များ၏ အကူအညီကို လိုအပ်ချိန်တိုင်း ရယူနိုင်ခြင်း")}
                 </p>
               </div>
             </div>
@@ -223,45 +237,44 @@ export default function PartTimeDevOpsSupportPage() {
                 <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
                   <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                Flexible DevOps Expertise
+                {t("Flexible DevOps Expertise", "Flexible DevOps Expertise")}
               </CardTitle>
               <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                Access senior DevOps professionals on your terms
+                {t("Access senior DevOps professionals on your terms", "Access senior DevOps professionals on your terms")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
               <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg">
-                Part-time DevOps support connects your organization with skilled
-                DevOps engineers on a flexible, as-needed basis. Perfect for
-                projects requiring specialized expertise, temporary resource
-                gaps, or ongoing maintenance without the cost of full-time
-                staff.
+                {t(
+                  "Part-time DevOps support connects your organization with skilled DevOps engineers on a flexible, as-needed basis. Perfect for projects requiring specialized expertise, temporary resource gaps, or ongoing maintenance without the cost of full-time staff.",
+                  "Part-time DevOps Support ဆိုသည်မှာ သင့်လုပ်ငန်းအတွက် ကျွမ်းကျင် DevOps Engineer များကို လိုအပ်သည့်အချိန်နှင့် ပမာဏအလိုက် ချိတ်ဆက်လုပ်ဆောင်ပေးသည့် ဝန်ဆောင်မှု ဖြစ်ပါသည်။ ဝန်ထမ်းအင်အား မလုံလောက်မှုများ သို့မဟုတ် Full-time ခန့်အပ်ရန် အခက်အခဲရှိသော လုပ်ငန်းများအတွက် အသင့်တော်ဆုံး ဖြစ်ပါသည်။"
+                )}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {[
                   {
                     icon: Users,
-                    title: "On-Demand Expertise",
-                    desc: "Access experienced DevOps professionals exactly when you need them.",
+                    title: t("On-Demand Expertise", "On-Demand Expertise"),
+                    desc: t("Access experienced DevOps professionals exactly when you need them.", "အတွေ့အကြုံရှိ DevOps Engineer များကို သင်လိုအပ်သော အချိန်တွင် ရယူနိုင်ပါသည်။"),
                     color: "blue",
                   },
                   {
                     icon: Scale,
-                    title: "Cost-Effective",
-                    desc: "Only pay for the support you need, avoiding full-time salary expenses.",
+                    title: t("Cost-Effective", "Cost-Effective"),
+                    desc: t("Only pay for the support you need, avoiding full-time salary expenses.", "လစာအပြည့်ပေးရန်မလိုဘဲ လိုအပ်သော ဝန်ဆောင်မှုအတွက်သာ ပေးချေရသဖြင့် ပိုမိုသက်သာပါသည်။"),
                     color: "green",
                   },
                   {
                     icon: RefreshCw,
-                    title: "Flexible Engagement",
-                    desc: "Customize support hours and project scopes to your specific needs.",
+                    title: t("Flexible Engagement", "Flexible Engagement"),
+                    desc: t("Customize support hours and project scopes to your specific needs.", "အလုပ်လုပ်မည့် နာရီနှင့် ပမာဏကို သင့်စိတ်ကြိုက် သတ်မှတ်နိုင်ပါသည်။"),
                     color: "orange",
                   },
                   {
                     icon: BookOpen,
-                    title: "Strategic Guidance",
-                    desc: "Receive expert advice to improve your DevOps maturity and cloud strategy.",
+                    title: t("Strategic Guidance", "Strategic Guidance"),
+                    desc: t("Receive expert advice to improve your DevOps maturity and cloud strategy.", "သင့်လုပ်ငန်း၏ Cloud နှင့် DevOps စနစ်များ ပိုမိုကောင်းမွန်လာစေရန် မှန်ကန်တဲ့ အကြံပေးမှုများကို ပြုလုပ်ပေးပါမည်။"),
                     color: "purple",
                   },
                 ].map((item, index) => (
@@ -300,10 +313,10 @@ export default function PartTimeDevOpsSupportPage() {
               </div>
               <div>
                 <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  Why Choose Part-Time DevOps Support?
+                  {t("Why Choose Part-Time DevOps Support?", "Why Choose Part-Time DevOps Support?")}
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  Save costs and boost efficiency with expert, flexible support
+                  {t("Save costs and boost efficiency with expert, flexible support", "Save costs and boost efficiency with expert, flexible support")}
                 </p>
               </div>
             </div>
@@ -316,7 +329,7 @@ export default function PartTimeDevOpsSupportPage() {
                   <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg md:rounded-xl">
                     <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
                   </div>
-                  Business Benefits
+                  {t("Business Benefits", "လုပ်ငန်းဆိုင်ရာ အကျိုးကျေးဇူးများ")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -324,26 +337,26 @@ export default function PartTimeDevOpsSupportPage() {
                   {[
                     {
                       icon: Scale,
-                      title: "Cost Savings",
-                      desc: "Lower operational expenses compared to hiring full-time DevOps staff.",
+                      title: t("Cost Savings", "ကုန်ကျစရိတ် သက်သာခြင်း"),
+                      desc: t("Lower operational expenses compared to hiring full-time DevOps staff.", "Full-time ဝန်ထမ်းခန့်ခြင်းထက် လုပ်ငန်းလည်ပတ်မှု ကုန်ကျစရိတ်ကို သိသိသာသာ လျှော့ချနိုင်ပါသည်။"),
                       color: "green",
                     },
                     {
                       icon: Target,
-                      title: "Focus on Core Business",
-                      desc: "Let your internal teams focus on product development while we handle DevOps.",
+                      title: t("Focus on Core Business", "အဓိကလုပ်ငန်းအပေါ် အာရုံစိုက်နိုင်ခြင်း"),
+                      desc: t("Let your internal teams focus on product development while we handle DevOps.", "DevOps အပိုင်းကို ကျွန်ုပ်တို့ကို လွှဲထားပြီး သင့်ဝန်ထမ်းများက Product Development အပေါ် ပိုမိုအာရုံစိုက်နိုင်ပါသည်။"),
                       color: "blue",
                     },
                     {
                       icon: Zap,
-                      title: "Increased Agility",
-                      desc: "Adapt quickly to changing project demands with on-demand support.",
+                      title: t("Increased Agility", "မြန်ဆန်သွက်လက်လာခြင်း"),
+                      desc: t("Adapt quickly to changing project demands with on-demand support.", "လိုအပ်ချက်အပြောင်းအလဲများကို အချိန်နှင့်တပြေးညီ လိုက်လျောညီထွေ ဆောင်ရွက်နိုင်ပါသည်။"),
                       color: "orange",
                     },
                     {
                       icon: ShieldCheck,
-                      title: "Reduced Overhead",
-                      desc: "Avoid recruitment, onboarding, and benefits costs of permanent hires.",
+                      title: t("Reduced Overhead", "အလုပ်ရှုပ်သက်သာခြင်း"),
+                      desc: t("Avoid recruitment, onboarding, and benefits costs of permanent hires.", "ဝန်ထမ်းရှာဖွေခြင်း၊ လေ့ကျင့်ပေးခြင်းနှင့် အခြားဝန်ထမ်းစရိတ်များကို သက်သာစေပါသည်။"),
                       color: "purple",
                     },
                   ].map((item, index) => (
@@ -378,7 +391,7 @@ export default function PartTimeDevOpsSupportPage() {
                   <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
                     <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  Technical Benefits
+                  {t("Technical Benefits", "နည်းပညာဆိုင်ရာ အကျိုးကျေးဇူးများ")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -386,26 +399,26 @@ export default function PartTimeDevOpsSupportPage() {
                   {[
                     {
                       icon: Lightbulb,
-                      title: "Access to Top Talent",
-                      desc: "Work with highly skilled professionals who stay current on industry trends.",
+                      title: t("Access to Top Talent", "ထိပ်တန်းကျွမ်းကျင်သူများ၏ အကြံဉာဏ်"),
+                      desc: t("Work with highly skilled professionals who stay current on industry trends.", "ခေတ်မီနည်းပညာများကို အမြဲလေ့လာနေသော ကျွမ်းကျင်ပညာရှင်များနှင့် လက်တွဲလုပ်ဆောင်ခွင့် ရမည်။"),
                       color: "blue",
                     },
                     {
                       icon: BellRing,
-                      title: "Proactive Problem Solving",
-                      desc: "Prevent costly outages with proactive monitoring and issue resolution.",
+                      title: t("Proactive Problem Solving", "ပြဿနာများကို ကြိုတင်ကာကွယ်ခြင်း"),
+                      desc: t("Prevent costly outages with proactive monitoring and issue resolution.", "စနစ်ပြတ်တောက်မှုများ မဖြစ်အောင် ကြိုတင်စောင့်ကြည့်ပြီး ဖြေရှင်းပေးပါသည်။"),
                       color: "teal",
                     },
                     {
                       icon: Workflow,
-                      title: "Best Practices",
-                      desc: "Implement industry-standard DevOps practices and tools.",
+                      title: t("Best Practices", "နိုင်ငံတကာစံနှုန်းများ"),
+                      desc: t("Implement industry-standard DevOps practices and tools.", "အဆင့်မြင့် DevOps စံနှုန်းများနှင့် Tool များကို သင့်လုပ်ငန်းတွင် အကောင်အထည်ဖော်ပေးပါသည်။"),
                       color: "green",
                     },
                     {
                       icon: RefreshCw,
-                      title: "Continuous Improvement",
-                      desc: "Ongoing optimization of your infrastructure and processes.",
+                      title: t("Continuous Improvement", "အမြဲမပြတ် တိုးတက်မှု"),
+                      desc: t("Ongoing optimization of your infrastructure and processes.", "သင့်လုပ်ငန်း၏ နည်းပညာစနစ်များကို အမြဲမပြတ် အဆင့်မြှင့်တင်ပေးပါသည်။"),
                       color: "orange",
                     },
                   ].map((item, index) => (
@@ -440,10 +453,10 @@ export default function PartTimeDevOpsSupportPage() {
         <section className="mb-16 md:mb-20">
           <div className="text-left mb-8 md:mb-12">
             <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white mb-3 md:mb-4">
-              Comprehensive DevOps Services
+              {t("Comprehensive DevOps Services", "Comprehensive DevOps Services")}
             </h2>
             <p className="text-lg md:text-xl text-black dark:text-gray-300 max-w-2xl">
-              End-to-end support across your entire DevOps lifecycle
+              {t("End-to-end support across your entire DevOps lifecycle", "End-to-end support across your entire DevOps lifecycle")}
             </p>
           </div>
 
@@ -453,10 +466,10 @@ export default function PartTimeDevOpsSupportPage() {
                 <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg md:rounded-xl">
                   <Workflow className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                Key Services Offered
+                {t("Key Services Offered", "Key Services Offered")}
               </CardTitle>
               <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
-                Everything you need to optimize your DevOps operations
+                {t("Everything you need to optimize your DevOps operations", "Everything you need to optimize your DevOps operations")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -465,37 +478,37 @@ export default function PartTimeDevOpsSupportPage() {
                   {
                     icon: Zap,
                     title: "CI/CD Pipeline Optimization",
-                    desc: "Streamline and automate build, test, and deployment workflows for faster releases.",
+                    desc: t("Streamline and automate build, test, and deployment workflows for faster releases.", "build, test, deploy အဆင့်တိုင်းကို ပိုမိုမြန်ဆန်အောင် အလိုအလျောက်စနစ်ဖြင့် တည်ဆောက်ခြင်း။"),
                     color: "blue",
                   },
                   {
                     icon: Code,
                     title: "Infrastructure Automation",
-                    desc: "Implement Infrastructure as Code using tools like Terraform, Ansible, or Pulumi.",
+                    desc: t("Implement Infrastructure as Code using tools like Terraform, Ansible, or Pulumi.", "Terraform နှင့် Ansible စသည့် Tool များဖြင့် Infrastructure ကို Code အဖြစ် အလိုအလျောက် စီမံခြင်း။"),
                     color: "green",
                   },
                   {
                     icon: Scale,
                     title: "Cloud Cost Optimization",
-                    desc: "Analyze and reduce your AWS, Azure, or GCP cloud spending to save money.",
+                    desc: t("Analyze and reduce your AWS, Azure, or GCP cloud spending to save money.", "သင့်လုပ်ငန်း၏ Cloud ကုန်ကျစရိတ်များကို သေချာတွက်ချက်ပြီး လျှော့ချပေးခြင်း။"),
                     color: "purple",
                   },
                   {
                     icon: Activity,
                     title: "Monitoring & Alerting",
-                    desc: "Deploy monitoring solutions and configure alerts for proactive management.",
+                    desc: t("Deploy monitoring solutions and configure alerts for proactive management.", "အမြဲစောင့်ကြည့်ပြီး ပြဿနာရှိပါက ချက်ချင်းသတင်းပို့ပေးမည့် စနစ်များ ထည့်သွင်းခြင်း။"),
                     color: "orange",
                   },
                   {
                     icon: Dock,
                     title: "Kubernetes Management",
-                    desc: "Assist with deployment, scaling, and troubleshooting of Kubernetes clusters.",
+                    desc: t("Assist with deployment, scaling, and troubleshooting of Kubernetes clusters.", "Kubernetes Cluster များကို စနစ်တကျ ပြင်ဆင်ခြင်းနှင့် စီမံခန့်ခွဲပေးခြင်း။"),
                     color: "teal",
                   },
                   {
                     icon: Database,
                     title: "Database & Storage Support",
-                    desc: "Manage cloud databases, backups, and storage for performance and reliability.",
+                    desc: t("Manage cloud databases, backups, and storage for performance and reliability.", "Database များနှင့် Backups များကို ယုံကြည်စိတ်ချရစေရန် စီမံခန့်ခွဲပေးခြင်း။"),
                     color: "red",
                   },
                 ].map((item, index) => (
@@ -532,10 +545,10 @@ export default function PartTimeDevOpsSupportPage() {
               </div>
               <div>
                 <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  How It Works
+                  {t("How It Works", "How It Works")}
                 </h2>
                 <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  Simple 4-step process to get expert DevOps support
+                  {t("Simple 4-step process to get expert DevOps support", "Simple 4-step process to get expert DevOps support")}
                 </p>
               </div>
             </div>
@@ -547,7 +560,7 @@ export default function PartTimeDevOpsSupportPage() {
                 <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
                   <Handshake className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                Simple Engagement Process
+                {t("Simple Engagement Process", "Simple Engagement Process")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -555,29 +568,29 @@ export default function PartTimeDevOpsSupportPage() {
                 {[
                   {
                     step: "1",
-                    title: "Initial Consultation",
-                    desc: "Discuss your current challenges, project goals, and desired outcomes.",
+                    title: t("Initial Consultation", "ပထမဆုံး ဆွေးနွေးခြင်း"),
+                    desc: t("Discuss your current challenges, project goals, and desired outcomes.", "သင့်လုပ်ငန်း၏ အခက်အခဲများနှင့် ရည်မှန်းချက်များကို ဆွေးနွေးခြင်း။"),
                     icon: Users,
                     color: "blue",
                   },
                   {
                     step: "2",
-                    title: "Scope Definition",
-                    desc: "Work together to define the project scope, deliverables, and timeline.",
+                    title: t("Scope Definition", "အလုပ်ပမာဏ သတ်မှတ်ခြင်း"),
+                    desc: t("Work together to define the project scope, deliverables, and timeline.", "ဆောင်ရွက်မည့် အပိုင်းများနှင့် ကြာချိန်ကို သတ်မှတ်ခြင်း။"),
                     icon: BookOpen,
                     color: "green",
                   },
                   {
                     step: "3",
-                    title: "Execution & Reporting",
-                    desc: "Our experts perform the work, providing regular progress updates and detailed reports.",
+                    title: t("Execution & Reporting", "ဆောင်ရွက်ခြင်း"),
+                    desc: t("Our experts perform the work, providing regular progress updates and detailed reports.", "အလုပ်များကို ဆောင်ရွက်ပြီး ပုံမှန် reports များ တင်ပြခြင်း။"),
                     icon: Code,
                     color: "purple",
                   },
                   {
                     step: "4",
-                    title: "Ongoing Support",
-                    desc: "Continuous assistance, maintenance, and optimization as your needs evolve.",
+                    title: t("Ongoing Support", "အမြဲတမ်း အကူအညီပေးခြင်း"),
+                    desc: t("Continuous assistance, maintenance, and optimization as your needs evolve.", "လိုအပ်ချက်နှင့်အညီ ဆက်လက် ပြုပြင်ထိန်းသိမ်းပေးခြင်း။"),
                     icon: RefreshCw,
                     color: "orange",
                   },
@@ -612,11 +625,13 @@ export default function PartTimeDevOpsSupportPage() {
             <CardContent className="p-6 md:p-12 text-center text-white">
               <div className="max-w-3xl mx-auto">
                 <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
-                  Ready to Enhance Your DevOps Capability?
+                  {t("Ready to Enhance Your DevOps Capability?", "Ready to Enhance Your DevOps Capability?")}
                 </h2>
                 <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-6 md:mb-8 leading-relaxed">
-                  Contact us today for a personalized consultation and a
-                  flexible support plan tailored to your business needs.
+                  {t(
+                    "Contact us today for a personalized consultation and a flexible support plan tailored to your business needs.",
+                    "သင့်လုပ်ငန်းလိုအပ်ချက်နှင့် အကိုက်ညီဆုံး ဝန်ဆောင်မှုကို ရယူနိုင်ရန် ဒီနေ့ပဲ ကျွန်ုပ်တို့နှင့် ဆွေးနွေးတိုင်ပင်လိုက်ပါ။"
+                  )}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
@@ -626,7 +641,7 @@ export default function PartTimeDevOpsSupportPage() {
                     className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                   >
                     <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                    Start Free Consultation
+                    {t("Start Free Consultation", "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန်")}
                   </Button>
                   <Button
                     variant="outline"
@@ -634,7 +649,7 @@ export default function PartTimeDevOpsSupportPage() {
                     onClick={handleCaseStudiesClick}
                     className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold transition-all duration-300 w-full sm:w-auto"
                   >
-                    View Case Studies
+                    {t("View Case Studies", "မှတ်တမ်းများ ကြည့်ရန်")}
                   </Button>
                 </div>
 
@@ -642,18 +657,18 @@ export default function PartTimeDevOpsSupportPage() {
                   {[
                     {
                       icon: CheckCircle2,
-                      label: "Flexible Plans",
-                      desc: "Tailored to your needs",
+                      label: t("Flexible Plans", "Flexible ဖြစ်တဲ့ အစီအစဉ်များ"),
+                      desc: t("Tailored to your needs", "လိုအပ်ချက်နှင့်အညီ"),
                     },
                     {
                       icon: ShieldCheck,
-                      label: "Expert Team",
-                      desc: "Senior DevOps professionals",
+                      label: t("Expert Team", "ကျွမ်းကျင်သော devops များ"),
+                      desc: t("Senior DevOps professionals", "စီနီယာ ပညာရှင်များ"),
                     },
                     {
                       icon: Zap,
-                      label: "Rapid Start",
-                      desc: "Get started in days",
+                      label: t("Rapid Start", "ချက်ချင်း စတင်နိုင်မှု"),
+                      desc: t("Get started in days", "ရက်ပိုင်းအတွင်း စတင်နိုင်ခြင်း"),
                     },
                   ].map((item, index) => (
                     <div key={index} className="flex flex-col items-center">

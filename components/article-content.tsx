@@ -621,22 +621,14 @@ export function ArticleContent({
                 // Use separate component for inline code
                 code: InlineCode,
 
-                // Block code component
                 pre: ({ children, ...props }: any) => {
                   const child = React.Children.only(children) as any;
                   const codeProps = child?.props || {};
                   const className = codeProps.className || "";
                   const childrenContent = codeProps.children || "";
 
-                  // Handle the case where there's no language specified or it's just backticks
                   const match = /language-(\w+)/.exec(className || "");
                   let language = match?.[1]?.toLowerCase() || "";
-
-                  // If className exists but doesn't match language-*, it might be something else
-                  if (className && !match) {
-                    // It could be just "```" without language
-                    language = "";
-                  }
 
                   const extractCodeString = (children: any): string => {
                     if (typeof children === "string") return children;
@@ -656,18 +648,6 @@ export function ArticleContent({
                     ""
                   );
                   const lines = codeString.split("\n");
-
-                  // Check if it's a shell-like language
-                  const isShellLike = ["bash", "shell", "sh", "zsh"].includes(
-                    language
-                  );
-                  const startsWithDollar =
-                    isShellLike && lines[0]?.trim().match(/^(\$|#|>)/);
-                  const promptChar =
-                    lines[0]?.trim().match(/^(\$|#|>)/)?.[1] || "$";
-
-                  // Show copy button for all code blocks, even without language
-                  const showCopyButton = true; // Always show copy button for code blocks
 
                   const getLanguageName = (lang: string): string => {
                     if (!lang || lang.trim() === "") return "Code";
@@ -714,52 +694,53 @@ export function ArticleContent({
                   };
 
                   return (
-                    <div className="relative mb-8 bg-gradient-to-br from-sky-50 dark:from-gray-800 rounded-xl to-white dark:to-gray-900 text-gray-700 dark:text-gray-300 font-mono text-sm shadow-lg border border-sky-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                      {/* Language header - show even if no language (shows "Code") */}
-                      <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-700 dark:to-blue-700 text-white px-4 py-2 text-xs font-semibold flex justify-between items-center">
-                        <span>{getLanguageName(language)}</span>
-                        <span className="text-sky-200 dark:text-sky-300 text-xs font-normal">
+                    <div className="relative my-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
+                      {/* Language header - cleaner design */}
+                      <div className="flex items-center justify-between bg-gray-900 text-gray-300 px-4 py-2.5 border-b border-gray-800">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+                          <span className="text-xs font-medium tracking-wide">
+                            {getLanguageName(language)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-500 font-medium">
                           {lines.length} line{lines.length !== 1 ? "s" : ""}
                         </span>
                       </div>
 
-                      {showCopyButton && <CopyButton code={codeString} />}
-                      <pre className={`p-6 overflow-x-auto rounded-2xl pt-12`}>
-                        <code className="font-mono text-sm block">
-                          {lines.map((line, idx) => {
-                            // Only show prompt for shell-like languages with proper syntax
-                            const hasPrompt =
-                              idx === 0 && startsWithDollar && isShellLike;
-                            const isEmptyLine = line.trim() === "";
-
-                            return (
-                              <div
-                                key={idx}
-                                className={`hover:bg-sky-50 dark:hover:bg-gray-700/50 rounded-lg px-2 -mx-2 transition-colors ${
-                                  isEmptyLine ? "min-h-[1.2em]" : ""
-                                }`}
-                              >
-                                {hasPrompt && (
-                                  <span className="text-sky-600 dark:text-sky-400 font-bold select-none mr-2">
-                                    {promptChar}
-                                  </span>
-                                )}
-                                <span
-                                  className={
-                                    isEmptyLine
-                                      ? "inline-block min-w-[1px]"
-                                      : ""
-                                  }
+                      {/* Code block */}
+                      <div className="relative">
+                        <pre
+                          className={`p-6 overflow-x-auto bg-gray-950 text-gray-100 text-sm font-mono leading-relaxed`}
+                        >
+                          <code className="block">
+                            {lines.map((line, idx) => {
+                              const isEmptyLine = line.trim() === "";
+                              return (
+                                <div
+                                  key={idx}
+                                  className={`group flex hover:bg-gray-800/30 transition-colors ${
+                                    isEmptyLine ? "min-h-[1.2em]" : ""
+                                  }`}
                                 >
-                                  {hasPrompt
-                                    ? line.slice(promptChar.length).trimStart()
-                                    : line}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </code>
-                      </pre>
+                                  <span className="text-gray-500 text-xs w-8 text-right pr-3 select-none border-r border-gray-800 mr-4">
+                                    {idx + 1}
+                                  </span>
+                                  <span
+                                    className={
+                                      isEmptyLine
+                                        ? "inline-block min-w-[1px]"
+                                        : ""
+                                    }
+                                  >
+                                    {line || " "}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </code>
+                        </pre>
+                      </div>
                     </div>
                   );
                 },
@@ -1029,7 +1010,7 @@ export function ArticleContent({
         </article>
 
         {/* Sidebar inside the grid column */}
-        <aside 
+        <aside
           className="hidden lg:block lg:col-span-1"
           style={{
             position: "sticky",
@@ -1178,7 +1159,9 @@ export function ArticleContent({
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border border-white dark:border-gray-800 shadow-sm">
                                   <img
-                                    src={itemAuthor?.avatar || "/placeholder.svg"}
+                                    src={
+                                      itemAuthor?.avatar || "/placeholder.svg"
+                                    }
                                     alt={itemAuthor?.name}
                                     className="w-full h-full object-cover"
                                   />
@@ -1211,7 +1194,8 @@ export function ArticleContent({
                 <div className="space-y-3">
                   {authors
                     .sort(
-                      (a, b) => (b.articles_count || 0) - (a.articles_count || 0)
+                      (a, b) =>
+                        (b.articles_count || 0) - (a.articles_count || 0)
                     )
                     .slice(0, 3)
                     .map((author, index) => (

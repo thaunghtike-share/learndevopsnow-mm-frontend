@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { notFound } from "next/navigation";
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
 
@@ -13,7 +15,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// FIXED: Use absolute URLs for OG image
 const SITE_URL = 'https://www.learndevopsnow-mm.blog';
 
 export const metadata: Metadata = {
@@ -91,13 +92,43 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+  params: Promise<{
+    locale: string;
+  }>;
+}
+
+const locales = ["en", "my"];
+
+export async function generateStaticParams() {
+  return locales.map((locale) => ({
+    locale,
+  }));
+}
+
+export default async function RootLayout({
+  children,
+  params
+}: RootLayoutProps) {
+  const { locale } = await params;
+  
+  if (!locales.includes(locale)) {
+    notFound();
+  }
+
+  // FIXED: From app/[locale]/layout.tsx, go up 2 levels to messages folder
+  let messages;
+  try {
+    messages = (await import(`../../messages/${locale}.json`)).default;
+  } catch (error) {
+    console.error(`Failed to load messages for locale: ${locale}`, error);
+    // Fallback to English if messages file not found
+    messages = (await import(`../../messages/en.json`)).default;
+  }
+
   return (
-    <html lang="en" className="h-full">
+    <html lang={locale} className="h-full">
       <head>
         {/* Preload critical resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -135,7 +166,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}>
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
         <GoogleAnalytics gaId="G-1XGYJMR2B7" />
       </body>
     </html>

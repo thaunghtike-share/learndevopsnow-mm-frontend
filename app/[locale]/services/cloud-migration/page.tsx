@@ -1,0 +1,893 @@
+"use client";
+
+import Image from "next/image";
+import { MinimalHeader } from "@/components/minimal-header";
+import { MinimalFooter } from "@/components/minimal-footer";
+import {
+  Dock,
+  ShieldCheck,
+  Cloud,
+  Server,
+  Activity,
+  ExternalLink,
+  Code,
+  FileText,
+  Zap,
+  Lock,
+  Layers,
+  Sparkles,
+  Database,
+  Rocket,
+  ArrowRight,
+  CheckCircle2,
+  Star,
+  GitBranch,
+  RefreshCw,
+  BellRing,
+  MessageSquare,
+  Cpu,
+  MemoryStick,
+  LayoutDashboard,
+  Terminal,
+  Scale,
+  Scan,
+  Users,
+  BookOpen,
+  GitCompare,
+  Container,
+  Workflow,
+  Play,
+  ShieldAlert,
+  Key,
+  Search,
+  Eye,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+export default function MonolithicToCloudNativePage() {
+  // Get current locale from URL params
+  const params = useParams();
+  const currentLocale = params.locale as "en" | "my" || "en";
+  
+  const [mounted, setMounted] = useState(false);
+
+  // Fix Hydration Error: Ensure component only renders after mounting on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Translation function - Humanized Myanmar Text
+  const t = (enText: string, myText: string) => {
+    return currentLocale === "en" ? enText : myText;
+  };
+
+  const features = [
+    {
+      icon: Workflow,
+      title: "End-to-End DevOps",
+      description: t("Complete automation from code to production", "Code စတင်ရေးချိန်မှစပြီး Production အဆင့်အထိ automation စနစ်ဖြင့် ချိတ်ဆက်ဆောင်ရွက်ပေးခြင်း"),
+    },
+    {
+      icon: ShieldCheck,
+      title: "Enterprise Security",
+      description: t("Built-in security at every layer", "Infrastructure အလွှာတိုင်းတွင် စိတ်ချရသော လုပ်ငန်းသုံးအဆင့် လုံခြုံရေးစနစ်များ ထည့်သွင်းတည်ဆောက်ခြင်း"),
+    },
+    {
+      icon: Scale,
+      title: "Auto Scaling",
+      description: t("Intelligent resource optimization", "user အသုံးပြုမှုအပေါ် မူတည်ပြီး application များကို အလိုအလျောက် စီမံခန့်ခွဲပေးခြင်း"),
+    },
+    {
+      icon: Zap,
+      title: "High Performance",
+      description: t("10x faster deployment cycles", "Deployment Lifecycle ကို ၁၀ ဆ ပိုမိုမြန်ဆန်သွက်လက်စေခြင်း"),
+    },
+  ];
+
+  const stats = [
+    { value: "99.9%", label: t("Uptime SLA", "application အသုံးပြုနိုင်မှု"), icon: CheckCircle2 },
+    { value: "50%", label: t("Cost Reduction", "ကုန်ကျစရိတ် လျှော့ချနိုင်မှု"), icon: ArrowRight },
+    { value: "10x", label: t("Faster Deployments", "Deployment ပိုမိုမြန်ဆန်မှု"), icon: Zap },
+    { value: "24/7", label: t("Monitoring", "အချိန်နှင့်တပြေးညီ စောင့်ကြည့်ပေးခြင်း"), icon: Activity },
+  ];
+
+  const handleEmailClick = () => {
+    const subject = t(
+      "Free Consultation - Cloud Native Transformation",
+      "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန် - Cloud Native ပြောင်းလဲမှု"
+    );
+    const body = t(
+      "Hi, I'm interested in learning more about your cloud native transformation services.",
+      "မင်္ဂလာပါ၊ Cloud Native ပြောင်းလဲမှု ဝန်ဆောင်မှုများအကြောင်း အသေးစိတ် သိရှိလိုပါသည်။"
+    );
+    window.location.href = `mailto:thaunghtikeoo.tho1234@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleCaseStudiesClick = () => {
+    window.open("https://github.com/thaunghtike-share/DevOps-Projects", "_blank");
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white/95 dark:bg-[#000000] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative transition-colors duration-300">
+      {/* Messenger Button */}
+      <a
+        href="https://m.me/learndevopsnowbytho"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t("Messenger Support", "Messenger အကူအညီ")}
+        className="hidden md:flex fixed top-[70%] right-4 z-50 group"
+      >
+        <div className="flex items-center gap-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-3 cursor-pointer transition-all duration-400 hover:scale-105 hover:shadow-xl">
+          <div className="relative w-8 h-8">
+            <div className="absolute inset-0 bg-purple-500 rounded-full animate-ping opacity-20"></div>
+            <div className="relative w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <span className="text-sm font-medium text-black dark:text-white">
+            {t("Chat Now", "စကားပြောရန်")}
+          </span>
+        </div>
+      </a>
+
+      <MinimalHeader />
+
+      <main className="px-4 md:px-11 md:py-8">
+        {/* Hero Section */}
+        <section className="mb-16 md:mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
+
+            <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
+                From Monolithic to
+              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                Cloud Native
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-8 md:mb-12 leading-relaxed max-w-3xl text-left">
+              {t(
+                "Transform your legacy applications into scalable, resilient cloud-native systems with our complete DevOps automation platform.",
+                "ကျွန်ုပ်တို့၏ DevOps Automation Platform ကိုအသုံးပြုပြီး Monolithic Application များကို ခေတ်မီပြီး အလိုအလျောက် စီမံခန့်ခွဲနိုင်သော Cloud-Native စနစ်အဖြစ် အောင်မြင်စွာ ပြောင်းလဲလိုက်ပါ။"
+              )}
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-left group p-4 md:p-0"
+                >
+                  <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 mb-3 md:mb-4 group-hover:scale-105 md:group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className="w-6 h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="font-semibold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-black dark:text-gray-300 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-start items-start">
+              <Button
+                onClick={handleEmailClick}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+              >
+                <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                {t("Get Free Consultation", "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန်")}
+              </Button>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="mb-16 md:mb-20">
+          <div className="grid grid-cols-2 gap-4 md:gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center p-4 md:p-8 bg-white dark:bg-gray-800 rounded-xl md:rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4">
+                  <stat.icon className="w-5 h-5 md:w-8 md:h-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="text-xl md:text-3xl font-bold text-black dark:text-white mb-1 md:mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-sm md:text-base text-black dark:text-gray-300 font-medium">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Architecture Section */}
+        <section className="mb-16 md:mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
+
+            <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
+                Infrastructure Design
+              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+                For Our Client
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "Our proven architecture handles everything from infrastructure to monitoring",
+                "Infrastructure စဥ်းစားချိန်မှ စပြီး Monitoring အဆင့် အထိ အရာအားလုံးကို စနစ်တကျ ထည့်သွင်းစဥ်းစားထားသည့် ဥပမာ infrastructure ပုံစံ ဖြစ်ပါသည်။"
+              )}
+            </p>
+          </motion.div>
+
+          <Card className="mb-6 md:mb-8 border-0 shadow-xl md:shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden">
+            <CardContent className="p-0">
+              <div className="h-[250px] md:h-[700px] w-full relative bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-50 dark:to-blue-50">
+                <Image
+                  src="/dinger.png"
+                  alt="DevOps Architecture"
+                  fill
+                  className="object-contain p-4 md:p-8"
+                  quality={100}
+                  priority
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl mb-6 md:mb-8">
+            <CardHeader className="pb-4 md:pb-6">
+              <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
+                  <Zap className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                {t("Understanding the Architecture", "Understanding the Architecture")}
+              </CardTitle>
+              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                {t("A detailed breakdown of our cloud-native solution", "ကျွန်ုပ်တို့၏ Cloud Native ပုံစံကို အသေးစိတ် ရှင်းလင်းချက်")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 md:space-y-6">
+              <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg">
+                {t(
+                  "The diagram above illustrates the end-to-end DevOps architecture we implement for our clients, ensuring a robust, scalable, and secure cloud-native environment.",
+                  "အထက်ပါပုံသည် ကျွန်ုပ်တို့၏ client တစ်ဦးအတွက် တည်ဆောက်ပေးသော DevOps Architecture ကို ပြသထားခြင်းဖြစ်ပြီး လုံခြုံ စိတ်ချရတဲ့ environment တစ်ခုဖြစ်ကြောင်း အာမခံပါသည်။"
+                )}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {[
+                  {
+                    icon: GitBranch,
+                    title: "Source Control (GitHub)",
+                    desc: t(
+                      "All application code, infrastructure as code (Terraform), and Kubernetes manifests stored in GitHub repositories.",
+                      "application code များနှင့် infrastructure setting များကို GitHub တွင် ဗားရှင်းအလိုက် စနစ်တကျ ထိန်းသိမ်းပါသည်။"
+                    ),
+                    color: "blue",
+                  },
+                  {
+                    icon: Code,
+                    title: "Infrastructure as Code",
+                    desc: t(
+                      "Terraform for declarative cloud infrastructure provisioning across Azure, AWS, GCP.",
+                      "Cloud ပေါ်တွင် resource အရင်းအမြစ် များကို Terraform ဖြင့် အလိုအလျောက် တည်ဆောက်ပါသည်။"
+                    ),
+                    color: "green",
+                  },
+                  {
+                    icon: Zap,
+                    title: "CI/CD Pipeline",
+                    desc: t(
+                      "GitHub Actions for automated build, test, and deployment workflows.",
+                      "Application တွေအတွက် Build လုပ်ခြင်း နှင့် Deployment အဆင့်များကို GitHub Actions ဖြင့် အလိုအလျောက် လုပ်ဆောင်ပါသည်။"
+                    ),
+                    color: "orange",
+                  },
+                  {
+                    icon: Dock,
+                    title: "Containerization",
+                    desc: t(
+                      "Docker for consistent application packaging and deployment.",
+                      "Application များကို မည်သည့် platform တွင်မဆို အလုပ်လုပ်နိုင်ရန် Docker ကိုသုံးပါသည်။"
+                    ),
+                    color: "purple",
+                  },
+                  {
+                    icon: Server,
+                    title: "Kubernetes Orchestration",
+                    desc: t(
+                      "AKS/EKS/GKE for managed Kubernetes with auto-scaling.",
+                      "Kubernetes Cluster များကိုအသုံးပြုပြီး security, scaling နှင့် application deployment များကို စနစ်တကျ စီမံခန့်ခွဲပါသည်။"
+                    ),
+                    color: "teal",
+                  },
+                  {
+                    icon: Layers,
+                    title: "GitOps (ArgoCD)",
+                    desc: t(
+                      "Declarative deployments with automated synchronization.",
+                      "Git ထဲရှိ version အလိုက် ပြောင်းလဲမှုများကို Kubernetes Cluster တွေဆီသို့ အလိုအလျောက် ချိတ်ဆက်ပေးပါသည်။"
+                    ),
+                    color: "indigo",
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300 group"
+                  >
+                    <div
+                      className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl flex-shrink-0 group-hover:scale-105 md:group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <item.icon
+                        className={`w-5 h-5 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                        {item.title}
+                      </h4>
+                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Step 1: Terraform Infrastructure */}
+        <section className="mb-16 md:mb-20">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                1
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
+                  Infrastructure as Code
+                </h2>
+                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
+                  {t("Automated cloud infrastructure provisioning", "Cloud Infrastructure များကို အလိုအလျောက် တည်ဆောက်ခြင်း")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6 md:space-y-8">
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
+              <CardHeader className="pb-4 md:pb-6">
+                <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                  <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  {t("Why Choose Terraform?", "Terraform ကို ဘာကြောင့် ရွေးချယ်သင့်သလဲ?")}
+                </CardTitle>
+                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                  {t("The industry standard for Infrastructure as Code", "ခေတ်မီ Infrastructure များအတွက် ကမ္ဘာ့အဆင့်မီ စံသတ်မှတ်ချက်")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  {[
+                    {
+                      icon: Code,
+                      title: "Infrastructure as Code",
+                      desc: t(
+                        "Version-controlled, repeatable infrastructure deployments with GitOps workflows.",
+                        "Infrastructure ပြောင်းလဲမှုများကို Code အဖြစ် ရေးသားပြီး အချိန်မရွေး တိကျစွာ ပြန်လည်အသုံးပြုနိုင်ပါသည်။"
+                      ),
+                      color: "green",
+                    },
+                    {
+                      icon: Cloud,
+                      title: "Multi-Cloud Excellence",
+                      desc: t(
+                        "Deploy seamlessly across Azure, AWS, GCP with consistent workflows.",
+                        "Azure, AWS, GCP စသည့် Cloud platform များပေါ်တွင် တစ်ပုံစံတည်း ချောမွေ့စွာ အသုံးပြုနိုင်ပါသည်။"
+                      ),
+                      color: "blue",
+                    },
+                    {
+                      icon: ShieldCheck,
+                      title: "State Management",
+                      desc: t(
+                        "Advanced state management for team collaboration.",
+                        "အဖွဲ့အလိုက် ဆောင်ရွက်မှုအတွက် အဆင့်မြင့် State Management စနစ် ပါဝင်ခြင်း။"
+                      ),
+                      color: "orange",
+                    },
+                    {
+                      icon: Zap,
+                      title: "Cost Optimization",
+                      desc: t(
+                        "Right-size resources and implement auto-scaling.",
+                        "resource အရင်းအမြစ်များကို လိုအပ်သလောက်သာ အသုံးပြုပြီး ကုန်ကျစရိတ်ကို အကောင်းဆုံး ထိန်းညှိခြင်း။"
+                      ),
+                      color: "purple",
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+                    >
+                      <div
+                        className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl flex-shrink-0`}
+                      >
+                        <item.icon
+                          className={`w-5 h-5 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`}
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                          {item.title}
+                        </h4>
+                        <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
+              <CardHeader className="pb-4 md:pb-6">
+                <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                  <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg md:rounded-xl">
+                    <Code className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  Production Terraform Modules
+                </CardTitle>
+                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                  {t("Enterprise-grade infrastructure modules", "လုပ်ငန်းသုံး အဆင့် Infrastructure Modules များ")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 md:space-y-6">
+                <div className="group p-4 md:p-6 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-xl md:rounded-2xl border border-blue-200 dark:border-blue-700 hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="p-2 md:p-3 bg-blue-500 rounded-lg md:rounded-xl shadow-lg">
+                        <Cloud className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2">
+                          Azure Infrastructure Module
+                        </h4>
+                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
+                          {t(
+                            "Complete Azure setup with AKS, ACR, VNet, and monitoring. Production-ready with security best practices.",
+                            "AKS, ACR, VNet နှင့် Monitoring များပါဝင်သည့် ပြီးပြည့်စုံသော Azure Setup ဖြစ်ပါသည်။ Security အဆင့်မြင့်ဆုံး စနစ်များဖြင့် တည်ဆောက်ထားပါသည်။"
+                          )}
+                        </p>
+                        <div className="flex flex-wrap gap-1 md:gap-2">
+                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">AKS</Badge>
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">ACR</Badge>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">VNet</Badge>
+                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">{t("Monitoring", "စောင့်ကြည့်ခြင်း")}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl font-semibold transition-all duration-300 hover:scale-105 mt-3 lg:mt-0 w-full lg:w-auto"
+                      onClick={() => window.open("https://github.com/thaunghtike-share/terraform-azure", "_blank")}
+                    >
+                      <ExternalLink className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                      View Module
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="group p-4 md:p-6 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl md:rounded-2xl border border-orange-200 dark:border-orange-700 hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="p-2 md:p-3 bg-orange-500 rounded-lg md:rounded-xl shadow-lg">
+                        <Server className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2">
+                          AWS EKS Spot Instance Module
+                        </h4>
+                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
+                          {t(
+                            "Cost-effective EKS cluster with spot instances and auto-scaling. Optimized for production workloads.",
+                            "Spot Instances နှင့် Auto-scaling တို့ကို အသုံးပြုပြီး ကုန်ကျစရိတ် အသက်သာဆုံးနှင့် အထိရောက်ဆုံး ဖြစ်အောင် တည်ဆောက်ထားသော EKS Cluster ဖြစ်ပါသည်။"
+                          )}
+                        </p>
+                        <div className="flex flex-wrap gap-1 md:gap-2">
+                          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">EKS</Badge>
+                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-0 text-xs">Spot Instances</Badge>
+                          <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">Auto-scaling</Badge>
+                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">Cost Optimized</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 md:px-6 md:py-3 rounded-lg md:rounded-xl font-semibold transition-all duration-300 hover:scale-105 mt-3 lg:mt-0 w-full lg:w-auto"
+                      onClick={() => window.open("https://github.com/thaunghtike-share/terraform-aws-kubespot", "_blank")}
+                    >
+                      <ExternalLink className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                      View Module
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Step 2: CI/CD Pipeline */}
+        <section className="mb-16 md:mb-20">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                2
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
+                  CI/CD Pipeline
+                </h2>
+                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
+                  {t("Automated build, test, and deployment workflows", "test, build , deploy အဆင့်တိုင်းကို အလိုအလျောက် လုပ်ဆောင်ခြင်း")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl mb-6 md:mb-8">
+            <CardHeader className="pb-4 md:pb-6">
+              <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg md:rounded-xl">
+                  <Zap className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
+                </div>
+                {t("Complete CI/CD Workflow", "ပြီးပြည့်စုံသော CI/CD လုပ်ငန်းစဉ်")}
+              </CardTitle>
+              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                {t("From code commit to production deployment", "Code ရေးသားမှုမှ Production သို့ ရောက်ရှိသည်အထိ")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {[
+                  { step: "1", title: "Code Push", desc: t("Developer pushes code to Git repository", "Developer က Code ကို Git Repository ထဲသို့ ထည့်လိုက်ခြင်း"), icon: Code, color: "blue" },
+                  { step: "2", title: "Docker Build", desc: t("Multi-platform container builds", "platform အမျိုးစားအားလုံးတွင် အလုပ်လုပ်နိုင်သော Container Image များ တည်ဆောက်ခြင်း"), icon: Dock, color: "indigo" },
+                  { step: "3", title: "Push to Registry", desc: t("Secure image storage with automated tagging", "Image များကို လုံခြုံစွာ သိမ်းဆည်းပြီး Tagging စနစ်ဖြင့် စီမံခြင်း"), icon: Database, color: "green" },
+                  { step: "4", title: "Security Scan", desc: t("Trivy vulnerability scanning", "Trivy ကို အသုံးပြုပြီး Image အတွင်းရှိ ချို့ယွင်းချက်များကို စစ်ဆေးခြင်း"), icon: ShieldCheck, color: "red" },
+                  { step: "5", title: "ArgoCD Deploy", desc: t("GitOps-based deployment", "GitOps စနစ်ဖြင့် Code ပြောင်းလဲမှုများကို Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးခြင်း"), icon: Rocket, color: "purple" },
+                  { step: "6", title: "Health Verify", desc: t("Automated verification and rollback", "application ကို လိုအပ်ပါက အရင် version တွေသို့ ပြန်ပြောင်းနိုင်ခြင်း"), icon: CheckCircle2, color: "orange" },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="text-center p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300"
+                  >
+                    <div className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl mb-3 md:mb-4 mx-auto w-12 h-12 md:w-16 md:h-16 flex items-center justify-center`}>
+                      <item.icon className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`} />
+                    </div>
+                    <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">{item.title}</h4>
+                    <p className="text-black dark:text-gray-300 text-xs md:text-sm">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
+            <CardHeader className="pb-4 md:pb-6">
+              <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
+                  <Terminal className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                Self-hosted Runners in CI/CD
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {[
+                  { icon: Zap, title: "Faster Builds", desc: t("Utilize powerful machines for build cycles.", "ပိုကောင်းသော server များကို အသုံးပြုပြီး build လုပ်ချိန်ကို သိသိသာသာ လျှော့ချခြင်း။"), color: "blue" },
+                  { icon: ShieldCheck, title: "Security", desc: t("Keep sensitive data within your network.", "ဒေတာများကို မိမိတို့ network အတွင်း၌သာ လုံခြုံစွာ ထိန်းသိမ်းထားခြင်း။"), color: "orange" },
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-200 dark:border-gray-700">
+                    <div className={`p-2 md:p-3 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded-lg md:rounded-xl flex-shrink-0`}>
+                      <item.icon className={`w-4 h-4 md:w-6 md:h-6 text-${item.color}-600 dark:text-${item.color}-400`} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-black dark:text-white mb-1 text-base md:text-lg">{item.title}</h4>
+                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Step 3: ArgoCD GitOps */}
+        <section className="mb-16 md:mb-20">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                3
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
+                  GitOps with ArgoCD
+                </h2>
+                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
+                  {t("Declarative, automated deployments to Kubernetes", "Code ပြောင်းလဲမှုကို အခြေခံပြီး Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးသော စနစ်")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
+              <CardHeader className="pb-4 md:pb-6">
+                <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                  <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg md:rounded-xl">
+                    <GitBranch className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  What is GitOps?
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg">
+                  {t(
+                    "GitOps uses Git repositories as the single source of truth for infrastructure and applications. ArgoCD ensures that your cluster always matches the state defined in Git.",
+                    "GitOps ဆိုတာ git repository ထဲမှာ သိမ်းထားတဲ့ code ပြောင်းလဲမှုရှိတာနဲ့ kubernetes cluster ပေါ်မှာ application ကို အလိုအလျောက် update လုပ်ပေးပါတယ်။ code ထဲမှာ ရေးထားတဲ့အတိုင်း application တွေကို cluster ပေါ်မှာ deploy လုပ်စေပါတယ်။"
+                  )}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
+              <CardHeader className="pb-4 md:pb-6">
+                <CardTitle className="flex items-center gap-2 md:gap-3 text-xl md:text-2xl font-bold text-black dark:text-white">
+                  <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg md:rounded-xl">
+                    <Layers className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  How ArgoCD Works
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 md:space-y-4">
+                  {[
+                    { icon: CheckCircle2, title: "Declarative State", desc: t("Ensures cluster matches Git definition.", "Cluster ၏ အခြေအနေသည် Git ထဲရှိ setting နှင့် အမြဲ တူညီနေစေခြင်း။"), color: "blue" },
+                    { icon: RefreshCw, title: "Automated Sync", desc: t("Continuously monitors and syncs changes.", "Git ထဲရှိ ပြောင်းလဲမှုများကို စောင့်ကြည့်ပြီး အလိုအလျောက် Update လုပ်ခြင်း။"), color: "green" },
+                    { icon: ArrowRight, title: "Instant Rollback", desc: t("Roll back to any version instantly.", "ယခင် Version များသို့ ချက်ချင်း ပြန်ပြောင်းနိုင်ခြင်း။"), color: "orange" },
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-2 md:gap-3">
+                      <div className={`p-1 md:p-2 bg-${item.color}-100 dark:bg-${item.color}-900/30 rounded md:rounded-lg flex-shrink-0 mt-1`}>
+                        <item.icon className={`w-3 h-3 md:w-4 md:h-4 text-${item.color}-600 dark:text-${item.color}-400`} />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm md:text-base">{item.title}</h4>
+                        <p className="text-black dark:text-gray-300 text-xs md:text-sm">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Step 4: Security & Compliance (NEW) */}
+        <section className="mb-16 md:mb-20">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-red-500 to-rose-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                4
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
+                  Security & Compliance
+                </h2>
+                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
+                  {t("DevSecOps at every stage of the lifecycle", "အဆင့်တိုင်းတွင် Security ကို ထည့်သွင်းစဥ်းစားခြင်း")}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-bold">
+                  <div className="p-2 md:p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
+                    <ShieldAlert className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
+                  </div>
+                  DevSecOps Integration
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
+                  {t("Security is baked into the pipeline, not added as an afterthought. We implement automated vulnerability scanning at every stage.", "လုံခြုံရေး ကို နောက်မှထည့်သွင်းခြင်းမျိုးမဟုတ်ဘဲ Pipeline တစ်ခုလုံး၏ အဆင့်တိုင်းတွင် အလိုအလျောက် စစ်ဆေးနိုင်ရန် တည်ဆောက်ထားပါသည်။")}
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">Container Scanning (Trivy)</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">Static Analysis (SonarQube)</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-xl md:text-2xl font-bold">
+                  <div className="p-2 md:p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
+                    <Key className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
+                  </div>
+                  Identity & Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
+                  {t("Zero Trust architecture with fine-grained access control using Kubernetes RBAC and secure secret management.", "Zero Trust ပုံစံကို အခြေခံပြီး Kubernetes RBAC နှင့် လုံခြုံသော Secret Management စနစ်များဖြင့် ဒေတာများကို ကာကွယ်ထားပါသည်။")}
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">RBAC & OPA Enforcement</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">Cloud Secret Store Integration</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Step 5: Logging & Observability (NEW) */}
+        <section className="mb-16 md:mb-20">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
+                5
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
+                  Logging & Observability
+                </h2>
+                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
+                  {t("Total visibility into your modern infrastructure", "ခေတ်မီ Infrastructure များအတွက် အပြည့်အဝ ခြေရာခံ စောင့်ကြည့်နိုင်မှု")}
+                </p>
+              </div>
+            </div>
+          </div>
+          <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800 p-6 md:p-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+              <div className="space-y-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl w-fit">
+                  <Activity className="w-6 h-6 text-blue-600" />
+                </div>
+                <h4 className="text-xl font-bold">Metrics Monitoring</h4>
+                <p className="text-sm md:text-base text-black dark:text-gray-400 leading-relaxed">
+                  {t("Real-time performance tracking with Prometheus and Grafana dashboards.", "Prometheus နှင့် Grafana တို့ကို အသုံးပြုပြီး cluster တွေ application တွေရဲ့ လုပ်ဆောင်ချက်များကို Real-time မျက်ခြေမပြတ် စောင့်ကြည့်နိုင်ပါသည်။")}
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl w-fit">
+                  <Search className="w-6 h-6 text-purple-600" />
+                </div>
+                <h4 className="text-xl font-bold">Centralized Logging</h4>
+                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                  {t("Consolidate logs from all microservices into one place for rapid debugging.", "ပြဿနာများကို မြန်မြန်ဆန်ဆန် ဖြေရှင်းနိုင်ရန် Logging System အဖြစ် Grafana Loki နှင့် ELK stack တို့ကိုအသုံးပြုထားပါသည်။")}
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-xl w-fit">
+                  <Eye className="w-6 h-6 text-orange-600" />
+                </div>
+                <h4 className="text-xl font-bold">Distributed Tracing</h4>
+                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                  {t("Track requests across microservices to identify bottlenecks instantly.", "Service တစ်ခုနှင့်တစ်ခုကြား ချိတ်ဆက်မှုများကို ခြေရာခံပြီး issue ဖြစ်ခဲ့လျှင် ချက်ချင်း ပြင်ဆင်နိုင်ပါသည်။")}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Final CTA */}
+        <section className="mb-12 md:mb-16">
+          <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 border-0 shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden">
+            <CardContent className="p-6 md:p-12 text-center text-white">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
+                  {t("Ready to Transform Your Infrastructure?", "Ready to Transform Your Infrastructure?")}
+                </h2>
+                <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-6 md:mb-8 leading-relaxed">
+                  {t(
+                    "Join dozens of successful companies who've modernized their stack with our cloud-native platform.",
+                    "ကျွန်ုပ်တို့၏ Cloud-Native Platform ကို အသုံးပြုပြီး သင်တို့ လုပ်ငန်းအတွက် လုံခြုံစိတ်ချရတဲ့ ခေတ်မီ tech stack များကိုအသုံးပြုလိုက်ပါ။"
+                  )}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
+                  <Button
+                    size="lg"
+                    onClick={handleEmailClick}
+                    className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                  >
+                    <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                    {t("Start Free Consultation", "အခမဲ့ ဆွေးနွေးတိုင်ပင်ရန်")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleCaseStudiesClick}
+                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold transition-all duration-300 w-full sm:w-auto"
+                  >
+                    {t("View Case Studies", "မှတ်တမ်းများ ကြည့်ရန်")}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-8 md:mt-12 pt-6 md:pt-8 border-t border-blue-500">
+                  {[
+                    { icon: CheckCircle2, label: t("30-Day Implementation", "ရက် ၃၀ အတွင်း အကောင်အထည်ဖော်ခြင်း"), desc: t("Rapid deployment", "မြန်ဆန်သော ပြင်ဆင်မှု") },
+                    { icon: ShieldCheck, label: t("Enterprise Grade", "လုပ်ငန်းသုံးအဆင့်"), desc: t("Production ready", "Production အတွက် အသင့်ဖြစ်မှု") },
+                    { icon: Zap, label: t("Cost Optimized", "ကုန်ကျစရိတ် အသက်သာဆုံး"), desc: t("Significant savings", "ကုန်ကျစရိတ် သိသာစွာ လျှော့ချမှု") },
+                  ].map((item, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <item.icon className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3 text-white" />
+                      <h4 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">{item.label}</h4>
+                      <p className="text-blue-200 dark:text-blue-300 text-xs md:text-sm">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
+      <MinimalFooter />
+    </div>
+  );
+}
