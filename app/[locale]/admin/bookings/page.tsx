@@ -7,26 +7,22 @@ import { MinimalFooter } from "@/components/minimal-footer";
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import {
   Search,
-  Filter,
   Calendar,
   Clock,
   CheckCircle,
   XCircle,
   AlertCircle,
-  MoreVertical,
   RefreshCw,
-  Download,
   Mail,
-  Phone,
   Building,
   Users,
   ArrowUpDown,
   Eye,
   Edit,
-  Trash2,
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Trash2,
 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -54,12 +50,6 @@ interface BookingStats {
   by_environment: Array<{ current_environment: string; count: number }>;
 }
 
-interface Pagination {
-  count: number;
-  next: string | null;
-  previous: string | null;
-}
-
 export default function BookingsManagementPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -74,14 +64,12 @@ export default function BookingsManagementPage() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFormData, setEditFormData] = useState<Partial<Booking>>({});
-  const [pagination, setPagination] = useState<Pagination>({
-    count: 0,
-    next: null,
-    previous: null,
-  });
-  const [page, setPage] = useState(1);
+  
+  // Pagination state - ALWAYS SHOW even with 1 booking
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalBookings, setTotalBookings] = useState(0);
   const [pageSize] = useState(10);
-  // Add to your state declarations:
+  
   const [alertState, setAlertState] = useState<{
     isOpen: boolean;
     title: string;
@@ -96,7 +84,6 @@ export default function BookingsManagementPage() {
 
   const isSuperUser = user?.is_super_user;
 
-  // Fetch bookings with filters
   const fetchBookings = async () => {
     if (!isSuperUser) return;
 
@@ -104,7 +91,7 @@ export default function BookingsManagementPage() {
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      let url = `${API_BASE_URL}/consultations/?page=${page}&page_size=${pageSize}&ordering=${sortBy}`;
+      let url = `${API_BASE_URL}/consultations/?page=${currentPage}&page_size=${pageSize}&ordering=${sortBy}`;
 
       if (searchQuery) {
         url += `&search=${encodeURIComponent(searchQuery)}`;
@@ -125,14 +112,17 @@ export default function BookingsManagementPage() {
       }
 
       const data = await response.json();
-      setBookings(data.results || data);
-
-      if (data.count !== undefined) {
-        setPagination({
-          count: data.count,
-          next: data.next,
-          previous: data.previous,
-        });
+      
+      // Handle both array response and paginated response
+      if (Array.isArray(data)) {
+        setBookings(data);
+        setTotalBookings(data.length);
+      } else if (data.results) {
+        setBookings(data.results);
+        setTotalBookings(data.count || 0);
+      } else {
+        setBookings([]);
+        setTotalBookings(0);
       }
     } catch (err) {
       setError((err as Error).message);
@@ -141,7 +131,6 @@ export default function BookingsManagementPage() {
     }
   };
 
-  // Fetch booking statistics
   const fetchBookingStats = async () => {
     try {
       setStatsLoading(true);
@@ -161,7 +150,54 @@ export default function BookingsManagementPage() {
     }
   };
 
-  // In your updateBookingStatus function, add logic to show the date
+  // Delete booking function
+  const deleteBooking = async (bookingId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/consultations/${bookingId}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setBookings(bookings.filter(b => b.id !== bookingId));
+        setTotalBookings(prev => prev - 1);
+        
+        setAlertState({
+          isOpen: true,
+          title: "Success",
+          message: "Booking deleted successfully",
+          type: "success",
+        });
+        
+        fetchBookingStats();
+        return true;
+      } else {
+        const data = await response.json();
+        setAlertState({
+          isOpen: true,
+          title: "Error",
+          message: data.error || "Failed to delete booking",
+          type: "error",
+        });
+        return false;
+      }
+    } catch (error) {
+      setAlertState({
+        isOpen: true,
+        title: "Error",
+        message: "Network error. Please try again.",
+        type: "error",
+      });
+      return false;
+    }
+  };
+
   const updateBookingStatus = async (
     bookingId: number,
     status: Booking["status"]
@@ -170,16 +206,12 @@ export default function BookingsManagementPage() {
       const token = localStorage.getItem("token");
       const booking = bookings.find((b) => b.id === bookingId);
 
-      // Prepare update data
       const updateData: any = { status };
 
-      // If confirming, add consultation date if not already set
       if (status === "confirmed" && !booking?.consultation_date) {
-        // Set consultation date to tomorrow at 10 AM as default
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(10, 0, 0, 0);
-
         updateData.consultation_date = tomorrow.toISOString();
       }
 
@@ -195,18 +227,13 @@ export default function BookingsManagementPage() {
         }
       );
 
-      console.log(`📊 Response status: ${response.status}`);
-
       const data = await response.json();
-      console.log(`📊 Response data:`, data);
 
       if (response.ok) {
-        // Update local state immediately
         setBookings((prev) =>
           prev.map((b) => (b.id === bookingId ? { ...b, status } : b))
         );
 
-        // Show success alert
         setAlertState({
           isOpen: true,
           title: "Success",
@@ -217,8 +244,6 @@ export default function BookingsManagementPage() {
         fetchBookingStats();
         return true;
       } else {
-        console.error(`❌ API Error: ${JSON.stringify(data)}`);
-        // Show error alert
         setAlertState({
           isOpen: true,
           title: "Error",
@@ -230,8 +255,6 @@ export default function BookingsManagementPage() {
         return false;
       }
     } catch (error) {
-      console.error("💥 Network error:", error);
-      // Show error alert
       setAlertState({
         isOpen: true,
         title: "Error",
@@ -287,7 +310,6 @@ export default function BookingsManagementPage() {
         message: "Network error. Please try again.",
         type: "error",
       });
-      console.error("Error:", error);
       return false;
     }
   };
@@ -307,7 +329,6 @@ export default function BookingsManagementPage() {
     }
   };
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -328,7 +349,6 @@ export default function BookingsManagementPage() {
     });
   };
 
-  // Get status badge
   const getStatusBadge = (status: Booking["status"]) => {
     const config = {
       pending: {
@@ -360,7 +380,6 @@ export default function BookingsManagementPage() {
     return config[status];
   };
 
-  // Get environment badge
   const getEnvironmentBadge = (env: string) => {
     const config: Record<string, { bg: string; text: string; label: string }> =
       {
@@ -400,7 +419,6 @@ export default function BookingsManagementPage() {
     );
   };
 
-  // Load data on component mount and when filters change
   useEffect(() => {
     if (isAuthenticated && isSuperUser) {
       fetchBookings();
@@ -409,21 +427,22 @@ export default function BookingsManagementPage() {
   }, [
     isAuthenticated,
     isSuperUser,
-    page,
+    currentPage,
     statusFilter,
     environmentFilter,
     sortBy,
   ]);
 
-  // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page !== 1) setPage(1);
-      else fetchBookings();
+      setCurrentPage(1); // Reset to page 1 when searching
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // Calculate total pages - ALWAYS at least 1
+  const totalPages = Math.max(1, Math.ceil(totalBookings / pageSize));
 
   if (isLoading) {
     return (
@@ -433,7 +452,7 @@ export default function BookingsManagementPage() {
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+              <p className="text-black dark:text-white">Loading...</p>
             </div>
           </div>
         </main>
@@ -454,7 +473,7 @@ export default function BookingsManagementPage() {
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
               Access Denied
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-lg text-black dark:text-white mb-8">
               Super user access required to view bookings
             </p>
           </div>
@@ -482,95 +501,85 @@ export default function BookingsManagementPage() {
               <h1 className="text-4xl md:text-5xl font-light text-black dark:text-white mb-2 tracking-tight">
                 Consultation Bookings
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-black dark:text-white">
                 Manage and track all consultation requests
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  fetchBookings();
-                  fetchBookingStats();
-                }}
-                className="p-2.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
-                title="Refresh"
-              >
-                <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
           </div>
         </div>
+        
         {/* Stats Cards */}
         {!statsLoading && stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium opacity-90">
-                  Total Bookings
-                </h3>
-                <Users className="w-5 h-5 opacity-80" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 max-w-4xl mx-auto text-center py-8 md:py-12">
+            {/* Total Bookings */}
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-light text-black dark:text-white">
+                {stats.total}
               </div>
-              <div className="text-3xl font-bold">{stats.total}</div>
-              <div className="text-sm opacity-80 mt-1">All time</div>
+              <div className="text-sm text-blue-600 font-semibold uppercase tracking-wider">
+                Total Bookings
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl p-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium opacity-90">Pending</h3>
-                <AlertCircle className="w-5 h-5 opacity-80" />
+            {/* Pending */}
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-light text-black dark:text-white">
+                {stats.pending}
               </div>
-              <div className="text-3xl font-bold">{stats.pending}</div>
-              <div className="text-sm opacity-80 mt-1">Awaiting action</div>
+              <div className="text-sm text-yellow-600 font-semibold uppercase tracking-wider">
+                Pending
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium opacity-90">Confirmed</h3>
-                <CheckCircle className="w-5 h-5 opacity-80" />
+            {/* Confirmed */}
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-light text-black dark:text-white">
+                {stats.confirmed}
               </div>
-              <div className="text-3xl font-bold">{stats.confirmed}</div>
-              <div className="text-sm opacity-80 mt-1">Scheduled</div>
+              <div className="text-sm text-green-600 font-semibold uppercase tracking-wider">
+                Confirmed
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium opacity-90">This Week</h3>
-                <Calendar className="w-5 h-5 opacity-80" />
+            {/* This Week */}
+            <div className="space-y-2">
+              <div className="text-4xl md:text-5xl font-light text-black dark:text-white">
+                {stats.weekly}
               </div>
-              <div className="text-3xl font-bold">{stats.weekly}</div>
-              <div className="text-sm opacity-80 mt-1">New bookings</div>
+              <div className="text-sm text-purple-600 font-semibold uppercase tracking-wider">
+                This Week
+              </div>
             </div>
           </div>
         )}
+        
         {/* Filters and Search */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-white mb-2">
                 Search
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black dark:text-white" />
                 <input
                   type="text"
                   placeholder="Search by name, email, or company..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
                 />
               </div>
             </div>
 
-            {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-white mb-2">
                 Status
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
               >
                 <option value="all">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -580,15 +589,14 @@ export default function BookingsManagementPage() {
               </select>
             </div>
 
-            {/* Environment Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-white mb-2">
                 Environment
               </label>
               <select
                 value={environmentFilter}
                 onChange={(e) => setEnvironmentFilter(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
               >
                 <option value="all">All Environments</option>
                 <option value="on-premise">On-premise</option>
@@ -600,48 +608,23 @@ export default function BookingsManagementPage() {
             </div>
           </div>
 
-          {/* Sort and Actions */}
-          <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
               <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-5 h-5 text-gray-500" />
+                <ArrowUpDown className="w-5 h-5 text-black dark:text-white" />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-transparent border-none focus:ring-0 text-sm text-gray-600 dark:text-gray-400"
+                  className="bg-transparent border-none focus:ring-0 text-sm text-black dark:text-white"
                 >
                   <option value="-booked_at">Newest First</option>
                   <option value="booked_at">Oldest First</option>
-                  <option value="name">Name A-Z</option>
-                  <option value="-name">Name Z-A</option>
                 </select>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  // Export functionality
-                  const dataStr = JSON.stringify(bookings, null, 2);
-                  const dataUri =
-                    "data:application/json;charset=utf-8," +
-                    encodeURIComponent(dataStr);
-                  const exportFileDefaultName = `bookings-${
-                    new Date().toISOString().split("T")[0]
-                  }.json`;
-
-                  const linkElement = document.createElement("a");
-                  linkElement.setAttribute("href", dataUri);
-                  linkElement.setAttribute("download", exportFileDefaultName);
-                  linkElement.click();
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl transition-all duration-300 text-sm font-medium"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-            </div>
           </div>
         </div>
+        
         {/* Bookings Table */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {loading ? (
@@ -661,24 +644,10 @@ export default function BookingsManagementPage() {
             </div>
           ) : bookings.length === 0 ? (
             <div className="p-8 text-center">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
+              <Calendar className="w-12 h-12 text-black dark:text-white mx-auto mb-4" />
+              <p className="text-black dark:text-white">
                 No bookings found
               </p>
-              {searchQuery ||
-              statusFilter !== "all" ||
-              environmentFilter !== "all" ? (
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("all");
-                    setEnvironmentFilter("all");
-                  }}
-                  className="mt-3 px-4 py-2 text-sm text-blue-600 hover:text-blue-700"
-                >
-                  Clear filters
-                </button>
-              ) : null}
             </div>
           ) : (
             <>
@@ -686,22 +655,22 @@ export default function BookingsManagementPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-900/50">
                     <tr>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Client
                       </th>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Environment
                       </th>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Preferred Time
                       </th>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Status
                       </th>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Booked Date
                       </th>
-                      <th className="py-4 px-6 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <th className="py-4 px-6 text-left text-sm font-semibold text-black dark:text-white">
                         Actions
                       </th>
                     </tr>
@@ -714,15 +683,15 @@ export default function BookingsManagementPage() {
                       >
                         <td className="py-4 px-6">
                           <div>
-                            <div className="font-medium text-gray-900 dark:text-white">
+                            <div className="font-medium text-black dark:text-white">
                               {booking.name}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
+                            <div className="text-sm text-black dark:text-white flex items-center gap-2 mt-1">
                               <Mail className="w-3 h-3" />
                               {booking.email}
                             </div>
                             {booking.company && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mt-1">
+                              <div className="text-sm text-black dark:text-white flex items-center gap-2 mt-1">
                                 <Building className="w-3 h-3" />
                                 {booking.company}
                               </div>
@@ -746,7 +715,7 @@ export default function BookingsManagementPage() {
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                          <div className="text-sm text-gray-700 dark:text-gray-300">
+                          <div className="text-sm text-black dark:text-white">
                             {booking.preferred_time
                               .replace(/_/g, " ")
                               .replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -765,12 +734,8 @@ export default function BookingsManagementPage() {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <div className="text-sm text-gray-700 dark:text-gray-300">
-                            {formatDate(booking.booked_at)}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {new Date(booking.booked_at).toLocaleTimeString(
+                          <div className="text-sm text-black dark:text-white">
+                            {formatDate(booking.booked_at)} at {new Date(booking.booked_at).toLocaleTimeString(
                               [],
                               { hour: "2-digit", minute: "2-digit" }
                             )}
@@ -778,6 +743,7 @@ export default function BookingsManagementPage() {
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-2">
+                            {/* Edit Button */}
                             <button
                               onClick={() => {
                                 setSelectedBooking(booking);
@@ -785,54 +751,36 @@ export default function BookingsManagementPage() {
                                   consultation_date:
                                     booking.consultation_date || undefined,
                                   notes: booking.notes,
+                                  status: booking.status,
                                 });
                                 setIsEditModalOpen(true);
                               }}
                               className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-300"
-                              title="Edit"
+                              title="Edit Booking"
                             >
                               <Edit className="w-4 h-4" />
                             </button>
+                            
+                            {/* Delete Button */}
                             <button
                               onClick={() => {
-                                const newStatus =
-                                  booking.status === "pending"
-                                    ? "confirmed"
-                                    : booking.status === "confirmed"
-                                    ? "completed"
-                                    : "pending";
-                                updateBookingStatus(booking.id, newStatus);
+                                if (confirm(`Are you sure you want to delete booking from ${booking.name}? This action cannot be undone.`)) {
+                                  deleteBooking(booking.id);
+                                }
                               }}
-                              className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-300"
-                              title="Update Status"
+                              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300"
+                              title="Delete Booking"
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
-                            {booking.status === "pending" && (
-                              <button
-                                onClick={() => {
-                                  if (confirm("Cancel this booking?")) {
-                                    updateBookingStatus(
-                                      booking.id,
-                                      "cancelled"
-                                    );
-                                  }
-                                }}
-                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300"
-                                title="Cancel"
-                              >
-                                <XCircle className="w-4 h-4" />
-                              </button>
-                            )}
+                            
+                            {/* Search/View Details Button */}
                             <button
-                              onClick={() => {
-                                // View details
-                                setSelectedBooking(booking);
-                              }}
-                              className="p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-300"
+                              onClick={() => setSelectedBooking(booking)}
+                              className="p-2 text-black dark:text-white hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-300"
                               title="View Details"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Search className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -842,74 +790,119 @@ export default function BookingsManagementPage() {
                 </table>
               </div>
 
-              {/* Pagination */}
-              {pagination.count > pageSize && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    Showing {(page - 1) * pageSize + 1} to{" "}
-                    {Math.min(page * pageSize, pagination.count)} of{" "}
-                    {pagination.count} bookings
+              {/* PAGINATION - ALWAYS SHOW (even with only 1 booking) */}
+              <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  {/* Showing count */}
+                  <div className="text-sm text-black dark:text-white font-medium text-center sm:text-left">
+                    {bookings.length > 0 ? (
+                      <>
+                        Showing {Math.min(currentPage * pageSize, totalBookings)} of {totalBookings} bookings
+                      </>
+                    ) : (
+                      "No bookings found"
+                    )}
                   </div>
+
+                  {/* Pagination buttons - SHOW EVEN IF ONLY 1 PAGE */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setPage(page - 1)}
-                      disabled={!pagination.previous}
-                      className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-black dark:text-white"
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="w-4 h-4" />
+                      <span>Previous</span>
                     </button>
-                    <span className="px-3 py-1 bg-blue-600 text-white rounded-lg font-medium">
-                      {page}
-                    </span>
+
+                    {/* Page numbers */}
+                    <div className="flex items-center gap-1">
+                      {(() => {
+                        // Always show page numbers, even if there's only 1 page
+                        const pagesToShow = 3;
+                        let startPage = Math.max(1, currentPage - 1);
+                        let endPage = Math.min(totalPages, startPage + pagesToShow - 1);
+                        
+                        if (endPage - startPage + 1 < pagesToShow) {
+                          startPage = Math.max(1, endPage - pagesToShow + 1);
+                        }
+
+                        const pages = [];
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(i);
+                        }
+
+                        return pages.map((pageNum) => (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all shadow-sm ${
+                              currentPage === pageNum
+                                ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                : "border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        ));
+                      })()}
+                    </div>
+
                     <button
-                      onClick={() => setPage(page + 1)}
-                      disabled={!pagination.next}
-                      className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-black dark:text-white"
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <span>Next</span>
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
+
+                  {/* Mobile page info */}
+                  <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 font-medium text-center">
+                    Page {currentPage} of {totalPages}
+                  </div>
                 </div>
-              )}
+              </div>
             </>
           )}
         </div>
+        
         {/* Selected Booking Details Modal */}
         {selectedBooking && !isEditModalOpen && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-xl font-bold text-black dark:text-white">
                     Booking Details
                   </h3>
                   <button
                     onClick={() => setSelectedBooking(null)}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-300"
                   >
-                    <XCircle className="w-5 h-5 text-gray-500" />
+                    <XCircle className="w-5 h-5 text-black dark:text-white" />
                   </button>
                 </div>
 
                 <div className="space-y-6">
-                  {/* Client Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                      <h4 className="text-sm font-medium text-black dark:text-white mb-2">
                         Client Information
                       </h4>
                       <div className="space-y-3">
                         <div>
-                          <div className="font-semibold text-gray-900 dark:text-white">
+                          <div className="font-semibold text-black dark:text-white">
                             {selectedBooking.name}
                           </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
+                          <div className="text-sm text-black dark:text-white flex items-center gap-2 mt-1">
                             <Mail className="w-4 h-4" />
                             {selectedBooking.email}
                           </div>
                         </div>
                         {selectedBooking.company && (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                          <div className="text-sm text-black dark:text-white flex items-center gap-2">
                             <Building className="w-4 h-4" />
                             {selectedBooking.company}
                           </div>
@@ -917,9 +910,8 @@ export default function BookingsManagementPage() {
                       </div>
                     </div>
 
-                    {/* Booking Info */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                      <h4 className="text-sm font-medium text-black dark:text-white mb-2">
                         Booking Information
                       </h4>
                       <div className="space-y-3">
@@ -951,8 +943,7 @@ export default function BookingsManagementPage() {
                             </span>
                           </div>
                         </div>
-                        {/* In the Booking Details Modal */}
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-black dark:text-white">
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" />
                             {selectedBooking.consultation_date ? (
@@ -967,7 +958,7 @@ export default function BookingsManagementPage() {
                             )}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-sm text-black dark:text-white">
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4" />
                             Preferred:{" "}
@@ -980,34 +971,31 @@ export default function BookingsManagementPage() {
                     </div>
                   </div>
 
-                  {/* Project Goals */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    <h4 className="text-sm font-medium text-black dark:text-white mb-2">
                       Project Goals
                     </h4>
                     <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
-                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      <p className="text-black dark:text-white whitespace-pre-wrap">
                         {selectedBooking.project_goals ||
                           "No project goals provided."}
                       </p>
                     </div>
                   </div>
 
-                  {/* Admin Notes */}
                   {selectedBooking.notes && (
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                      <h4 className="text-sm font-medium text-black dark:text-white mb-2">
                         Admin Notes
                       </h4>
                       <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4">
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                        <p className="text-black dark:text-white whitespace-pre-wrap">
                           {selectedBooking.notes}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Actions */}
                   <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                       onClick={() => {
@@ -1015,6 +1003,7 @@ export default function BookingsManagementPage() {
                           consultation_date:
                             selectedBooking.consultation_date || undefined,
                           notes: selectedBooking.notes,
+                          status: selectedBooking.status,
                         });
                         setIsEditModalOpen(true);
                       }}
@@ -1024,7 +1013,7 @@ export default function BookingsManagementPage() {
                     </button>
                     <button
                       onClick={() => setSelectedBooking(null)}
-                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-medium"
+                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-medium"
                     >
                       Close
                     </button>
@@ -1034,17 +1023,18 @@ export default function BookingsManagementPage() {
             </div>
           </div>
         )}
+        
         {/* Edit Booking Modal */}
         {isEditModalOpen && selectedBooking && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full">
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+                <h3 className="text-xl font-bold text-black dark:text-white mb-6">
                   Edit Booking
                 </h3>
                 <form onSubmit={handleEditSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-black dark:text-white mb-2">
                       Consultation Date
                     </label>
                     <input
@@ -1059,15 +1049,14 @@ export default function BookingsManagementPage() {
                       onChange={(e) =>
                         setEditFormData({
                           ...editFormData,
-                          consultation_date: e.target.value + ":00Z", // Add seconds and timezone
+                          consultation_date: e.target.value + ":00Z",
                         })
                       }
-                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
                     />
                   </div>
-                  {/* Status */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-black dark:text-white mb-2">
                       Status
                     </label>
                     <select
@@ -1078,7 +1067,7 @@ export default function BookingsManagementPage() {
                           status: e.target.value as Booking["status"],
                         })
                       }
-                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
@@ -1086,9 +1075,8 @@ export default function BookingsManagementPage() {
                       <option value="completed">Completed</option>
                     </select>
                   </div>
-                  {/* Notes */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-black dark:text-white mb-2">
                       Notes
                     </label>
                     <textarea
@@ -1100,7 +1088,7 @@ export default function BookingsManagementPage() {
                         })
                       }
                       rows={4}
-                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
                       placeholder="Add notes..."
                     />
                   </div>
@@ -1111,7 +1099,7 @@ export default function BookingsManagementPage() {
                         setIsEditModalOpen(false);
                         setEditFormData({});
                       }}
-                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-medium"
+                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 font-medium"
                     >
                       Cancel
                     </button>
