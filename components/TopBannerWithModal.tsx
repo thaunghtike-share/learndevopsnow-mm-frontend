@@ -211,8 +211,8 @@ export function TopBannerWithModal() {
                   <div className="flex items-center space-x-2">
                     <h3 className="font-bold text-sm sm:text-base bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
                       {t(
-                        "🚀 Free Expert DevOps Strategy Session",
-                        "🚀 Free Expert DevOps Strategy Session"
+                        "Free Cloud-Native Strategy Session",
+                        "Free Cloud-Native Strategy Session"
                       )}
                     </h3>
                     <div className="hidden sm:flex items-center space-x-1">
