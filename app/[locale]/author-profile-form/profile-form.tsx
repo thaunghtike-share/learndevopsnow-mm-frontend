@@ -362,7 +362,7 @@ export default function ProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16">
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
@@ -378,7 +378,7 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16">
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">

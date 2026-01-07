@@ -2,6 +2,7 @@
 
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import {
   Users,
   Lightbulb,
@@ -25,6 +26,9 @@ import {
   Play,
   ExternalLink,
   MessageSquare,
+  Calendar,
+  Clock,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +48,28 @@ export default function PartTimeDevOpsSupportPage() {
   const params = useParams();
   const currentLocale = (params?.locale as "en" | "my") || "en";
   const [mounted, setMounted] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    current_environment: "",
+    project_goals: "",
+    preferred_time: "",
+  });
+
+  const [alertState, setAlertState] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "success" | "error" | "info";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info",
+  });
 
   // Fix Hydration Error: Ensure component only renders after mounting on client
   useEffect(() => {
@@ -52,6 +78,96 @@ export default function PartTimeDevOpsSupportPage() {
 
   const t = (enText: string, myText: string) => {
     return currentLocale === "en" ? enText : myText;
+  };
+
+  // Handle form input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    console.log("Submitting form data:", formData);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      console.log("API URL:", `${apiUrl}/api/consultations/book/`);
+
+      const response = await fetch(`${apiUrl}/api/consultations/book/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log("Response status:", response.status);
+      const responseText = await response.text();
+      console.log("Response text:", responseText);
+
+      if (response.ok) {
+        // Show success alert
+        setAlertState({
+          isOpen: true,
+          title: t("Success", "အောင်မြင်ပါသည်"),
+          message: t(
+            "Thank you! Your consultation request has been submitted successfully. We'll contact you within 24 hours.",
+            "ကျေးဇူးတင်ပါသည်! သင်၏ ဆွေးနွေးတိုင်ပင်မှု တောင်းဆိုချက်ကို အောင်မြင်စွာ လက်ခံရရှိပါသည်။ ကျွန်ုပ်တို့သည် ၂၄ နာရီအတွင်း သင့်ထံ ဆက်သွယ်ပါမည်။"
+          ),
+          type: "success",
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          current_environment: "",
+          project_goals: "",
+          preferred_time: "",
+        });
+
+        // Close modal after 1 second
+        setTimeout(() => {
+          setIsBookingModalOpen(false);
+        }, 1000);
+      } else {
+        // Show error alert
+        setAlertState({
+          isOpen: true,
+          title: t("Error", "အမှား"),
+          message: t(
+            "Failed to submit booking. Please try again or contact us directly.",
+            "အာဏာပိုင်သို့ မပေးပို့နိုင်ပါ။ ကျေးဇူးပြု၍ ထပ်မံကြိုးစားကြည့်ပါ သို့မဟုတ် တိုက်ရိုက်ဆက်သွယ်ပါ။"
+          ),
+          type: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      setAlertState({
+        isOpen: true,
+        title: t("Network Error", "Network အမှား"),
+        message: t(
+          "Network error. Please check your connection and try again.",
+          "Network error. ကျေးဇူးပြု၍ သင့်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားကြည့်ပါ။"
+        ),
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const features = [
@@ -83,12 +199,6 @@ export default function PartTimeDevOpsSupportPage() {
     { value: "10x", label: t("Faster Resolution", "ပိုမိုမြန်ဆန်သော deployment"), icon: Zap },
     { value: "99.9%", label: t("Uptime Guarantee", "သင့်လုပ်ငန်း အမြဲတမ်း အလုပ်လုပ်နိုင်မှု"), icon: CheckCircle2 },
   ];
-
-  const handleEmailClick = () => {
-    const subject = t("Part-Time DevOps Support Consultation", "Part-Time DevOps ဝန်ဆောင်မှုအတွက် ဆွေးနွေးတိုင်ပင်ရန်");
-    const body = t("Hi, I'm interested in learning more about your part-time DevOps support services.", "မင်္ဂလာပါ၊ သင်တို့၏ Part-Time DevOps support ဝန်ဆောင်မှုများအကြောင်း သိရှိလိုပါသည်။");
-    window.location.href = `mailto:thaunghtikeoo.tho1234@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
 
   const handleCaseStudiesClick = () => {
     window.open(
@@ -178,7 +288,7 @@ export default function PartTimeDevOpsSupportPage() {
             {/* CTA Buttons - Stack on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-start items-start">
               <Button
-                onClick={handleEmailClick}
+                onClick={() => setIsBookingModalOpen(true)}
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
                 <Play className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -637,7 +747,7 @@ export default function PartTimeDevOpsSupportPage() {
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
                   <Button
                     size="lg"
-                    onClick={handleEmailClick}
+                    onClick={() => setIsBookingModalOpen(true)}
                     className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                   >
                     <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -689,6 +799,258 @@ export default function PartTimeDevOpsSupportPage() {
       </main>
 
       <MinimalFooter />
+
+      {/* Modern Alert Dialog */}
+      <AlertDialog
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+        duration={5000}
+      />
+
+      {/* Premium Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200/30 dark:border-gray-800/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute top-5 right-5 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 hover:scale-105 hover:shadow-md transition-all duration-300"
+              aria-label="Close"
+            >
+              <svg
+                className="w-5 h-5 text-gray-600 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="p-8">
+              {/* Header */}
+              <div className="mb-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-md">
+                    <MessageSquare className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-black dark:text-white">
+                      {t("Schedule Consultation", "ဆွေးနွေးပွဲ ချိန်းဆိုရန်")}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {t(
+                        "Free 30-minute DevOps support assessment",
+                        "DevOps Support အကဲဖြတ်ခြင်း (၃၀ မိနစ်)"
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700"></div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Full Name", "အမည်")} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                      placeholder={t("John Doe", "ကျော်ဇေယျာ")}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Email Address", "အီးမေးလ်")} *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                      placeholder="email@company.com"
+                    />
+                  </div>
+                </div>
+
+                {/* Company */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    {t("Company", "ကုမ္ပဏီ")}
+                  </label>
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300"
+                    placeholder={t("Optional", "မဖြစ်မနေ မဟုတ်")}
+                  />
+                </div>
+
+                {/* Current Infrastructure & Preferred Time */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Current Infrastructure", "လက်ရှိ Infrastructure")} *
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        name="current_environment"
+                        value={formData.current_environment}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 appearance-none transition-all duration-300"
+                      >
+                        <option value="">
+                          {t("Select Infra", "Infra ရွေးချယ်ပါ")}
+                        </option>
+                        <option value="on-premise">
+                          {t("On-premise", "On-premise")}
+                        </option>
+                        <option value="aws">AWS</option>
+                        <option value="azure">Azure</option>
+                        <option value="gcp">Google Cloud</option>
+                        <option value="hybrid">
+                          {t("Hybrid / Multi-cloud", "Hybrid / Multi-cloud")}
+                        </option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                      {t("Preferred Time", "နှစ်သက်ရာ အချိန်")} *
+                    </label>
+                    <div className="relative">
+                      <select
+                        required
+                        name="preferred_time"
+                        value={formData.preferred_time}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 appearance-none transition-all duration-300"
+                      >
+                        <option value="">
+                          {t("Select time", "အချိန် ရွေးချယ်ပါ")}
+                        </option>
+                        <option value="morning">
+                          {t("Weekday Morning", "အလုပ်ရက် မနက်ပိုင်း")}
+                        </option>
+                        <option value="afternoon">
+                          {t("Weekday Afternoon", "အလုပ်ရက် နေ့လယ်ပိုင်း")}
+                        </option>
+                        <option value="evening">
+                          {t("Weekday Evening", "အလုပ်ရက် ညနေပိုင်း")}
+                        </option>
+                        <option value="flexible">
+                          {t("Flexible Schedule", "လိုက်လျောညီထွေ")}
+                        </option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DevOps Support Needs */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    {t("Support Requirements", "Support လိုအပ်ချက်များ")}
+                  </label>
+                  <textarea
+                    rows={3}
+                    name="project_goals"
+                    value={formData.project_goals}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3.5 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-300/70 dark:border-gray-700/70 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 resize-none transition-all duration-300"
+                    placeholder={t(
+                      "Describe your DevOps support needs, challenges, or project goals...",
+                      "သင်၏ DevOps support လိုအပ်ချက်များ၊ အခက်အခဲများ သို့မဟုတ် စီမံကိန်း ရည်မှန်းချက်များကို ရှင်းပြပါ..."
+                    )}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <span className="relative z-10 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      {t("Submitting...", "ပေးပို့နေသည်...")}
+                    </span>
+                  ) : (
+                    <span className="relative z-10 flex items-center justify-center">
+                      <Calendar className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
+                      {t(
+                        "Schedule Free Session",
+                        "အခမဲ့ ဆွေးနွေးပွဲ ချိန်းဆိုမည်"
+                      )}
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                </Button>
+
+                {/* Privacy Note */}
+                <div className="pt-6 border-t border-gray-300/30 dark:border-gray-700/30">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>
+                        {t(
+                          "We respect your privacy",
+                          "သင့်ကိုယ်ရေးကိုယ်တာကို လေးစားပါသည်"
+                        )}
+                      </span>
+                    </div>
+                    <div className="hidden sm:block text-gray-400 dark:text-gray-600">
+                      •
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {t(
+                          "24-hour response time",
+                          "၂၄ နာရီအတွင်း တုံ့ပြန်မှု"
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

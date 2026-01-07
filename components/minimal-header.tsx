@@ -78,6 +78,27 @@ export function MinimalHeader() {
     { code: "my", name: "မြန်မာ", flag: "🇲🇲" },
   ];
 
+  // Add this useEffect in MinimalHeader to adjust for banner
+  useEffect(() => {
+    // Check if banner is visible
+    const checkBanner = () => {
+      const hasBanner = document.querySelector(".fixed.top-0.z-\\[10000\\]");
+      if (hasBanner) {
+        document.body.classList.add("banner-visible");
+      } else {
+        document.body.classList.remove("banner-visible");
+      }
+    };
+
+    // Initial check
+    checkBanner();
+
+    // Check periodically (banner might appear/disappear)
+    const interval = setInterval(checkBanner, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     setMounted(true);
 

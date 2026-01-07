@@ -155,3 +155,100 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.animate-progress {
+  animation: progress 5s linear forwards;
+}
+
+/* Top Banner Styles - NO body padding */
+/* The banner is fixed above everything without pushing content down */
+
+/* Banner itself - slim version */
+.fixed.top-0.z-\[10000\] {
+  height: 48px; /* Slimmer banner */
+}
+
+/* Make sure content starts at top, banner overlaps */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Header should be below banner */
+header.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* When banner is visible, adjust header to appear immediately below it */
+body.banner-visible header.sticky {
+  top: 48px; /* Same as banner height */
+}
+
+/* But we don't need body padding since banner is fixed above */
+/* The header will just stick to top: 48px when banner is visible */
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Adjust for top banner */
+.relative.z-10 {
+  position: relative;
+  z-index: 10;
+}
+
+/* Force background colors to prevent white flash */
+html,
+body {
+  background: white;
+  overflow-x: hidden;
+}
+
+.dark html,
+.dark body {
+  background: #0a0a0a;
+}
+
+/* Ensure all sections have proper backgrounds */
+section,
+main,
+div[class*="section"] {
+  background-color: inherit !important;
+}
+
+/* Smooth transitions for banner */
+.fixed.top-0 {
+  transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Ensure modal is above everything */
+.z-\[99999\] {
+  z-index: 99999 !important;
+}
