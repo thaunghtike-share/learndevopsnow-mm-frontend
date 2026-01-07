@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
+// REMOVE: import { TopBannerWithModal } from "@/components/TopBannerWithModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -167,6 +168,9 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
+          {/* REMOVE: <TopBannerWithModal /> from here */}
+          
+          {/* Your existing content */}
           {children}
         </NextIntlClientProvider>
         <GoogleAnalytics gaId="G-1XGYJMR2B7" />

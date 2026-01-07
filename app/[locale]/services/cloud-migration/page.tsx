@@ -1201,9 +1201,10 @@ export default function MonolithicToCloudNativePage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
+                  {/* UPDATE THIS BUTTON */}
                   <Button
                     size="lg"
-                    onClick={() => setIsBookingModalOpen(true)}
+                    onClick={() => setIsBookingModalOpen(true)} // Add this onClick handler
                     className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                   >
                     <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
