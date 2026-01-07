@@ -337,6 +337,7 @@ export default function MonolithicToCloudNativePage() {
               ))}
             </div>
 
+            {/* Hero Section CTA Button - Mobile Optimized */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-start items-start">
               <Button
                 onClick={() => setIsBookingModalOpen(true)}
@@ -1182,7 +1183,7 @@ export default function MonolithicToCloudNativePage() {
           </Card>
         </section>
 
-        {/* Final CTA */}
+        {/* Final CTA Section - Mobile Optimized */}
         <section className="mb-12 md:mb-16">
           <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 border-0 shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden">
             <CardContent className="p-6 md:p-12 text-center text-white">
@@ -1201,10 +1202,10 @@ export default function MonolithicToCloudNativePage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
-                  {/* UPDATE THIS BUTTON */}
+                  {/* Final CTA Button - Mobile Optimized */}
                   <Button
                     size="lg"
-                    onClick={() => setIsBookingModalOpen(true)} // Add this onClick handler
+                    onClick={() => setIsBookingModalOpen(true)}
                     className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 md:px-8 md:py-3 rounded-xl text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                   >
                     <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
@@ -1276,14 +1277,49 @@ export default function MonolithicToCloudNativePage() {
         duration={5000}
       />
 
-      {/* Premium Booking Modal */}
+      {/* Premium Booking Modal - Optimized for Mobile */}
       {isBookingModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div
-            className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200/30 dark:border-gray-800/30"
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+          {/* Mobile: Bottom sheet style, Desktop: Centered modal (original design preserved) */}
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", damping: 25 }}
+            className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg md:rounded-3xl shadow-2xl w-full md:max-w-md h-[90vh] md:h-auto md:max-h-[85vh] overflow-hidden border border-gray-200/30 dark:border-gray-800/30 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
+            {/* Mobile Header with Drag Handle */}
+            <div className="md:hidden pt-4 px-4">
+              <div className="flex justify-center mb-2">
+                <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+              </div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-black dark:text-white">
+                  {t("Schedule Consultation", "ဆွေးနွေးပွဲ ချိန်းဆိုရန်")}
+                </h3>
+                <button
+                  onClick={() => setIsBookingModalOpen(false)}
+                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Close"
+                >
+                  <svg
+                    className="w-5 h-5 text-gray-600 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Desktop Close Button - EXACTLY AS BEFORE */}
             <button
               onClick={() => setIsBookingModalOpen(false)}
               className="absolute top-5 right-5 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-800 hover:scale-105 hover:shadow-md transition-all duration-300"
@@ -1304,8 +1340,8 @@ export default function MonolithicToCloudNativePage() {
               </svg>
             </button>
 
-            <div className="p-8">
-              {/* Header */}
+            <div className="flex-1 overflow-y-auto p-4 md:p-8">
+              {/* Desktop Header - EXACTLY AS BEFORE */}
               <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl shadow-md">
@@ -1323,14 +1359,13 @@ export default function MonolithicToCloudNativePage() {
                     </p>
                   </div>
                 </div>
-
                 <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700"></div>
               </div>
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Name & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name & Email - Mobile: Stack vertically, Desktop: Grid */}
+                <div className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
                   <div>
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                       {t("Full Name", "အမည်")} *
@@ -1377,8 +1412,8 @@ export default function MonolithicToCloudNativePage() {
                   />
                 </div>
 
-                {/* Current Infrastructure & Preferred Time */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Current Infrastructure & Preferred Time - Mobile: Stack vertically, Desktop: Grid */}
+                <div className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
                   <div>
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                       {t("Current Infrastructure", "လက်ရှိ Infrastructure")} *
@@ -1463,58 +1498,60 @@ export default function MonolithicToCloudNativePage() {
                   />
                 </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <span className="relative z-10 flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                      {t("Submitting...", "ပေးပို့နေသည်...")}
-                    </span>
-                  ) : (
-                    <span className="relative z-10 flex items-center justify-center">
-                      <Calendar className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
-                      {t(
-                        "Schedule Free Session",
-                        "အခမဲ့ ဆွေးနွေးပွဲ ချိန်းဆိုမည်"
-                      )}
-                    </span>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                </Button>
+                {/* Submit Button - Mobile: Sticky at bottom, Desktop: Normal */}
+                <div className="sticky md:static bottom-0 bg-white/95 dark:bg-gray-900/95 pt-6 md:pt-0 -mx-4 md:mx-0 px-4 md:px-0 -mb-4 md:mb-0">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <span className="relative z-10 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                        {t("Submitting...", "ပေးပို့နေသည်...")}
+                      </span>
+                    ) : (
+                      <span className="relative z-10 flex items-center justify-center">
+                        <Calendar className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
+                        {t(
+                          "Schedule Free Session",
+                          "အခမဲ့ ဆွေးနွေးပွဲ ချိန်းဆိုမည်"
+                        )}
+                      </span>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  </Button>
 
-                {/* Privacy Note */}
-                <div className="pt-6 border-t border-gray-300/30 dark:border-gray-700/30">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>
-                        {t(
-                          "We respect your privacy",
-                          "သင့်ကိုယ်ရေးကိုယ်တာကို လေးစားပါသည်"
-                        )}
-                      </span>
-                    </div>
-                    <div className="hidden sm:block text-gray-400 dark:text-gray-600">
-                      •
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      <span>
-                        {t(
-                          "24-hour response time",
-                          "၂၄ နာရီအတွင်း တုံ့ပြန်မှု"
-                        )}
-                      </span>
+                  {/* Privacy Note - Mobile: Smaller spacing */}
+                  <div className="pt-6 mt-6 md:mt-6 border-t border-gray-300/30 dark:border-gray-700/30">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>
+                          {t(
+                            "We respect your privacy",
+                            "သင့်ကိုယ်ရေးကိုယ်တာကို လေးစားပါသည်"
+                          )}
+                        </span>
+                      </div>
+                      <div className="hidden sm:block text-gray-400 dark:text-gray-600">
+                        •
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                          {t(
+                            "24-hour response time",
+                            "၂၄ နာရီအတွင်း တုံ့ပြန်မှု"
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
