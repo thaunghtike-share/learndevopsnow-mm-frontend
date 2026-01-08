@@ -743,7 +743,7 @@ export default function ArticlesClient() {
               <div className="flex items-center gap-4 mb-4 md:mb-6">
                 <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
                 <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                  Author Dashboard
+                  Articles Dashboard
                 </span>
               </div>
 

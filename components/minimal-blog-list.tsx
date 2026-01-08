@@ -242,12 +242,16 @@ export function MinimalBlogList({
     <div className="w-full">
       {/* Header */}
       <div className="mb-12">
-        <div className="h-1 w-20 bg-gradient-to-r from-sky-500 to-blue-600 rounded-full mb-6"></div>
-        <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-gray-100 mb-4 leading-tight">
-          DevOps Articles
-          <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-            Learn & Build
+        {/* Blue/Purple gradient line with "Author Dashboard" style */}
+        <div className="flex items-center gap-4 mb-4 md:mb-6">
+          <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+          <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
+            Articles Dashboard
           </span>
+        </div>
+        {/* Main title with your font style */}
+        <h1 className="text-3xl md:text-7xl text-black dark:text-white mb-4 md:mb-6 tracking-tight">
+          Latest Articles
         </h1>
         <p className="text-lg text-black dark:text-gray-300 max-w-3xl leading-relaxed">
           Explore comprehensive tutorials, best practices, and real-world DevOps
@@ -267,7 +271,7 @@ export function MinimalBlogList({
                 placeholder="Search articles by topic, technology, or keyword..."
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-500 dark:border-gray-700 text-black dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
               />
               {localSearch && (
                 <button
@@ -289,7 +293,7 @@ export function MinimalBlogList({
                 className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-all duration-200 ${
                   filterTagSlug
                     ? "bg-sky-600 text-white border-sky-600 shadow-md"
-                    : "bg-white dark:bg-gray-800 text-black dark:text-gray-100 border-gray-300 dark:border-gray-700 hover:border-sky-400 dark:hover:border-sky-600 hover:shadow-sm"
+                    : "bg-white dark:bg-gray-800 text-black dark:text-gray-100 border-gray-500 dark:border-gray-700 hover:border-sky-400 dark:hover:border-sky-600 hover:shadow-sm"
                 }`}
               >
                 <Filter className="w-4 h-4" />
@@ -439,9 +443,8 @@ export function MinimalBlogList({
                         </Link>
                       )}
                       <div className="flex items-center gap-1 text-sm text-sky-600 dark:text-sky-400">
-                        <Eye className="w-4 h-4 text-gray-700 dark:text-gray-300" />
                         <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {article.read_count?.toLocaleString() || 0}
+                          {article.read_count?.toLocaleString() || 0} view
                         </span>
                       </div>
                     </div>
