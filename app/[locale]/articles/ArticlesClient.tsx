@@ -760,7 +760,7 @@ export default function ArticlesClient() {
               </p>
             </div>
 
-            {/* Polished KodeKloud Layout with Bio Limit */}
+            {/* Polished KodeKloud Layout with Smooth Animations - No Shadows */}
             {authors.length > 0 ? (
               <div className="mb-20">
                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
@@ -773,7 +773,6 @@ export default function ArticlesClient() {
                       maxLength: number = 320
                     ) => {
                       if (bio.length <= maxLength) return bio;
-                      // Cut at last complete sentence before maxLength
                       const trimmed = bio.substring(0, maxLength);
                       const lastPeriod = trimmed.lastIndexOf(".");
                       const lastExclamation = trimmed.lastIndexOf("!");
@@ -793,113 +792,129 @@ export default function ArticlesClient() {
                     return (
                       <div
                         key={author.id}
-                        className={`transition-all duration-500 cursor-pointer overflow-hidden ${
+                        className={`transition-[width,height] duration-500 ease-out cursor-pointer overflow-hidden ${
                           isSelected ? "md:w-1/2" : "md:w-1/6"
                         } ${isSelected ? "min-h-[420px]" : "min-h-[320px]"}`}
                         onClick={() => setExpandedAuthorId(author.id)}
                       >
                         <div
-                          className={`h-full rounded-2xl transition-all duration-500 ${
+                          className={`h-full rounded-2xl transition-all duration-500 ease-out border ${
                             isSelected
-                              ? "bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700"
-                              : "bg-gray-100 dark:bg-gray-900/50 hover:bg-gray-200 dark:hover:bg-gray-800/70"
+                              ? "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700"
+                              : "bg-gray-100 dark:bg-gray-900/50 hover:bg-gray-200 dark:hover:bg-gray-800/70 border-gray-200 dark:border-gray-800"
                           }`}
                         >
-                          {!isSelected ? (
-                            // Collapsed State
-                            <div className="h-full flex flex-col">
-                              <div className="flex-1 relative overflow-hidden">
-                                <img
-                                  src={author.avatar}
-                                  alt={author.name}
-                                  className="absolute inset-0 w-full h-full object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src =
-                                      "/placeholder.svg";
-                                  }}
-                                />
-                                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
-                              </div>
-                              <div className="p-4">
-                                <h3 className="text-gray-900 dark:text-gray-100 text-center text-sm mb-1 line-clamp-1">
-                                  {author.name}
-                                </h3>
-                                <p className="text-gray-600 dark:text-gray-400 text-xs text-center line-clamp-1">
-                                  {author.job_title}
-                                </p>
+                          {/* Always render both states, just show/hide with opacity */}
+                          <div className="relative h-full">
+                            {/* Collapsed State */}
+                            <div
+                              className={`absolute inset-0 transition-all duration-500 ${
+                                isSelected
+                                  ? "opacity-0 scale-95 pointer-events-none"
+                                  : "opacity-100 scale-100"
+                              }`}
+                            >
+                              <div className="h-full flex flex-col">
+                                <div className="flex-1 relative overflow-hidden">
+                                  <img
+                                    src={author.avatar}
+                                    alt={author.name}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src =
+                                        "/placeholder.svg";
+                                    }}
+                                  />
+                                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+                                </div>
+                                <div className="p-4">
+                                  <h3 className="text-gray-900 dark:text-gray-100 text-center text-sm mb-1 line-clamp-1">
+                                    {author.name}
+                                  </h3>
+                                  <p className="text-gray-600 dark:text-gray-400 text-xs text-center line-clamp-1">
+                                    {author.job_title}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          ) : (
-                            // Expanded State with Limited Bio
-                            <div className="h-full p-6 md:p-8">
-                              <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
-                                {/* Photo Left Side */}
-                                <div className="lg:w-2/5">
-                                  <div className="relative w-full h-64 lg:h-full rounded-xl overflow-hidden shadow-lg">
-                                    <img
-                                      src={author.avatar}
-                                      alt={author.name}
-                                      className="w-full h-full object-cover"
-                                      onError={(e) => {
-                                        (e.target as HTMLImageElement).src =
-                                          "/placeholder.svg";
-                                      }}
-                                    />
-                                  </div>
-                                </div>
 
-                                {/* Content Right Side */}
-                                <div className="lg:w-3/5 flex flex-col">
-                                  {/* Header Section */}
-                                  <div className="mb-6">
-                                    <div className="flex items-start justify-between mb-4">
-                                      <div>
-                                        <h3 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-wide">
-                                          {author.name}
-                                        </h3>
-                                        <p className="text-sky-600 dark:text-sky-400 font-semibold text-sm tracking-wide">
-                                          {author.job_title}
-                                        </p>
+                            {/* Expanded State */}
+                            <div
+                              className={`absolute inset-0 transition-all duration-500 ${
+                                isSelected
+                                  ? "opacity-100 scale-100"
+                                  : "opacity-0 scale-105 pointer-events-none"
+                              }`}
+                            >
+                              <div className="h-full p-6 md:p-8">
+                                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 h-full">
+                                  {/* Photo Left Side */}
+                                  <div className="lg:w-2/5">
+                                    <div className="relative w-full h-64 lg:h-full rounded-xl overflow-hidden">
+                                      <img
+                                        src={author.avatar}
+                                        alt={author.name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                          (e.target as HTMLImageElement).src =
+                                            "/placeholder.svg";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Content Right Side */}
+                                  <div className="lg:w-3/5 flex flex-col">
+                                    {/* Header Section */}
+                                    <div className="mb-6">
+                                      <div className="flex items-start justify-between mb-4">
+                                        <div>
+                                          <h3 className="font-bold text-xl text-gray-900 dark:text-gray-100 mb-2 uppercase tracking-wide">
+                                            {author.name}
+                                          </h3>
+                                          <p className="text-sky-600 dark:text-sky-400 font-semibold text-sm tracking-wide">
+                                            {author.job_title}
+                                          </p>
+                                        </div>
                                       </div>
+
+                                      <div className="h-px bg-gradient-to-r from-sky-200 to-blue-200 dark:from-gray-700 dark:to-gray-700" />
                                     </div>
 
-                                    <div className="h-px bg-gradient-to-r from-sky-200 to-blue-200 dark:from-gray-700 dark:to-gray-700" />
-                                  </div>
-
-                                  {/* Bio Section with Limited Length */}
-                                  <div className="flex-1 mb-6">
-                                    <div className="h-full overflow-y-auto pr-1">
+                                    {/* Bio Section - FIXED HEIGHT */}
+                                    <div className="flex-1 mb-4 min-h-[180px] max-h-[200px] overflow-y-auto pr-1">
                                       <p className="text-black dark:text-gray-300 text-base leading-relaxed">
                                         {getLimitedBio(author.bio)}
                                       </p>
-                                      {/* Show indicator if bio was truncated */}
                                       {author.bio.length > 320 && (
                                         <p className="text-gray-500 dark:text-gray-400 text-sm italic mt-2">
                                           Read full bio in profile
                                         </p>
                                       )}
                                     </div>
-                                  </div>
 
-                                  {/* Action Button */}
-                                  <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(`/authors/${author.slug}`);
-                                      }}
-                                      className="group w-full flex items-center justify-center gap-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                      <span className="text-base">
-                                        View Full Profile
-                                      </span>
-                                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                    {/* Action Button - ALWAYS VISIBLE IN EXPANDED STATE */}
+                                    <div className="pt-2">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          router.push(
+                                            `/authors/${author.slug}`
+                                          );
+                                        }}
+                                        className="group w-full flex items-center justify-center gap-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                                      >
+                                        <span className="text-base">
+                                          View Full Profile
+                                        </span>
+                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          )}
+                          </div>
                         </div>
                       </div>
                     );
