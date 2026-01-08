@@ -73,8 +73,6 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
-      {/* SIMPLY ADD THE BANNER - No conditional rendering */}
-      {!isMobile && <TopBannerWithModal />}
 
       <div className="relative z-10">
         <MinimalHeader />
