@@ -753,17 +753,92 @@ export default function ArticlesClient() {
               </h1>
 
               {/* Subtitle/description */}
-              <p className="text-lg text-black dark:text-gray-300 leading-relaxed">
+              <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed">
                 Get insights from professionals who work with cutting-edge
                 technologies daily. Real-world experience, practical knowledge,
                 and proven methodologies.
               </p>
             </div>
 
-            {/* Polished KodeKloud Layout with Smooth Animations - No Shadows */}
+            {/* Polished KodeKloud Layout - Desktop EXACT as before, mobile added */}
             {authors.length > 0 ? (
               <div className="mb-20">
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
+                {/* MOBILE VIEW - Completely separate */}
+                <div className="block md:hidden space-y-6">
+                  {authors.map((author) => {
+                    // Function to limit bio length
+                    const getLimitedBio = (
+                      bio: string,
+                      maxLength: number = 200
+                    ) => {
+                      if (bio.length <= maxLength) return bio;
+                      const trimmed = bio.substring(0, maxLength);
+                      const lastPeriod = trimmed.lastIndexOf(".");
+                      const lastExclamation = trimmed.lastIndexOf("!");
+                      const lastQuestion = trimmed.lastIndexOf("?");
+                      const lastSentenceEnd = Math.max(
+                        lastPeriod,
+                        lastExclamation,
+                        lastQuestion
+                      );
+
+                      if (lastSentenceEnd > maxLength * 0.7) {
+                        return trimmed.substring(0, lastSentenceEnd + 1);
+                      }
+                      return trimmed.substring(0, maxLength - 3) + "...";
+                    };
+
+                    return (
+                      <div
+                        key={`mobile-${author.id}`}
+                        className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+                        onClick={() => router.push(`/authors/${author.slug}`)}
+                      >
+                        <div className="p-4">
+                          <div className="flex gap-4 mb-4">
+                            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                              <img
+                                src={author.avatar}
+                                alt={author.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src =
+                                    "/placeholder.svg";
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-1 uppercase tracking-wide">
+                                {author.name}
+                              </h3>
+                              <p className="text-sky-600 dark:text-sky-400 font-medium text-sm tracking-wide">
+                                {author.job_title}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mb-4">
+                            <p className="text-black dark:text-gray-300 text-sm leading-relaxed">
+                              {getLimitedBio(author.bio)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/authors/${author.slug}`);
+                            }}
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors"
+                          >
+                            <span className="text-sm">View Profile</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* DESKTOP VIEW - EXACTLY AS YOU HAD IT - NO CHANGES */}
+                <div className="hidden md:flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
                   {authors.map((author) => {
                     const isSelected = expandedAuthorId === author.id;
 
@@ -893,7 +968,7 @@ export default function ArticlesClient() {
                                       )}
                                     </div>
 
-                                    {/* Action Button - ALWAYS VISIBLE IN EXPANDED STATE */}
+                                    {/* Action Button */}
                                     <div className="pt-2">
                                       <button
                                         onClick={(e) => {
@@ -921,8 +996,8 @@ export default function ArticlesClient() {
                   })}
                 </div>
 
-                {/* Navigation Hint */}
-                <div className="mt-8 text-center">
+                {/* Navigation Hint - Desktop only */}
+                <div className="hidden md:block mt-8 text-center">
                   <div className="inline-flex items-center gap-2 text-black dark:text-gray-400 text-sm">
                     <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
                     <span>Click on any author to expand and learn more</span>
