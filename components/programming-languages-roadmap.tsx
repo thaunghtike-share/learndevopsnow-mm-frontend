@@ -164,13 +164,18 @@ export function ProgrammingLanguagesRoadmap({
         {/* Header Section - English titles kept as requested */}
         <div className="mb-12 md:mb-16">
           <div className="max-w-3xl">
-            <div className="h-1 w-20 md:w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4 md:mb-6" />
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 leading-tight">
-              Start with Coding Before
-              <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                Your DevOps Journey
+            {/* Blue/Purple gradient line with "Author Dashboard" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                Learn Coding
               </span>
-            </h2>
+            </div>
+
+            {/* Main title with your font style */}
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight">
+              Learn Coding Before DevOps
+            </h1>
             <p className="text-base md:text-lg text-black-400 dark:text-gray-300 leading-relaxed">
               {locale === "en"
                 ? "Before diving into DevOps tools and automation, it's important to have a solid understanding of programming. Coding skills help you write scripts, automate tasks, and understand how software is built and deployed."

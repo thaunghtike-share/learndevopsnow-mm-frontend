@@ -424,7 +424,14 @@ const roadmap: RoadmapStage[] = [
         descriptionMy:
           "Orchestrate containers at scale with K8s clusters and deployments",
         tags: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
-        tagsMy: ["pods", "services", "deployments", "configmaps", "helm", "rbac"],
+        tagsMy: [
+          "pods",
+          "services",
+          "deployments",
+          "configmaps",
+          "helm",
+          "rbac",
+        ],
         image: "kubernetes.png",
         officialLink: "https://kubernetes.io",
       },
@@ -526,7 +533,9 @@ interface MinimalDevopsRoadmapProps {
   locale?: string;
 }
 
-export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProps) {
+export function MinimalDevopsRoadmap({
+  locale = "en",
+}: MinimalDevopsRoadmapProps) {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
 
   const nextStage = () => {
@@ -562,23 +571,23 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="max-w-3xl">
-              <motion.div
-                className="h-1 w-20 md:w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4 md:mb-6"
-                initial={{ width: 0 }}
-                animate={{ width: "5rem" }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              />
-
+              {/* Blue/Purple gradient line with "Our Mission" style */}
+              <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                  DevOps Roadmap
+                </span>
+              </div>
+              
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 leading-tight"
+                className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight"
               >
-                {locale === 'en' ? 'DevOps Roadmap with' : 'DevOps Roadmap with'}
-                <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                  {locale === 'en' ? 'Structured Learning Path' : 'Structured Learning Path'}
-                </span>
+                {locale === "en"
+                  ? "Complete DevOps Roadmap"
+                  : "​​Complete DevOps Roadmap"}
               </motion.h2>
 
               <motion.p
@@ -587,9 +596,9 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                 transition={{ delay: 0.2 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed"
               >
-                {locale === 'en' 
-                  ? 'Follow our comprehensive DevOps roadmap designed to take you from complete beginner to advanced practitioner with hands-on projects and real-world scenarios'
-                  : 'beginner level မှ စတင်ပြီး advanced အထိ level တစ်ခုချင်းစီအလိုက် လေ့လာရမည့် topics များကို စုစည်းထားသော DevOps Roadmap တစ်ခုဖြစ်ပါသည်။'}
+                {locale === "en"
+                  ? "Follow our comprehensive DevOps roadmap designed to take you from complete beginner to advanced practitioner with hands-on projects and real-world scenarios"
+                  : "beginner level မှ စတင်ပြီး advanced အထိ level တစ်ခုချင်းစီအလိုက် လေ့လာရမည့် topics များကို စုစည်းထားသော DevOps Roadmap တစ်ခုဖြစ်ပါသည်။"}
               </motion.p>
             </div>
           </motion.div>
@@ -616,17 +625,24 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                   >
                     <div>
                       <span className="text-xs font-mono text-black-500 dark:text-gray-400 tracking-wider uppercase hidden md:block">
-                        {locale === 'en' ? 'Stage' : 'အဆင့်'} {currentStageIndex + 1} {locale === 'en' ? 'of' : '/'} {roadmap.length}
+                        {locale === "en" ? "Stage" : "အဆင့်"}{" "}
+                        {currentStageIndex + 1} {locale === "en" ? "of" : "/"}{" "}
+                        {roadmap.length}
                       </span>
                       <h3
                         className={`text-2xl md:text-4xl font-bold mt-1 md:mt-2 tracking-tight bg-gradient-to-r ${currentConfig.gradient} bg-clip-text text-transparent`}
                       >
-                        {locale === 'en' ? currentStage.label : currentStage.labelMy}
+                        {locale === "en"
+                          ? currentStage.label
+                          : currentStage.labelMy}
                       </h3>
                     </div>
 
                     <div className="space-y-3 md:space-y-4">
-                      {(locale === 'en' ? currentStage.description : currentStage.descriptionMy).map((desc, index) => (
+                      {(locale === "en"
+                        ? currentStage.description
+                        : currentStage.descriptionMy
+                      ).map((desc, index) => (
                         <p
                           key={index}
                           className="text-base text-black dark:text-gray-300 leading-relaxed"
@@ -654,7 +670,7 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                           >
                             <img
                               src={`/${item.image}`}
-                              alt={locale === 'en' ? item.title : item.titleMy}
+                              alt={locale === "en" ? item.title : item.titleMy}
                               className="w-8 h-8 md:w-12 md:h-12 object-contain"
                               onError={handleImageError}
                             />
@@ -665,7 +681,7 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                             rel="noopener noreferrer"
                             className="text-xs text-gray-700 dark:text-gray-300 text-center font-medium max-w-[60px] md:max-w-[70px] leading-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
                           >
-                            {locale === 'en' ? item.title : item.titleMy}
+                            {locale === "en" ? item.title : item.titleMy}
                           </a>
                         </motion.div>
                       ))}
@@ -677,7 +693,9 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                   <button
                     onClick={prevStage}
                     className="p-2 md:p-3 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
-                    aria-label={locale === 'en' ? "Previous stage" : "ယခင်အဆင့်"}
+                    aria-label={
+                      locale === "en" ? "Previous stage" : "ယခင်အဆင့်"
+                    }
                   >
                     <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -690,7 +708,11 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                           setCurrentStageIndex(index);
                         }}
                         className="group"
-                        aria-label={locale === 'en' ? `Go to stage ${index + 1}` : `အဆင့် ${index + 1} သို့သွားရန်`}
+                        aria-label={
+                          locale === "en"
+                            ? `Go to stage ${index + 1}`
+                            : `အဆင့် ${index + 1} သို့သွားရန်`
+                        }
                       >
                         <div
                           className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
@@ -710,7 +732,7 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                   <button
                     onClick={nextStage}
                     className="p-2 md:p-3 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
-                    aria-label={locale === 'en' ? "Next stage" : "နောက်အဆင့်"}
+                    aria-label={locale === "en" ? "Next stage" : "နောက်အဆင့်"}
                   >
                     <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -771,16 +793,21 @@ export function MinimalDevopsRoadmap({ locale = 'en' }: MinimalDevopsRoadmapProp
                                 rel="noopener noreferrer"
                                 className="text-base font-semibold text-sky-700 dark:text-sky-400 leading-tight mb-1 md:mb-2 hover:text-sky-700 dark:hover:text-sky-300 transition-colors duration-200 cursor-pointer block"
                               >
-                                {locale === 'en' ? item.title : item.titleMy}
+                                {locale === "en" ? item.title : item.titleMy}
                               </a>
 
                               <p className="text-sm text-black-700 dark:text-gray-300 leading-relaxed mb-2 md:mb-3">
-                                {locale === 'en' ? item.description : item.descriptionMy}
+                                {locale === "en"
+                                  ? item.description
+                                  : item.descriptionMy}
                               </p>
 
                               {/* Compact Tags */}
                               <div className="flex flex-wrap gap-1 md:gap-1.5">
-                                {(locale === 'en' ? item.tags : item.tagsMy).map((tag, tagIndex) => (
+                                {(locale === "en"
+                                  ? item.tags
+                                  : item.tagsMy
+                                ).map((tag, tagIndex) => (
                                   <span
                                     key={tagIndex}
                                     className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-medium ${currentConfig.tagBg} dark:bg-gray-700 border ${currentConfig.tagBorder} dark:border-gray-600 text-orange-600 dark:text-orange-400 transition-all duration-200 hover:scale-105 ${currentConfig.tagHover} dark:hover:bg-gray-600`}

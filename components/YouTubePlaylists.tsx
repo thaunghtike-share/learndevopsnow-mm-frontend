@@ -197,7 +197,8 @@ const youtubePlaylists = [
     is_burmese: false,
     recommended: true,
     description: "Master Azure fundamentals with clear explanations",
-    descriptionMy: "ရှင်းလင်းတဲ့ရှင်းပြချက်တွေနဲ့ Azure အခြေခံများ ကျွမ်းကျင်ပါ",
+    descriptionMy:
+      "ရှင်းလင်းတဲ့ရှင်းပြချက်တွေနဲ့ Azure အခြေခံများ ကျွမ်းကျင်ပါ",
     order: 5,
   },
 
@@ -296,7 +297,8 @@ const youtubePlaylists = [
     is_burmese: false,
     recommended: true,
     description: "Modern CI/CD pipelines explained clearly",
-    descriptionMy: "ခေတ်မီ CI/CD pipelines တွေကို ရှင်းရှင်းလင်းလင်းရှင်းပြထားတယ်",
+    descriptionMy:
+      "ခေတ်မီ CI/CD pipelines တွေကို ရှင်းရှင်းလင်းလင်းရှင်းပြထားတယ်",
     order: 3,
   },
   {
@@ -375,7 +377,8 @@ const youtubePlaylists = [
     is_burmese: false,
     recommended: true,
     description: "AWS security best practices and implementation",
-    descriptionMy: "AWS security အကောင်းဆုံးအလေ့အကျင့်များနှင့် အကောင်အထည်ဖော်မှု",
+    descriptionMy:
+      "AWS security အကောင်းဆုံးအလေ့အကျင့်များနှင့် အကောင်အထည်ဖော်မှု",
     order: 5,
   },
   {
@@ -740,7 +743,7 @@ interface YouTubePlaylistsProps {
   locale?: string;
 }
 
-export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
+export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [completedPlaylists, setCompletedPlaylists] = useState<Set<number>>(
     new Set()
@@ -824,7 +827,9 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
     return (
       <section className="max-w-7xl mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="animate-pulse dark:text-gray-300">
-          {locale === 'en' ? "Loading YouTube courses..." : "YouTube သင်ခန်းစာများ ဖွင့်နေသည်..."}
+          {locale === "en"
+            ? "Loading YouTube courses..."
+            : "YouTube သင်ခန်းစာများ ဖွင့်နေသည်..."}
         </div>
       </section>
     );
@@ -842,22 +847,24 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
           >
             {/* Left Content */}
             <div className="flex-1 text-left">
-              <motion.div
-                className="h-1 w-20 md:w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4"
-                initial={{ width: 0 }}
-                animate={{ width: "5rem" }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              />
-              <motion.h1
+              {/* Blue/Purple gradient line with "Our Mission" style */}
+              <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                  Youtube Courses
+                </span>
+              </div>
+
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight"
+                transition={{ delay: 0.1 }}
+                className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight"
               >
-                {locale === 'en' ? "Master DevOps with" : "Master DevOps with"}
-                <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                  {locale === 'en' ? "YouTube Courses" : "YouTube Courses"}
-                </span>
-              </motion.h1>
+                {locale === "en"
+                  ? "Learn DevOps on YouTube"
+                  : "​​Learn DevOps on YouTube"}
+              </motion.h2>
 
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
@@ -865,10 +872,9 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                 transition={{ delay: 0.1 }}
                 className="text-base md:text-lg text-black dark:text-gray-300 mb-6 leading-relaxed max-w-2xl"
               >
-                {locale === 'en' 
+                {locale === "en"
                   ? "Curated learning paths from fundamentals to advanced production skills. Follow structured roadmaps with the best YouTube content."
-                  : "Youtube မှာ အခြေခံကနေ စတင်ပြီး devops နဲ့ဆိုင်တဲ့ သင်ခန်းစာ တွေကို level အလိုက် စနစ်တကျ လေ့လာပါ။"
-                }
+                  : "Youtube မှာ အခြေခံကနေ စတင်ပြီး devops နဲ့ဆိုင်တဲ့ သင်ခန်းစာ တွေကို level အလိုက် စနစ်တကျ လေ့လာပါ။"}
               </motion.p>
 
               {/* Search Bar */}
@@ -881,13 +887,14 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder={locale === 'en' 
-                    ? "Search courses by topic, technology, or channel..."
-                    : "ခေါင်းစဉ်၊ နည်းပညာ သို့မဟုတ် channel အလိုက် သင်ခန်းစာများ ရှာရန်..."
+                  placeholder={
+                    locale === "en"
+                      ? "Search courses by topic, technology, or channel..."
+                      : "ခေါင်းစဉ်၊ နည်းပညာ သို့မဟုတ် channel အလိုက် သင်ခန်းစာများ ရှာရန်..."
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-lg"
+                  className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent shadow-lg"
                 />
                 {searchQuery && (
                   <button
@@ -949,13 +956,23 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                               {path.title} {/* Always show English title */}
                             </h2>
                             <span className="text-sm font-medium text-sky-600 dark:text-sky-400 mt-1 block">
-                              {locale === 'en' ? `${difficulty} Level` : difficulty === 'Beginner' ? 'Beginner' : difficulty === 'Intermediate' ? 'Intermediate' : 'Advanced'} • {playlists.length} {locale === 'en' ? 'courses' : 'courses'}
+                              {locale === "en"
+                                ? `${difficulty} Level`
+                                : difficulty === "Beginner"
+                                ? "Beginner"
+                                : difficulty === "Intermediate"
+                                ? "Intermediate"
+                                : "Advanced"}{" "}
+                              • {playlists.length}{" "}
+                              {locale === "en" ? "courses" : "courses"}
                             </span>
                           </div>
                         </div>
 
                         <p className="text-black dark:text-gray-300 text-base leading-relaxed mb-4 md:mb-8">
-                          {locale === 'en' ? path.description : path.descriptionMy}
+                          {locale === "en"
+                            ? path.description
+                            : path.descriptionMy}
                         </p>
 
                         {/* Learning Path - Made scrollable on mobile */}
@@ -965,7 +982,9 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                           }`}
                         >
                           <span className="text-sm md:mb-4 font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
-                            {locale === 'en' ? "Recommended Learning Path" : "Recommended Learning Path"}
+                            {locale === "en"
+                              ? "Recommended Learning Path"
+                              : "Recommended Learning Path"}
                           </span>
                           <div
                             className="w-full overflow-x-auto pb-2 
@@ -984,7 +1003,8 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
                                   >
                                     <span className="text-lg">{step.icon}</span>
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                      {step.title} {/* Always show English title */}
+                                      {step.title}{" "}
+                                      {/* Always show English title */}
                                     </span>
                                   </div>
                                   {index < path.learningPath.length - 1 && (
@@ -1016,7 +1036,9 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
               className="mb-12 md:mb-16"
             >
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 md:mb-8">
-                {locale === 'en' ? `Found ${filteredPlaylists.length} courses` : `သင်ခန်းစာ ${filteredPlaylists.length} ခု တွေ့ရှိပါသည်`}
+                {locale === "en"
+                  ? `Found ${filteredPlaylists.length} courses`
+                  : `သင်ခန်းစာ ${filteredPlaylists.length} ခု တွေ့ရှိပါသည်`}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPlaylists.map((playlist, index) => {
@@ -1046,16 +1068,18 @@ export function YouTubePlaylists({ locale = 'en' }: YouTubePlaylistsProps) {
             >
               <Search className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                {locale === 'en' ? "No courses found" : "သင်ခန်းစာ မတွေ့ပါ"}
+                {locale === "en" ? "No courses found" : "သင်ခန်းစာ မတွေ့ပါ"}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {locale === 'en' ? "Try different keywords" : "မတူညီတဲ့ keyword တွေ စမ်းကြည့်ပါ"}
+                {locale === "en"
+                  ? "Try different keywords"
+                  : "မတူညီတဲ့ keyword တွေ စမ်းကြည့်ပါ"}
               </p>
               <button
                 onClick={() => setSearchQuery("")}
                 className="px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
               >
-                {locale === 'en' ? "Clear Search" : "ရှာဖွေမှုကို ရှင်းလင်းရန်"}
+                {locale === "en" ? "Clear Search" : "ရှာဖွေမှုကို ရှင်းလင်းရန်"}
               </button>
             </motion.div>
           )}
@@ -1078,7 +1102,7 @@ function HorizontalScrollSection({
   config,
   completedPlaylists,
   toggleComplete,
-  locale = 'en'
+  locale = "en",
 }: HorizontalScrollSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -1116,7 +1140,7 @@ function HorizontalScrollSection({
         <button
           onClick={() => scroll("left")}
           className="absolute -left-4 md:-left-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
-          aria-label={locale === 'en' ? "Scroll left" : "ဘယ်ဘက်သို့ ရွှေ့ရန်"}
+          aria-label={locale === "en" ? "Scroll left" : "ဘယ်ဘက်သို့ ရွှေ့ရန်"}
         >
           <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
@@ -1126,7 +1150,7 @@ function HorizontalScrollSection({
         <button
           onClick={() => scroll("right")}
           className="absolute -right-4 md:-right-6 top-1/3 -translate-y-1/2 z-20 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-full shadow-xl hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all hidden sm:block"
-          aria-label={locale === 'en' ? "Scroll right" : "ညာဘက်သို့ ရွှေ့ရန်"}
+          aria-label={locale === "en" ? "Scroll right" : "ညာဘက်သို့ ရွှေ့ရန်"}
         >
           <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700 dark:text-gray-300" />
         </button>
@@ -1166,7 +1190,7 @@ function HorizontalScrollSection({
 }
 
 interface PlaylistCardProps {
-  playlist: typeof youtubePlaylists[0];
+  playlist: (typeof youtubePlaylists)[0];
   config: (typeof difficultyConfig)[keyof typeof difficultyConfig];
   index: number;
   isCompleted?: boolean;
@@ -1180,7 +1204,7 @@ function PlaylistCard({
   index,
   isCompleted,
   toggleComplete,
-  locale = 'en'
+  locale = "en",
 }: PlaylistCardProps) {
   return (
     <motion.div
@@ -1231,7 +1255,7 @@ function PlaylistCard({
 
             <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {locale === 'en' ? playlist.estDuration : playlist.estDurationMy}
+              {locale === "en" ? playlist.estDuration : playlist.estDurationMy}
             </div>
           </div>
         </a>
@@ -1243,9 +1267,14 @@ function PlaylistCard({
               toggleComplete(playlist.id);
             }}
             className="absolute top-3 right-3 z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110 transition-transform border-2 border-gray-300 dark:border-gray-600"
-            aria-label={isCompleted ? 
-              (locale === 'en' ? "Mark as incomplete" : "မပြီးဆုံးသေးဟု မှတ်သားရန်") : 
-              (locale === 'en' ? "Mark as complete" : "ပြီးဆုံးပြီဟု မှတ်သားရန်")
+            aria-label={
+              isCompleted
+                ? locale === "en"
+                  ? "Mark as incomplete"
+                  : "မပြီးဆုံးသေးဟု မှတ်သားရန်"
+                : locale === "en"
+                ? "Mark as complete"
+                : "ပြီးဆုံးပြီဟု မှတ်သားရန်"
             }
           >
             {isCompleted ? (
@@ -1285,7 +1314,7 @@ function PlaylistCard({
           {isCompleted && (
             <span className="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              {locale === 'en' ? "Completed" : "ပြီးဆုံးပြီ"}
+              {locale === "en" ? "Completed" : "ပြီးဆုံးပြီ"}
             </span>
           )}
         </div>

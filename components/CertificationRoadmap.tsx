@@ -300,7 +300,9 @@ interface CertificationRoadmapProps {
   locale?: string;
 }
 
-export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProps) {
+export function CertificationRoadmap({
+  locale = "en",
+}: CertificationRoadmapProps) {
   const [hoveredCert, setHoveredCert] = useState<string | null>(null);
 
   const handleCertClick = (examLink: string) => {
@@ -319,22 +321,23 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
           transition={{ duration: 0.6 }}
         >
           <div className="flex-1">
-            <motion.div
-              className="h-1 w-32 mb-4 bg-gradient-to-r from-sky-500 to-blue-500 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: 128 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            />
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Get Certified
+              </span>
+            </div>
 
             <motion.h2
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight"
+              transition={{ delay: 0.1 }}
+              className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight"
             >
-              Advance Your Career
-              <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-                DevOps Certifications
-              </span>
+              {locale === "en"
+                ? "Advance Your DevOps Career"
+                : "​Advance Your DevOps Career"}
             </motion.h2>
 
             <motion.p
@@ -343,10 +346,9 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
               transition={{ delay: 0.1 }}
               className="text-black dark:text-gray-300 mt-4 text-base md:text-lg max-w-2xl"
             >
-              {locale === 'en' 
+              {locale === "en"
                 ? "Validate your skills with industry-recognized certifications that showcase your DevOps expertise and boost your career prospects."
-                : "beginner level မှစတင်ပြီး ဖြေဆိုသင့်တဲ့ certificate တွေကို ဖော်ပြ ပေးထားပါတယ်။ ​Certifiacte တွေ ပိုင်ဆိုင်ထားတာကလည်း အလုပ်အကိုင် အခွင့်အလမ်းကောင်းတွေကို ပိုမိုရရှိစေနိုင်ပါတယ်။"
-              }
+                : "beginner level မှစတင်ပြီး ဖြေဆိုသင့်တဲ့ certificate တွေကို ဖော်ပြ ပေးထားပါတယ်။ ​Certifiacte တွေ ပိုင်ဆိုင်ထားတာကလည်း အလုပ်အကိုင် အခွင့်အလမ်းကောင်းတွေကို ပိုမိုရရှိစေနိုင်ပါတယ်။"}
             </motion.p>
           </div>
         </motion.div>
@@ -497,10 +499,9 @@ export function CertificationRoadmap({ locale = 'en' }: CertificationRoadmapProp
           className="text-center mt-6 md:block hidden md:mt-8"
         >
           <p className="text-black dark:text-gray-300 text-sm md:text-base">
-            {locale === 'en' 
+            {locale === "en"
               ? "💡 Click on any certification to visit the official exam page"
-              : "💡 exam ရဲ့  တရားဝင် စာမျက်နှာကို သွားဖို့ icon ပေါ်ကို နှိပ်ပါ"
-            }
+              : "💡 exam ရဲ့  တရားဝင် စာမျက်နှာကို သွားဖို့ icon ပေါ်ကို နှိပ်ပါ"}
           </p>
         </motion.div>
       </div>

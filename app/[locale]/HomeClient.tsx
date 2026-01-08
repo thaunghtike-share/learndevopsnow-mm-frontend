@@ -21,7 +21,6 @@ export default function HomeClient() {
 
   const initialTag = searchParams.get("tag") || null;
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [mounted, setMounted] = useState(false);
   // REMOVE the isMobile state and useEffect for checking screen size
 
@@ -37,21 +36,6 @@ export default function HomeClient() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Handle initial load scroll
-  useEffect(() => {
-    if (isInitialLoad) {
-      window.scrollTo(0, 0);
-      setIsInitialLoad(false);
-    }
-  }, [isInitialLoad]);
-
-  // Scroll to top when home is selected (tag is cleared)
-  useEffect(() => {
-    if (!selectedTag && !isInitialLoad) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [selectedTag, isInitialLoad]);
 
   // Update URL when tag changes
   useEffect(() => {

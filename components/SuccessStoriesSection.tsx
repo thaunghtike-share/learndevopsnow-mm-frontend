@@ -125,21 +125,22 @@ export function SuccessStoriesSection() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex-1">
-              <motion.div
-                className="h-1 w-24 md:w-32 mb-4 md:mb-6 bg-gradient-to-r from-sky-500 to-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: "6rem" }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              />
-              <motion.h2
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 leading-tight"
-              >
-                Real Stories from
-                <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent mt-1 md:mt-2">
-                  Our Community
+              {/* Blue/Purple gradient line with "Our Mission" style */}
+              <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                  Success Stories
                 </span>
+              </div>
+
+
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-4 tracking-tight"
+              >
+                Feedback from Our Students
               </motion.h2>
 
               <motion.p
