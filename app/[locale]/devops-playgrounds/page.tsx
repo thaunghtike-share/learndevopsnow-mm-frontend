@@ -206,12 +206,15 @@ export default function DevOpsPlaygroundsPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="max-w-4xl">
-                <div className="h-1 w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4"></div>
-                <h1 className="text-3xl md:text-5xl font-bold text-black dark:text-white mb-4 leading-tight">
-                  DevOps Playgrounds
-                  <span className="block bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
-                    Practice in Real Environments
+                {/* Blue/Purple gradient line with "Our Mission" style */}
+                <div className="flex items-center gap-4 mb-4 md:mb-6">
+                  <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                  <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                    DevOps Playgrounds
                   </span>
+                </div>
+                <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+                  Practice in Real Environments
                 </h1>
                 <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed max-w-3xl">
                   Free interactive playgrounds to practice DevOps skills. No

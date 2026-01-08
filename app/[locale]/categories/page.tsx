@@ -103,7 +103,7 @@ export default function CategoriesPage() {
     fetchCategories();
   }, []);
 
-  const displayedCategories = showAll ? categories : categories.slice(0, 6);
+  const displayedCategories = showAll ? categories : categories.slice(0, 12);
 
   const toggleShowAll = () => {
     if (showAll && categoriesRef.current) {
@@ -112,7 +112,7 @@ export default function CategoriesPage() {
     setShowAll(!showAll);
   };
 
-   if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
@@ -174,29 +174,22 @@ export default function CategoriesPage() {
           transition={{ duration: 0.6 }}
         >
           <div className="max-w-3xl">
-            <motion.div
-              className="h-1 w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-6"
-              initial={{ width: 0 }}
-              animate={{ width: "6rem" }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            />
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Categories
+              </span>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="flex items-center gap-4 mb-6"
+              className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight"
             >
-              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center p-2">
-                <Folder className="w-8 h-8 text-sky-600 dark:text-sky-400" />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-                Explore by
-                <span className="block bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
-                  Categories
-                </span>
-              </h2>
-            </motion.div>
+              Explore By Categories
+            </motion.h2>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}

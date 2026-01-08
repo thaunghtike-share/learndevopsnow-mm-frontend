@@ -299,13 +299,16 @@ export default function MonolithicToCloudNativePage() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl"
           >
-            <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
-
-            <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
-              From Monolithic to
-              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                Cloud Native
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Cloud Migration Services
               </span>
+            </div>
+
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+              From Monolithic To Cloud-Native
             </h1>
 
             <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-8 md:mb-12 leading-relaxed max-w-3xl text-left">
@@ -382,13 +385,15 @@ export default function MonolithicToCloudNativePage() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl"
           >
-            <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
-
-            <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
-              Infrastructure Design
-              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                For Our Client
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                DevOps Architecture
               </span>
+            </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+              Infrastucture Design For Clients
             </h1>
             <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
               {t(

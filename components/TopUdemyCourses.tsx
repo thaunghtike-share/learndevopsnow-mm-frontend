@@ -485,12 +485,15 @@ export function TopUdemyCourses() {
         <div className="px-6 md:px-11">
           {/* Header - Mobile Optimized */}
           <div className="max-w-3xl mb-16">
-            <div className="h-1 w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-6"></div>
-            <h2 className="text-2xl md:text-5xl font-bold text-slate-900 dark:text-gray-100 mb-6 leading-tight">
-              Start Your Journey with
-              <span className="block bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent mt-2">
-                KodeKloud
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Online Courses
               </span>
+            </div>{" "}
+            <h2 className="text-2xl md:text-6xl text-slate-900 dark:text-gray-100 mb-6 tracking-tight">
+              Learn DevOps on KodeKloud
             </h2>
             <p className="text-lg md:text-xl text-slate-700 dark:text-gray-300 leading-relaxed">
               The leading platform for DevOps, Cloud, and Infrastructure

@@ -279,23 +279,16 @@ export default function FAQPage() {
         {/* Header Section */}
         <div className="mb-16">
           <div className="max-w-3xl">
-            <motion.div
-              className="h-1 w-24 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-6"
-              initial={{ width: 0 }}
-              animate={{ width: 96 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            />
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-6 leading-tight"
-            >
-              Frequently Asked
-              <span className="block bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
-                Questions
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                FAQS
               </span>
-            </motion.h1>
+            </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+              Frequently Asked Questions
+            </h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}

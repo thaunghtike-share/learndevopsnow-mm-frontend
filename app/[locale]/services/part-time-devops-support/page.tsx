@@ -271,15 +271,15 @@ export default function PartTimeDevOpsSupportPage() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-4xl"
           >
-            {/* Underline */}
-            <div className="h-1 w-20 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-4 md:mb-6"></div>
-
-            {/* Main Title - Left Aligned */}
-            <h1 className="text-3xl md:text-6xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight text-left">
-              Part-Time
-              <span className="block bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent">
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                 DevOps Support
               </span>
+            </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+              Part-Time DevOps Support
             </h1>
 
             {/* Description - Left Aligned */}

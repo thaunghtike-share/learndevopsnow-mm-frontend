@@ -79,13 +79,16 @@ export default function TermsOfService() {
           <div className="max-w-4xl">
             {/* Header */}
             <div className="max-w-3xl mb-12 md:mb-16">
-              <div className="h-1 w-20 bg-gradient-to-r from-sky-600 to-blue-600 rounded-full mb-4 md:mb-6"></div>
-              <h2 className="text-3xl md:text-5xl font-bold text-black dark:text-white mb-4 md:mb-6 leading-tight">
-                Terms of Service
-                <span className="block bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent">
-                  Clear & Fair
+              {/* Blue/Purple gradient line with "Our Mission" style */}
+              <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                  Terms of Service
                 </span>
-              </h2>
+              </div>
+              <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+                Terms of Service
+              </h1>
               <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed">
                 Simple guidelines to ensure our DevOps community remains
                 productive, respectful, and focused on learning and sharing
