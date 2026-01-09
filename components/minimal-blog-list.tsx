@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Folder,
   Tag as TagIcon,
+  Calendar,
   Eye,
   AlertTriangle,
   ChevronLeft,
@@ -87,6 +88,16 @@ export function MinimalBlogList({
     const words = content.trim().split(/\s+/).length;
     const minutes = Math.ceil(words / 200);
     return `${minutes} min read`;
+  };
+
+  // Format date to readable format
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   // Close dropdown when clicking outside
@@ -408,12 +419,7 @@ export function MinimalBlogList({
               const author = getAuthor(article.author);
               const category = getCategoryById(article.category);
               const readTime = calculateReadTime(article.content);
-
-              // Get article tags
-              const articleTags = article.tags
-                .map((tagId) => getTagById(tagId))
-                .filter(Boolean)
-                .slice(0, 3);
+              const releaseDate = formatDate(article.published_at);
 
               return (
                 <article key={article.id} className="group">
@@ -482,7 +488,7 @@ export function MinimalBlogList({
                       </p>
                     </div>
 
-                    {/* Author and Main Tag */}
+                    {/* Author and Release Date */}
                     <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-4">
                       {/* Author - Left Side */}
                       <div className="flex items-center gap-2">
@@ -503,16 +509,11 @@ export function MinimalBlogList({
                         </span>
                       </div>
 
-                      {/* Main Tag - Right Side */}
-                      {articleTags.length > 0 && (
-                        <Link
-                          href={`/articles?tag=${articleTags[0]!.slug}`}
-                          className="flex items-center gap-1 text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 font-medium text-sm"
-                        >
-                          <TagIcon className="w-4 h-4" />
-                          {articleTags[0]!.name}
-                        </Link>
-                      )}
+                      {/* Release Date - Right Side */}
+                      <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-sm">
+                        <Calendar className="w-4 h-4" />
+                        {releaseDate}
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -537,10 +538,6 @@ export function MinimalBlogList({
 
                   {/* Always show 3 pages (or less if fewer pages exist) */}
                   {(() => {
-                    // For testing: Let's see how many pages we have
-                    console.log("Total pages:", totalPages);
-                    console.log("Current page:", currentPage);
-
                     // Create an array of page numbers to show
                     let pagesToShow: number[] = [];
 
