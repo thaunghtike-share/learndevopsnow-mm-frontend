@@ -315,10 +315,6 @@ export function MinimalHeader() {
       ),
     },
     {
-      href: `/${currentLocale}/free-courses`,
-      label: getNavText("Learn Free Courses", "အခမဲ့သင်တန်းများ"),
-    },
-    {
       href: `/${currentLocale}/devops-playgrounds`,
       label: getNavText(
         "Explore DevOps Playgrounds",
@@ -331,10 +327,6 @@ export function MinimalHeader() {
     {
       href: `/${currentLocale}/services/cloud-migration`,
       label: getNavText("Cloud Migration", "Cloud Migration"),
-    },
-    {
-      href: `/${currentLocale}/services/infrastructure-automation`,
-      label: getNavText("Infrastructure as Code", "Infrastructure as Code"),
     },
     {
       href: `/${currentLocale}/services/part-time-devops-support`,
@@ -888,12 +880,6 @@ export function MinimalHeader() {
                       "Learn DevOps on YouTube",
                       "YouTube သင်ခန်းစာများ"
                     )}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/free-courses`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Learn Free Courses", "အခမဲ့ သင်ခန်းစာများ")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/devops-playgrounds`}
