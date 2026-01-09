@@ -127,8 +127,8 @@ export default function CategoriesPage() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
                     <img
-                      src="/kodekloud.webp"
-                      alt="KodeKloud"
+                      src="/logo.png"
+                      alt="Logo"
                       className="w-16 h-16 object-contain animate-pulse"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "/placeholder.svg";
