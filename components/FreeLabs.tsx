@@ -163,12 +163,9 @@ export function FreeLabs() {
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight"
+            className="text-2xl md:text-6xl text-black dark:text-gray-100 mb-5 tracking-tight"
           >
-            Practice DevOps with
-            <span className="block bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
-              Interactive Labs
-            </span>
+            Free DevOps Playgrounds
           </motion.h2>
 
           <motion.div
