@@ -64,12 +64,11 @@ export function SuccessStoriesSection() {
               </div>
 
               <h2 className="text-2xl md:text-6xl text-black dark:text-white mb-4 md:mb-6 tracking-tight">
-                Feedback from Our Students
+                Real Stories, Real Success
               </h2>
 
               <p className="text-black dark:text-gray-300 text-base md:text-lg max-w-2xl">
-                See how students and junior engineers from Myanmar are growing
-                their careers and mastering DevOps skills
+                See how we helped students and junior engineers from Myanmar Achieve Their Goals. Hear from our visitors who have transformed their careers by breaking into DevOps, advancing their careers, and achieving their professional goals.
               </p>
             </div>
           </div>
