@@ -45,6 +45,13 @@ import {
   Calendar,
   Clock,
   ChevronDown,
+  GitPullRequest,
+  Shield,
+  Wifi,
+  HardDrive,
+  Network,
+  Cctv,
+  Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -198,32 +205,32 @@ export default function MonolithicToCloudNativePage() {
       icon: Workflow,
       title: "End-to-End DevOps",
       description: t(
-        "Complete automation from code to production",
-        "Code စတင်ရေးချိန်မှစပြီး Production အဆင့်အထိ automation စနစ်ဖြင့် ချိတ်ဆက်ဆောင်ရွက်ပေးခြင်း"
+        "Complete automation from code to production with GitOps workflows, Infrastructure as Code, and automated security scanning",
+        "Code စတင်ရေးချိန်မှစပြီး Production အဆင့်အထိ GitOps workflows, Infrastructure as Code, နှင့် automated security scanning များပါဝင်သော automation စနစ်ဖြင့် ချိတ်ဆက်ဆောင်ရွက်ပေးခြင်း"
       ),
     },
     {
       icon: ShieldCheck,
       title: "Enterprise Security",
       description: t(
-        "Built-in security at every layer",
-        "Infrastructure အလွှာတိုင်းတွင် စိတ်ချရသော လုပ်ငန်းသုံးအဆင့် လုံခြုံရေးစနစ်များ ထည့်သွင်းတည်ဆောက်ခြင်း"
+        "Built-in security at every layer with Zero Trust architecture, RBAC, OPA policies, and automated vulnerability scanning",
+        "Infrastructure အလွှာတိုင်းတွင် Zero Trust architecture, RBAC, OPA policies, နှင့် automated vulnerability scanning များပါဝင်သည့် စိတ်ချရသော လုပ်ငန်းသုံးအဆင့် လုံခြုံရေးစနစ်များ ထည့်သွင်းတည်ဆောက်ခြင်း"
       ),
     },
     {
       icon: Scale,
       title: "Auto Scaling",
       description: t(
-        "Intelligent resource optimization",
-        "user အသုံးပြုမှုအပေါ် မူတည်ပြီး application များကို အလိုအလျောက် စီမံခန့်ခွဲပေးခြင်း"
+        "Intelligent resource optimization with Horizontal Pod Autoscaler (HPA), Cluster Autoscaler, and predictive scaling based on metrics",
+        "user အသုံးပြုမှုအပေါ် မူတည်ပြီး Horizontal Pod Autoscaler (HPA), Cluster Autoscaler နှင့် metrics-based predictive scaling တို့ဖြင့် application များကို အလိုအလျောက် စီမံခန့်ခွဲပေးခြင်း"
       ),
     },
     {
       icon: Zap,
       title: "High Performance",
       description: t(
-        "10x faster deployment cycles",
-        "Deployment Lifecycle ကို ၁၀ ဆ ပိုမိုမြန်ဆန်သွက်လက်စေခြင်း"
+        "10x faster deployment cycles with parallel builds, incremental deployments, and intelligent caching strategies",
+        "Parallel builds, incremental deployments နှင့် intelligent caching strategies တို့ဖြင့် Deployment Lifecycle ကို ၁၀ ဆ ပိုမိုမြန်ဆန်သွက်လက်စေခြင်း"
       ),
     },
   ];
@@ -307,14 +314,14 @@ export default function MonolithicToCloudNativePage() {
               </span>
             </div>
 
-            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
               From Monolithic To Cloud-Native
             </h1>
 
             <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-8 md:mb-12 leading-relaxed max-w-3xl text-left">
               {t(
-                "Transform your legacy applications into scalable, resilient cloud-native systems with our complete DevOps automation platform.",
-                "ကျွန်ုပ်တို့၏ DevOps Automation Platform ကိုအသုံးပြုပြီး Monolithic Application များကို ခေတ်မီပြီး အလိုအလျောက် စီမံခန့်ခွဲနိုင်သော Cloud-Native စနစ်အဖြစ် အောင်မြင်စွာ ပြောင်းလဲလိုက်ပါ။"
+                "Transform your legacy applications into scalable, resilient cloud-native systems with our complete DevOps automation platform featuring modern toolchain including Kubernetes, Terraform, ArgoCD, Prometheus, Grafana, and comprehensive security stack.",
+                "ကျွန်ုပ်တို့၏ DevOps Automation Platform ကိုအသုံးပြုပြီး Monolithic Application များကို Kubernetes, Terraform, ArgoCD, Prometheus, Grafana နှင့် ခေတ်မီ security stack များပါဝင်သော ခေတ်မီပြီး အလိုအလျောက် စီမံခန့်ခွဲနိုင်သော Cloud-Native စနစ်အဖြစ် အောင်မြင်စွာ ပြောင်းလဲလိုက်ပါ။"
               )}
             </p>
 
@@ -330,10 +337,10 @@ export default function MonolithicToCloudNativePage() {
                   <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 mb-3 md:mb-4 group-hover:scale-105 md:group-hover:scale-110 transition-transform duration-300">
                     <feature.icon className="w-6 h-6 md:w-8 md:h-8 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="font-semibold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                  <h3 className="font-semibold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg text-left">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-black dark:text-gray-300 leading-relaxed">
+                  <p className="text-sm text-black dark:text-gray-300 leading-relaxed text-left">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -392,13 +399,13 @@ export default function MonolithicToCloudNativePage() {
                 DevOps Architecture
               </span>
             </div>
-            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
               Infrastucture Design For Clients
             </h1>
             <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
               {t(
-                "Our proven architecture handles everything from infrastructure to monitoring",
-                "Infrastructure စဥ်းစားချိန်မှ စပြီး Monitoring အဆင့် အထိ အရာအားလုံးကို စနစ်တကျ ထည့်သွင်းစဥ်းစားထားသည့် ဥပမာ infrastructure ပုံစံ ဖြစ်ပါသည်။"
+                "Our proven architecture handles everything from infrastructure to monitoring with modern DevOps toolchain including Kubernetes orchestration, GitOps workflows, service mesh, and comprehensive observability stack",
+                "Infrastructure စဥ်းစားချိန်မှ စပြီး Monitoring အဆင့် အထိ Kubernetes orchestration, GitOps workflows, service mesh နှင့် ပြည့်စုံသော observability stack များပါဝင်သည့် ခေတ်မီ DevOps toolchain ဖြင့် အရာအားလုံးကို စနစ်တကျ ထည့်သွင်းစဥ်းစားထားသည့် ဥပမာ infrastructure ပုံစံ ဖြစ်ပါသည်။"
               )}
             </p>
           </motion.div>
@@ -429,18 +436,18 @@ export default function MonolithicToCloudNativePage() {
                   "Understanding the Architecture"
                 )}
               </CardTitle>
-              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg text-left">
                 {t(
-                  "A detailed breakdown of our cloud-native solution",
-                  "ကျွန်ုပ်တို့၏ Cloud Native ပုံစံကို အသေးစိတ် ရှင်းလင်းချက်"
+                  "A detailed breakdown of our cloud-native solution with modern DevOps/DevSecOps toolchain",
+                  "ကျွန်ုပ်တို့၏ Cloud Native ပုံစံကို ခေတ်မီ DevOps/DevSecOps toolchain များဖြင့် အသေးစိတ် ရှင်းလင်းချက်"
                 )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
-              <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg">
+              <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg text-left">
                 {t(
-                  "The diagram above illustrates the end-to-end DevOps architecture we implement for our clients, ensuring a robust, scalable, and secure cloud-native environment.",
-                  "အထက်ပါပုံသည် ကျွန်ုပ်တို့၏ client တစ်ဦးအတွက် တည်ဆောက်ပေးသော DevOps Architecture ကို ပြသထားခြင်းဖြစ်ပြီး လုံခြုံ စိတ်ချရတဲ့ environment တစ်ခုဖြစ်ကြောင်း အာမခံပါသည်။"
+                  "The diagram above illustrates the end-to-end DevOps architecture we implement for our clients, ensuring a robust, scalable, and secure cloud-native environment with modern tooling including Kubernetes, service mesh (Istio/Linkerd), GitOps (ArgoCD/Flux), monitoring stack (Prometheus/Grafana/Loki), and security toolchain (Trivy/OPA/Falco).",
+                  "အထက်ပါပုံသည် ကျွန်ုပ်တို့၏ client တစ်ဦးအတွက် တည်ဆောက်ပေးသော DevOps Architecture ကို Kubernetes, service mesh (Istio/Linkerd), GitOps (ArgoCD/Flux), monitoring stack (Prometheus/Grafana/Loki) နှင့် security toolchain (Trivy/OPA/Falco) အပါအဝင် ခေတ်မီ tooling များဖြင့် လုံခြုံ စိတ်ချရတဲ့ environment တစ်ခုဖြစ်ကြောင်း အာမခံပါသည်။"
                 )}
               </p>
 
@@ -448,10 +455,10 @@ export default function MonolithicToCloudNativePage() {
                 {[
                   {
                     icon: GitBranch,
-                    title: "Source Control (GitHub)",
+                    title: "Source Control (GitHub/GitLab)",
                     desc: t(
-                      "All application code, infrastructure as code (Terraform), and Kubernetes manifests stored in GitHub repositories.",
-                      "application code များနှင့် infrastructure setting များကို GitHub တွင် ဗားရှင်းအလိုက် စနစ်တကျ ထိန်းသိမ်းပါသည်။"
+                      "All application code, infrastructure as code (Terraform/Pulumi), Kubernetes manifests, and Helm charts stored in Git repositories with branch protection and automated workflows.",
+                      "application code များနှင့် infrastructure setting များ၊ Kubernetes manifests နှင့် Helm charts များကို branch protection နှင့် automated workflows များပါဝင်သော Git repositories တွင် ဗားရှင်းအလိုက် စနစ်တကျ ထိန်းသိမ်းပါသည်။"
                     ),
                     color: "blue",
                   },
@@ -459,8 +466,8 @@ export default function MonolithicToCloudNativePage() {
                     icon: Code,
                     title: "Infrastructure as Code",
                     desc: t(
-                      "Terraform for declarative cloud infrastructure provisioning across Azure, AWS, GCP.",
-                      "Cloud ပေါ်တွင် resource အရင်းအမြစ် များကို Terraform ဖြင့် အလိုအလျောက် တည်ဆောက်ပါသည်။"
+                      "Terraform for declarative cloud infrastructure provisioning across Azure, AWS, GCP with advanced modules, state management, and policy enforcement using OPA/Sentinel.",
+                      "Cloud ပေါ်တွင် resource အရင်းအမြစ် များကို advanced modules, state management နှင့် OPA/Sentinel ဖြင့် policy enforcement တို့ပါဝင်သော Terraform ဖြင့် အလိုအလျောက် တည်ဆောက်ပါသည်။"
                     ),
                     color: "green",
                   },
@@ -468,17 +475,17 @@ export default function MonolithicToCloudNativePage() {
                     icon: Zap,
                     title: "CI/CD Pipeline",
                     desc: t(
-                      "GitHub Actions for automated build, test, and deployment workflows.",
-                      "Application တွေအတွက် Build လုပ်ခြင်း နှင့် Deployment အဆင့်များကို GitHub Actions ဖြင့် အလိုအလျောက် လုပ်ဆောင်ပါသည်။"
+                      "GitHub Actions/GitLab CI for automated build, test, security scanning, and deployment workflows with self-hosted runners, artifact caching, and parallel execution.",
+                      "Application တွေအတွက် Build လုပ်ခြင်း၊ စမ်းသပ်ခြင်း၊ လုံခြုံရေးစစ်ဆေးခြင်း နှင့် Deployment အဆင့်များကို self-hosted runners, artifact caching နှင့် parallel execution တို့ဖြင့် GitHub Actions/GitLab CI ဖြင့် အလိုအလျောက် လုပ်ဆောင်ပါသည်။"
                     ),
                     color: "orange",
                   },
                   {
                     icon: Dock,
-                    title: "Containerization",
+                    title: "Containerization & Registry",
                     desc: t(
-                      "Docker for consistent application packaging and deployment.",
-                      "Application များကို မည်သည့် platform တွင်မဆို အလုပ်လုပ်နိုင်ရန် Docker ကိုသုံးပါသည်။"
+                      "Docker for consistent application packaging and deployment with multi-stage builds, slim images, and secure image registries (ACR/ECR/GCR/Artifactory) with vulnerability scanning.",
+                      "Application များကို multi-stage builds, slim images နှင့် vulnerability scanning ပါဝင်သော secure image registries (ACR/ECR/GCR/Artifactory) များဖြင့် Docker ကိုသုံးပြီး မည်သည့် platform တွင်မဆို အလုပ်လုပ်နိုင်ရန် ထုပ်ပိုးပါသည်။"
                     ),
                     color: "purple",
                   },
@@ -486,17 +493,17 @@ export default function MonolithicToCloudNativePage() {
                     icon: Server,
                     title: "Kubernetes Orchestration",
                     desc: t(
-                      "AKS/EKS/GKE for managed Kubernetes with auto-scaling.",
-                      "Kubernetes Cluster များကိုအသုံးပြုပြီး security, scaling နှင့် application deployment များကို စနစ်တကျ စီမံခန့်ခွဲပါသည်။"
+                      "AKS/EKS/GKE for managed Kubernetes with auto-scaling, RBAC, network policies, and service mesh integration (Istio/Linkerd) for traffic management and observability.",
+                      "Kubernetes Cluster များကိုအသုံးပြုပြီး auto-scaling, RBAC, network policies နှင့် service mesh integration (Istio/Linkerd) တို့ဖြင့် traffic management နှင့် observability များအတွက် security, scaling နှင့် application deployment များကို စနစ်တကျ စီမံခန့်ခွဲပါသည်။"
                     ),
                     color: "teal",
                   },
                   {
                     icon: Layers,
-                    title: "GitOps (ArgoCD)",
+                    title: "GitOps (ArgoCD/Flux)",
                     desc: t(
-                      "Declarative deployments with automated synchronization.",
-                      "Git ထဲရှိ version အလိုက် ပြောင်းလဲမှုများကို Kubernetes Cluster တွေဆီသို့ အလိုအလျောက် ချိတ်ဆက်ပေးပါသည်။"
+                      "Declarative deployments with automated synchronization, drift detection, health assessment, and rollback capabilities for multi-cluster management.",
+                      "Git ထဲရှိ version အလိုက် ပြောင်းလဲမှုများကို automated synchronization, drift detection, health assessment နှင့် rollback capabilities တို့ဖြင့် multi-cluster management အတွက် Kubernetes Cluster တွေဆီသို့ အလိုအလျောက် ချိတ်ဆက်ပေးပါသည်။"
                     ),
                     color: "indigo",
                   },
@@ -513,10 +520,10 @@ export default function MonolithicToCloudNativePage() {
                       />
                     </div>
                     <div>
-                      <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                      <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg text-left">
                         {item.title}
                       </h4>
-                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base text-left">
                         {item.desc}
                       </p>
                     </div>
@@ -527,26 +534,30 @@ export default function MonolithicToCloudNativePage() {
           </Card>
         </section>
 
-        {/* Step 1: Terraform Infrastructure */}
+        {/* Infrastructure as Code Section */}
         <section className="mb-16 md:mb-20">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
-                1
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  Infrastructure as Code
-                </h2>
-                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t(
-                    "Automated cloud infrastructure provisioning",
-                    "Cloud Infrastructure များကို အလိုအလျောက် တည်ဆောက်ခြင်း"
-                  )}
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Infrastructure Automation
+              </span>
             </div>
-          </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              Infrastructure as Code
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "Automated cloud infrastructure provisioning with Terraform, Pulumi, and Crossplane for consistent, repeatable deployments across multi-cloud environments",
+                "Cloud Infrastructure များကို Terraform, Pulumi, နှင့် Crossplane တို့ဖြင့် multi-cloud environments တွင် တစ်ပုံစံတည်း၊ အချိန်မရွေး ပြန်လည်အသုံးပြုနိုင်သော deployments များအတွက် အလိုအလျောက် တည်ဆောက်ခြင်း"
+              )}
+            </p>
+          </motion.div>
 
           <div className="space-y-6 md:space-y-8">
             <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
@@ -560,10 +571,10 @@ export default function MonolithicToCloudNativePage() {
                     "Terraform ကို ဘာကြောင့် ရွေးချယ်သင့်သလဲ?"
                   )}
                 </CardTitle>
-                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg text-left">
                   {t(
-                    "The industry standard for Infrastructure as Code",
-                    "ခေတ်မီ Infrastructure များအတွက် ကမ္ဘာ့အဆင့်မီ စံသတ်မှတ်ချက်"
+                    "The industry standard for Infrastructure as Code with ecosystem of providers and modules",
+                    "ခေတ်မီ Infrastructure များအတွက် providers နှင့် modules ecosystem ပါဝင်သော ကမ္ဘာ့အဆင့်မီ စံသတ်မှတ်ချက်"
                   )}
                 </CardDescription>
               </CardHeader>
@@ -574,8 +585,8 @@ export default function MonolithicToCloudNativePage() {
                       icon: Code,
                       title: "Infrastructure as Code",
                       desc: t(
-                        "Version-controlled, repeatable infrastructure deployments with GitOps workflows.",
-                        "Infrastructure ပြောင်းလဲမှုများကို Code အဖြစ် ရေးသားပြီး အချိန်မရွေး တိကျစွာ ပြန်လည်အသုံးပြုနိုင်ပါသည်။"
+                        "Version-controlled, repeatable infrastructure deployments with GitOps workflows, modular design, and policy as code using OPA/Sentinel.",
+                        "Infrastructure ပြောင်းလဲမှုများကို Code အဖြစ် ရေးသားပြီး GitOps workflows, modular design နှင့် OPA/Sentinel ဖြင့် policy as code တို့ဖြင့် အချိန်မရွေး တိကျစွာ ပြန်လည်အသုံးပြုနိုင်ပါသည်။"
                       ),
                       color: "green",
                     },
@@ -583,8 +594,8 @@ export default function MonolithicToCloudNativePage() {
                       icon: Cloud,
                       title: "Multi-Cloud Excellence",
                       desc: t(
-                        "Deploy seamlessly across Azure, AWS, GCP with consistent workflows.",
-                        "Azure, AWS, GCP စသည့် Cloud platform များပေါ်တွင် တစ်ပုံစံတည်း ချောမွေ့စွာ အသုံးပြုနိုင်ပါသည်။"
+                        "Deploy seamlessly across Azure, AWS, GCP with consistent workflows using Terraform Cloud/Enterprise for collaboration and state management.",
+                        "Azure, AWS, GCP စသည့် Cloud platform များပေါ်တွင် collaboration နှင့် state management အတွက် Terraform Cloud/Enterprise ကိုအသုံးပြုပြီး တစ်ပုံစံတည်း ချောမွေ့စွာ အသုံးပြုနိုင်ပါသည်။"
                       ),
                       color: "blue",
                     },
@@ -592,8 +603,8 @@ export default function MonolithicToCloudNativePage() {
                       icon: ShieldCheck,
                       title: "State Management",
                       desc: t(
-                        "Advanced state management for team collaboration.",
-                        "အဖွဲ့အလိုက် ဆောင်ရွက်မှုအတွက် အဆင့်မြင့် State Management စနစ် ပါဝင်ခြင်း။"
+                        "Advanced state management for team collaboration with remote state backends, state locking, and drift detection capabilities.",
+                        "အဖွဲ့အလိုက် ဆောင်ရွက်မှုအတွက် remote state backends, state locking နှင့် drift detection capabilities တို့ပါဝင်သော အဆင့်မြင့် State Management စနစ် ပါဝင်ခြင်း။"
                       ),
                       color: "orange",
                     },
@@ -601,8 +612,8 @@ export default function MonolithicToCloudNativePage() {
                       icon: Zap,
                       title: "Cost Optimization",
                       desc: t(
-                        "Right-size resources and implement auto-scaling.",
-                        "resource အရင်းအမြစ်များကို လိုအပ်သလောက်သာ အသုံးပြုပြီး ကုန်ကျစရိတ်ကို အကောင်းဆုံး ထိန်းညှိခြင်း။"
+                        "Right-size resources and implement auto-scaling with Infracost integration for real-time cost estimation and optimization recommendations.",
+                        "resource အရင်းအမြစ်များကို လိုအပ်သလောက်သာ အသုံးပြုပြီး real-time cost estimation နှင့် optimization recommendations များအတွက် Infracost integration ဖြင့် ကုန်ကျစရိတ်ကို အကောင်းဆုံး ထိန်းညှိခြင်း။"
                       ),
                       color: "purple",
                     },
@@ -619,10 +630,10 @@ export default function MonolithicToCloudNativePage() {
                         />
                       </div>
                       <div>
-                        <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg">
+                        <h4 className="font-bold text-black dark:text-white mb-1 md:mb-2 text-base md:text-lg text-left">
                           {item.title}
                         </h4>
-                        <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                        <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base text-left">
                           {item.desc}
                         </p>
                       </div>
@@ -640,10 +651,10 @@ export default function MonolithicToCloudNativePage() {
                   </div>
                   Production Terraform Modules
                 </CardTitle>
-                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+                <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg text-left">
                   {t(
-                    "Enterprise-grade infrastructure modules",
-                    "လုပ်ငန်းသုံး အဆင့် Infrastructure Modules များ"
+                    "Enterprise-grade infrastructure modules with security best practices",
+                    "လုံခြုံရေးအကောင်းဆုံးအလေ့အကျင့်များပါဝင်သော လုပ်ငန်းသုံး အဆင့် Infrastructure Modules များ"
                   )}
                 </CardDescription>
               </CardHeader>
@@ -655,13 +666,13 @@ export default function MonolithicToCloudNativePage() {
                         <Cloud className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2">
+                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2 text-left">
                           Azure Infrastructure Module
                         </h4>
-                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
+                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base text-left">
                           {t(
-                            "Complete Azure setup with AKS, ACR, VNet, and monitoring. Production-ready with security best practices.",
-                            "AKS, ACR, VNet နှင့် Monitoring များပါဝင်သည့် ပြီးပြည့်စုံသော Azure Setup ဖြစ်ပါသည်။ Security အဆင့်မြင့်ဆုံး စနစ်များဖြင့် တည်ဆောက်ထားပါသည်။"
+                            "Complete Azure setup with AKS, ACR, VNet, Azure Monitor, and Azure Policy. Production-ready with security best practices including network security groups, private endpoints, and managed identities.",
+                            "AKS, ACR, VNet, Azure Monitor နှင့် Azure Policy များပါဝင်သည့် ပြီးပြည့်စုံသော Azure Setup ဖြစ်ပါသည်။ network security groups, private endpoints နှင့် managed identities အပါအဝင် Security အဆင့်မြင့်ဆုံး စနစ်များဖြင့် တည်ဆောက်ထားပါသည်။"
                           )}
                         </p>
                         <div className="flex flex-wrap gap-1 md:gap-2">
@@ -675,7 +686,10 @@ export default function MonolithicToCloudNativePage() {
                             VNet
                           </Badge>
                           <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-0 text-xs">
-                            {t("Monitoring", "စောင့်ကြည့်ခြင်း")}
+                            {t("Azure Monitor", "Azure Monitor")}
+                          </Badge>
+                          <Badge className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-0 text-xs">
+                            {t("Security", "လုံခြုံရေး")}
                           </Badge>
                         </div>
                       </div>
@@ -702,13 +716,13 @@ export default function MonolithicToCloudNativePage() {
                         <Server className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2">
+                        <h4 className="font-bold text-black dark:text-white text-lg md:text-xl mb-1 md:mb-2 text-left">
                           AWS EKS Spot Instance Module
                         </h4>
-                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
+                        <p className="text-black dark:text-gray-300 mb-2 md:mb-3 text-sm md:text-base text-left">
                           {t(
-                            "Cost-effective EKS cluster with spot instances and auto-scaling. Optimized for production workloads.",
-                            "Spot Instances နှင့် Auto-scaling တို့ကို အသုံးပြုပြီး ကုန်ကျစရိတ် အသက်သာဆုံးနှင့် အထိရောက်ဆုံး ဖြစ်အောင် တည်ဆောက်ထားသော EKS Cluster ဖြစ်ပါသည်။"
+                            "Cost-effective EKS cluster with spot instances, auto-scaling (Karpenter), and comprehensive monitoring. Optimized for production workloads with node diversity, pod disruption budgets, and cost allocation tags.",
+                            "Spot Instances, auto-scaling (Karpenter) နှင့် ပြည့်စုံသော monitoring တို့ကို အသုံးပြုပြီး node diversity, pod disruption budgets နှင့် cost allocation tags တို့ဖြင့် ကုန်ကျစရိတ် အသက်သာဆုံးနှင့် အထိရောက်ဆုံး ဖြစ်အောင် တည်ဆောက်ထားသော EKS Cluster ဖြစ်ပါသည်။"
                           )}
                         </p>
                         <div className="flex flex-wrap gap-1 md:gap-2">
@@ -719,10 +733,13 @@ export default function MonolithicToCloudNativePage() {
                             Spot Instances
                           </Badge>
                           <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-0 text-xs">
-                            Auto-scaling
+                            Karpenter
                           </Badge>
                           <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-0 text-xs">
                             Cost Optimized
+                          </Badge>
+                          <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-0 text-xs">
+                            Monitoring
                           </Badge>
                         </div>
                       </div>
@@ -746,26 +763,30 @@ export default function MonolithicToCloudNativePage() {
           </div>
         </section>
 
-        {/* Step 2: CI/CD Pipeline */}
+        {/* CI/CD Pipeline Section */}
         <section className="mb-16 md:mb-20">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
-                2
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  CI/CD Pipeline
-                </h2>
-                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t(
-                    "Automated build, test, and deployment workflows",
-                    "test, build , deploy အဆင့်တိုင်းကို အလိုအလျောက် လုပ်ဆောင်ခြင်း"
-                  )}
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Continuous Integration & Delivery
+              </span>
             </div>
-          </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              CI/CD Pipeline
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "Automated build, test, security scanning, and deployment workflows with modern tooling for rapid, reliable software delivery",
+                "test, build, security scanning, deploy အဆင့်တိုင်းကို ခေတ်မီ tooling များဖြင့် မြန်ဆန်စိတ်ချရသော software delivery အတွက် အလိုအလျောက် လုပ်ဆောင်ခြင်း"
+              )}
+            </p>
+          </motion.div>
 
           <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl mb-6 md:mb-8">
             <CardHeader className="pb-4 md:pb-6">
@@ -778,10 +799,10 @@ export default function MonolithicToCloudNativePage() {
                   "ပြီးပြည့်စုံသော CI/CD လုပ်ငန်းစဉ်"
                 )}
               </CardTitle>
-              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg">
+              <CardDescription className="text-black dark:text-gray-300 text-base md:text-lg text-left">
                 {t(
-                  "From code commit to production deployment",
-                  "Code ရေးသားမှုမှ Production သို့ ရောက်ရှိသည်အထိ"
+                  "From code commit to production deployment with security and quality gates",
+                  "Code ရေးသားမှုမှ Production သို့ ရောက်ရှိသည်အထိ လုံခြုံရေးနှင့် အရည်အသွေး စစ်ဆေးမှုများပါဝင်"
                 )}
               </CardDescription>
             </CardHeader>
@@ -790,20 +811,20 @@ export default function MonolithicToCloudNativePage() {
                 {[
                   {
                     step: "1",
-                    title: "Code Push",
+                    title: "Code Push & PR",
                     desc: t(
-                      "Developer pushes code to Git repository",
-                      "Developer က Code ကို Git Repository ထဲသို့ ထည့်လိုက်ခြင်း"
+                      "Developer pushes code to Git repository with automated PR checks, code review, and branch protection rules",
+                      "Developer က Code ကို automated PR checks, code review နှင့် branch protection rules များပါဝင်သော Git Repository ထဲသို့ ထည့်လိုက်ခြင်း"
                     ),
-                    icon: Code,
+                    icon: GitPullRequest,
                     color: "blue",
                   },
                   {
                     step: "2",
-                    title: "Docker Build",
+                    title: "Docker Build & Scan",
                     desc: t(
-                      "Multi-platform container builds",
-                      "platform အမျိုးစားအားလုံးတွင် အလုပ်လုပ်နိုင်သော Container Image များ တည်ဆောက်ခြင်း"
+                      "Multi-platform container builds with vulnerability scanning (Trivy/Grype), SBOM generation, and image signing using Cosign/Sigstore",
+                      "platform အမျိုးစားအားလုံးတွင် အလုပ်လုပ်နိုင်သော Container Image များကို vulnerability scanning (Trivy/Grype), SBOM generation နှင့် Cosign/Sigstore ဖြင့် image signing တို့ဖြင့် တည်ဆောက်ခြင်း"
                     ),
                     icon: Dock,
                     color: "indigo",
@@ -812,18 +833,18 @@ export default function MonolithicToCloudNativePage() {
                     step: "3",
                     title: "Push to Registry",
                     desc: t(
-                      "Secure image storage with automated tagging",
-                      "Image များကို လုံခြုံစွာ သိမ်းဆည်းပြီး Tagging စနစ်ဖြင့် စီမံခြင်း"
+                      "Secure image storage with automated tagging, image promotion policies, and registry scanning using Harbor/Quay/Artifactory",
+                      "Image များကို automated tagging, image promotion policies နှင့် Harbor/Quay/Artifactory ဖြင့် registry scanning တို့ဖြင့် လုံခြုံစွာ သိမ်းဆည်းပြီး Tagging စနစ်ဖြင့် စီမံခြင်း"
                     ),
                     icon: Database,
                     color: "green",
                   },
                   {
                     step: "4",
-                    title: "Security Scan",
+                    title: "Security Scanning",
                     desc: t(
-                      "Trivy vulnerability scanning",
-                      "Trivy ကို အသုံးပြုပြီး Image အတွင်းရှိ ချို့ယွင်းချက်များကို စစ်ဆေးခြင်း"
+                      "Comprehensive security scanning with Trivy for vulnerabilities, Grype for SBOM analysis, and Snyk/Checkov for IaC security",
+                      "Trivy ဖြင့် vulnerabilities, Grype ဖြင့် SBOM analysis နှင့် Snyk/Checkov ဖြင့် IaC security တို့အတွက် ပြည့်စုံသော လုံခြုံရေးစစ်ဆေးခြင်း"
                     ),
                     icon: ShieldCheck,
                     color: "red",
@@ -832,18 +853,18 @@ export default function MonolithicToCloudNativePage() {
                     step: "5",
                     title: "ArgoCD Deploy",
                     desc: t(
-                      "GitOps-based deployment",
-                      "GitOps စနစ်ဖြင့် Code ပြောင်းလဲမှုများကို Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးခြင်း"
+                      "GitOps-based deployment with automated sync, health assessment, rollback capabilities, and multi-cluster management using ApplicationSets",
+                      "GitOps စနစ်ဖြင့် automated sync, health assessment, rollback capabilities နှင့် ApplicationSets ဖြင့် multi-cluster management တို့ပါဝင်သော Code ပြောင်းလဲမှုများကို Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးခြင်း"
                     ),
                     icon: Rocket,
                     color: "purple",
                   },
                   {
                     step: "6",
-                    title: "Health Verify",
+                    title: "Health Verification",
                     desc: t(
-                      "Automated verification and rollback",
-                      "application ကို လိုအပ်ပါက အရင် version တွေသို့ ပြန်ပြောင်းနိုင်ခြင်း"
+                      "Automated verification with smoke tests, integration tests, performance testing, and SLO validation using Litmus/Chaos Engineering",
+                      "application ကို smoke tests, integration tests, performance testing နှင့် Litmus/Chaos Engineering ဖြင့် SLO validation တို့ဖြင့် အလိုအလျောက် အတည်ပြုခြင်းနှင့် လိုအပ်ပါက အရင် version တွေသို့ ပြန်ပြောင်းနိုင်ခြင်း"
                     ),
                     icon: CheckCircle2,
                     color: "orange",
@@ -886,19 +907,19 @@ export default function MonolithicToCloudNativePage() {
                 {[
                   {
                     icon: Zap,
-                    title: "Faster Builds",
+                    title: "Faster Builds & Security",
                     desc: t(
-                      "Utilize powerful machines for build cycles.",
-                      "ပိုကောင်းသော server များကို အသုံးပြုပြီး build လုပ်ချိန်ကို သိသိသာသာ လျှော့ချခြင်း။"
+                      "Utilize powerful machines for build cycles with custom hardware, GPU acceleration, and keep sensitive data within your private network with air-gapped deployments.",
+                      "ပိုကောင်းသော server များကို custom hardware, GPU acceleration တို့ဖြင့် အသုံးပြုပြီး build လုပ်ချိန်ကို သိသိသာသာ လျှော့ချခြင်းနှင့် air-gapped deployments ဖြင့် ဒေတာများကို မိမိတို့ private network အတွင်း၌သာ လုံခြုံစွာ ထိန်းသိမ်းထားခြင်း။"
                     ),
                     color: "blue",
                   },
                   {
                     icon: ShieldCheck,
-                    title: "Security",
+                    title: "Compliance & Cost Control",
                     desc: t(
-                      "Keep sensitive data within your network.",
-                      "ဒေတာများကို မိမိတို့ network အတွင်း၌သာ လုံခြုံစွာ ထိန်းသိမ်းထားခြင်း။"
+                      "Meet regulatory requirements with controlled environments and reduce cloud compute costs by 60-80% with on-premise or colocated runners for large-scale builds.",
+                      "ထိန်းချုပ်ထားသော environment များဖြင့် စည်းမျဉ်းစည်းကမ်းလိုအပ်ချက်များကို ဖြည့်ဆည်းခြင်းနှင့် large-scale builds များအတွက် on-premise သို့မဟုတ် colocated runners များဖြင့် cloud compute ကုန်ကျစရိတ်ကို ၆၀-၈၀% အထိ လျှော့ချခြင်း။"
                     ),
                     color: "orange",
                   },
@@ -915,10 +936,10 @@ export default function MonolithicToCloudNativePage() {
                       />
                     </div>
                     <div>
-                      <h4 className="font-bold text-black dark:text-white mb-1 text-base md:text-lg">
+                      <h4 className="font-bold text-black dark:text-white mb-1 text-base md:text-lg text-left">
                         {item.title}
                       </h4>
-                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base">
+                      <p className="text-black dark:text-gray-300 leading-relaxed text-sm md:text-base text-left">
                         {item.desc}
                       </p>
                     </div>
@@ -929,26 +950,30 @@ export default function MonolithicToCloudNativePage() {
           </Card>
         </section>
 
-        {/* Step 3: ArgoCD GitOps */}
+        {/* GitOps Section */}
         <section className="mb-16 md:mb-20">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
-                3
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  GitOps with ArgoCD
-                </h2>
-                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t(
-                    "Declarative, automated deployments to Kubernetes",
-                    "Code ပြောင်းလဲမှုကို အခြေခံပြီး Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးသော စနစ်"
-                  )}
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Declarative Deployments
+              </span>
             </div>
-          </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              GitOps with ArgoCD
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "Declarative, automated deployments to Kubernetes with GitOps workflows and progressive delivery for consistent, auditable infrastructure management",
+                "Code ပြောင်းလဲမှုကို အခြေခံပြီး GitOps workflows နှင့် progressive delivery တို့ဖြင့် တစ်ပုံစံတည်း၊ audit လုပ်နိုင်သော infrastructure management အတွက် Kubernetes Cluster ပေါ်သို့ အလိုအလျောက် ပို့ဆောင်ပေးသော စနစ်"
+              )}
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl">
@@ -961,10 +986,10 @@ export default function MonolithicToCloudNativePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg">
+                <p className="text-black dark:text-gray-300 leading-relaxed text-base md:text-lg text-left">
                   {t(
-                    "GitOps uses Git repositories as the single source of truth for infrastructure and applications. ArgoCD ensures that your cluster always matches the state defined in Git.",
-                    "GitOps ဆိုတာ git repository ထဲမှာ သိမ်းထားတဲ့ code ပြောင်းလဲမှုရှိတာနဲ့ kubernetes cluster ပေါ်မှာ application ကို အလိုအလျောက် update လုပ်ပေးပါတယ်။ code ထဲမှာ ရေးထားတဲ့အတိုင်း application တွေကို cluster ပေါ်မှာ deploy လုပ်စေပါတယ်။"
+                    "GitOps uses Git repositories as the single source of truth for infrastructure and applications. ArgoCD ensures that your cluster always matches the state defined in Git with automated synchronization, drift detection, and self-healing capabilities. It enables declarative continuous delivery with audit trails, rollback capabilities, and multi-environment management.",
+                    "GitOps ဆိုတာ git repository ထဲမှာ သိမ်းထားတဲ့ code ပြောင်းလဲမှုရှိတာနဲ့ automated synchronization, drift detection, နှင့် self-healing capabilities တို့ဖြင့် kubernetes cluster ပေါ်မှာ application ကို အလိုအလျောက် update လုပ်ပေးပါတယ်။ code ထဲမှာ ရေးထားတဲ့အတိုင်း application တွေကို audit trails, rollback capabilities, နှင့် multi-environment management တို့ဖြင့် cluster ပေါ်မှာ declarative continuous delivery လုပ်စေပါတယ်။"
                   )}
                 </p>
               </CardContent>
@@ -984,28 +1009,28 @@ export default function MonolithicToCloudNativePage() {
                   {[
                     {
                       icon: CheckCircle2,
-                      title: "Declarative State",
+                      title: "Declarative State Management",
                       desc: t(
-                        "Ensures cluster matches Git definition.",
-                        "Cluster ၏ အခြေအနေသည် Git ထဲရှိ setting နှင့် အမြဲ တူညီနေစေခြင်း။"
+                        "Ensures cluster matches Git definition with desired state reconciliation, configuration drift prevention, and automated remediation.",
+                        "Cluster ၏ အခြေအနေသည် desired state reconciliation, configuration drift prevention, နှင့် automated remediation တို့ဖြင့် Git ထဲရှိ setting နှင့် အမြဲ တူညီနေစေခြင်း။"
                       ),
                       color: "blue",
                     },
                     {
                       icon: RefreshCw,
-                      title: "Automated Sync",
+                      title: "Automated Sync & Health Checks",
                       desc: t(
-                        "Continuously monitors and syncs changes.",
-                        "Git ထဲရှိ ပြောင်းလဲမှုများကို စောင့်ကြည့်ပြီး အလိုအလျောက် Update လုပ်ခြင်း။"
+                        "Continuously monitors and syncs changes with health assessments, resource hooks, and sync waves for ordered deployments.",
+                        "Git ထဲရှိ ပြောင်းလဲမှုများကို health assessments, resource hooks, နှင့် ordered deployments အတွက် sync waves တို့ဖြင့် စောင့်ကြည့်ပြီး အလိုအလျောက် Update လုပ်ခြင်း။"
                       ),
                       color: "green",
                     },
                     {
                       icon: ArrowRight,
-                      title: "Instant Rollback",
+                      title: "Progressive Delivery & Rollback",
                       desc: t(
-                        "Roll back to any version instantly.",
-                        "ယခင် Version များသို့ ချက်ချင်း ပြန်ပြောင်းနိုင်ခြင်း။"
+                        "Roll back to any version instantly with canary deployments, blue-green deployments, and analysis-based promotion using Argo Rollouts.",
+                        "Argo Rollouts ကိုအသုံးပြုပြီး canary deployments, blue-green deployments, နှင့် analysis-based promotion တို့ဖြင့် ယခင် Version များသို့ ချက်ချင်း ပြန်ပြောင်းနိုင်ခြင်း။"
                       ),
                       color: "orange",
                     },
@@ -1022,10 +1047,10 @@ export default function MonolithicToCloudNativePage() {
                         />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm md:text-base">
+                        <h4 className="font-semibold text-black dark:text-white mb-1 text-sm md:text-base text-left">
                           {item.title}
                         </h4>
-                        <p className="text-black dark:text-gray-300 text-xs md:text-sm">
+                        <p className="text-black dark:text-gray-300 text-xs md:text-sm text-left">
                           {item.desc}
                         </p>
                       </div>
@@ -1037,26 +1062,30 @@ export default function MonolithicToCloudNativePage() {
           </div>
         </section>
 
-        {/* Step 4: Security & Compliance (NEW) */}
+        {/* Security & Compliance Section */}
         <section className="mb-16 md:mb-20">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-red-500 to-rose-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
-                4
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  Security & Compliance
-                </h2>
-                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t(
-                    "DevSecOps at every stage of the lifecycle",
-                    "အဆင့်တိုင်းတွင် Security ကို ထည့်သွင်းစဥ်းစားခြင်း"
-                  )}
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Enterprise Security
+              </span>
             </div>
-          </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              Security & Compliance
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "DevSecOps at every stage of the lifecycle with modern security toolchain for comprehensive protection and regulatory compliance",
+                "အဆင့်တိုင်းတွင် ခေတ်မီ security toolchain များဖြင့် ပြည့်စုံသော ကာကွယ်မှုနှင့် စည်းမျဉ်းစည်းကမ်းလိုက်နာမှုအတွက် Security ကို ထည့်သွင်းစဥ်းစားခြင်း"
+              )}
+            </p>
+          </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800">
               <CardHeader className="pb-4">
@@ -1068,23 +1097,29 @@ export default function MonolithicToCloudNativePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
+                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed text-left">
                   {t(
-                    "Security is baked into the pipeline, not added as an afterthought. We implement automated vulnerability scanning at every stage.",
-                    "လုံခြုံရေး ကို နောက်မှထည့်သွင်းခြင်းမျိုးမဟုတ်ဘဲ Pipeline တစ်ခုလုံး၏ အဆင့်တိုင်းတွင် အလိုအလျောက် စစ်ဆေးနိုင်ရန် တည်ဆောက်ထားပါသည်။"
+                    "Security is baked into the pipeline, not added as an afterthought. We implement automated vulnerability scanning at every stage with SAST, DAST, SCA, and IaC security scanning integrated into CI/CD workflows.",
+                    "လုံခြုံရေး ကို နောက်မှထည့်သွင်းခြင်းမျိုးမဟုတ်ဘဲ SAST, DAST, SCA, နှင့် IaC security scanning တို့ဖြင့် CI/CD workflows ထဲသို့ ပေါင်းစပ်ထည့်သွင်းပြီး Pipeline တစ်ခုလုံး၏ အဆင့်တိုင်းတွင် အလိုအလျောက် စစ်ဆေးနိုင်ရန် တည်ဆောက်ထားပါသည်။"
                   )}
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <span className="text-sm md:text-base">
-                      Container Scanning (Trivy)
+                      Container Scanning (Trivy/Grype/Clair)
                     </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <span className="text-sm md:text-base">
-                      Static Analysis (SonarQube)
+                      Static Analysis (SonarQube/Semgrep/Checkmarx)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">
+                      Runtime Security (Falco/Polaris/Kyverno)
                     </span>
                   </div>
                 </div>
@@ -1097,21 +1132,21 @@ export default function MonolithicToCloudNativePage() {
                   <div className="p-2 md:p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
                     <Key className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
                   </div>
-                  Identity & Access
+                  Identity & Access Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed">
+                <p className="text-black dark:text-gray-300 mb-6 leading-relaxed text-left">
                   {t(
-                    "Zero Trust architecture with fine-grained access control using Kubernetes RBAC and secure secret management.",
-                    "Zero Trust ပုံစံကို အခြေခံပြီး Kubernetes RBAC နှင့် လုံခြုံသော Secret Management စနစ်များဖြင့် ဒေတာများကို ကာကွယ်ထားပါသည်။"
+                    "Zero Trust architecture with fine-grained access control using Kubernetes RBAC, OPA/Gatekeeper policies, and secure secret management with HashiCorp Vault/AWS Secrets Manager/Azure Key Vault integration.",
+                    "Zero Trust ပုံစံကို အခြေခံပြီး Kubernetes RBAC, OPA/Gatekeeper policies နှင့် HashiCorp Vault/AWS Secrets Manager/Azure Key Vault integration ဖြင့် လုံခြုံသော Secret Management စနစ်များဖြင့် fine-grained access control ဖြင့် ဒေတာများကို ကာကွယ်ထားပါသည်။"
                   )}
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
                     <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <span className="text-sm md:text-base">
-                      RBAC & OPA Enforcement
+                      RBAC & OPA/Gatekeeper Enforcement
                     </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
@@ -1120,43 +1155,53 @@ export default function MonolithicToCloudNativePage() {
                       Cloud Secret Store Integration
                     </span>
                   </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-xl">
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <span className="text-sm md:text-base">
+                      Service Mesh mTLS (Istio/Linkerd)
+                    </span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         </section>
 
-        {/* Step 5: Logging & Observability (NEW) */}
+        {/* Logging & Observability Section */}
         <section className="mb-16 md:mb-20">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white font-bold text-xl md:text-2xl">
-                5
-              </div>
-              <div>
-                <h2 className="text-2xl md:text-4xl font-bold text-black dark:text-white">
-                  Logging & Observability
-                </h2>
-                <p className="text-lg md:text-xl text-black dark:text-gray-300 mt-1 md:mt-2">
-                  {t(
-                    "Total visibility into your modern infrastructure",
-                    "ခေတ်မီ Infrastructure များအတွက် အပြည့်အဝ ခြေရာခံ စောင့်ကြည့်နိုင်မှု"
-                  )}
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Full Stack Observability
+              </span>
             </div>
-          </div>
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              Logging & Observability
+            </h1>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              {t(
+                "Total visibility into your modern infrastructure with comprehensive observability stack for proactive monitoring and rapid troubleshooting",
+                "ခေတ်မီ Infrastructure များအတွက် proactive monitoring နှင့် rapid troubleshooting အတွက် ပြည့်စုံသော observability stack ဖြင့် အပြည့်အဝ ခြေရာခံ စောင့်ကြည့်နိုင်မှု"
+              )}
+            </p>
+          </motion.div>
           <Card className="border-0 shadow-lg rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800 p-6 md:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
               <div className="space-y-4">
                 <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl w-fit">
                   <Activity className="w-6 h-6 text-blue-600" />
                 </div>
-                <h4 className="text-xl font-bold">Metrics Monitoring</h4>
-                <p className="text-sm md:text-base text-black dark:text-gray-400 leading-relaxed">
+                <h4 className="text-xl font-bold text-left">Metrics Monitoring</h4>
+                <p className="text-sm md:text-base text-black dark:text-gray-400 leading-relaxed text-left">
                   {t(
-                    "Real-time performance tracking with Prometheus and Grafana dashboards.",
-                    "Prometheus နှင့် Grafana တို့ကို အသုံးပြုပြီး cluster တွေ application တွေရဲ့ လုပ်ဆောင်ချက်များကို Real-time မျက်ခြေမပြတ် စောင့်ကြည့်နိုင်ပါသည်။"
+                    "Real-time performance tracking with Prometheus and Grafana dashboards, custom metrics collection, and alerting with Alertmanager/PagerDuty integration for SLO/SLA monitoring.",
+                    "Prometheus နှင့် Grafana dashboards, custom metrics collection, နှင့် SLO/SLA monitoring အတွက် Alertmanager/PagerDuty integration တို့ဖြင့် cluster တွေ application တွေရဲ့ လုပ်ဆောင်ချက်များကို Real-time မျက်ခြေမပြတ် စောင့်ကြည့်နိုင်ပါသည်။"
                   )}
                 </p>
               </div>
@@ -1164,11 +1209,11 @@ export default function MonolithicToCloudNativePage() {
                 <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl w-fit">
                   <Search className="w-6 h-6 text-purple-600" />
                 </div>
-                <h4 className="text-xl font-bold">Centralized Logging</h4>
-                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                <h4 className="text-xl font-bold text-left">Centralized Logging</h4>
+                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed text-left">
                   {t(
-                    "Consolidate logs from all microservices into one place for rapid debugging.",
-                    "ပြဿနာများကို မြန်မြန်ဆန်ဆန် ဖြေရှင်းနိုင်ရန် Logging System အဖြစ် Grafana Loki နှင့် ELK stack တို့ကိုအသုံးပြုထားပါသည်။"
+                    "Consolidate logs from all microservices into one place for rapid debugging with Grafana Loki, ELK Stack (Elasticsearch, Logstash, Kibana), or OpenSearch with structured logging and log retention policies.",
+                    "ပြဿနာများကို မြန်မြန်ဆန်ဆန် ဖြေရှင်းနိုင်ရန် structured logging နှင့် log retention policies တို့ဖြင့် Grafana Loki, ELK Stack (Elasticsearch, Logstash, Kibana) သို့မဟုတ် OpenSearch ကို အသုံးပြုထားသော Logging System ဖြစ်ပါသည်။"
                   )}
                 </p>
               </div>
@@ -1176,11 +1221,11 @@ export default function MonolithicToCloudNativePage() {
                 <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-xl w-fit">
                   <Eye className="w-6 h-6 text-orange-600" />
                 </div>
-                <h4 className="text-xl font-bold">Distributed Tracing</h4>
-                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                <h4 className="text-xl font-bold text-left">Distributed Tracing</h4>
+                <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed text-left">
                   {t(
-                    "Track requests across microservices to identify bottlenecks instantly.",
-                    "Service တစ်ခုနှင့်တစ်ခုကြား ချိတ်ဆက်မှုများကို ခြေရာခံပြီး issue ဖြစ်ခဲ့လျှင် ချက်ချင်း ပြင်ဆင်နိုင်ပါသည်။"
+                    "Track requests across microservices to identify bottlenecks instantly with Jaeger, Zipkin, or OpenTelemetry for end-to-end visibility, latency analysis, and dependency mapping in complex microservices architectures.",
+                    "Service တစ်ခုနှင့်တစ်ခုကြား ချိတ်ဆက်မှုများကို Jaeger, Zipkin, သို့မဟုတ် OpenTelemetry ဖြင့် end-to-end visibility, latency analysis, နှင့် dependency mapping တို့ဖြင့် ခြေရာခံပြီး complex microservices architectures တွင် issue ဖြစ်ခဲ့လျှင် ချက်ချင်း ပြင်ဆင်နိုင်ပါသည်။"
                   )}
                 </p>
               </div>
@@ -1193,16 +1238,16 @@ export default function MonolithicToCloudNativePage() {
           <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-500 dark:to-cyan-500 border-0 shadow-2xl rounded-2xl md:rounded-3xl overflow-hidden">
             <CardContent className="p-6 md:p-12 text-center text-white">
               <div className="max-w-3xl mx-auto">
-                <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
+                <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-left md:text-center">
                   {t(
                     "Ready to Transform Your Infrastructure?",
                     "Ready to Transform Your Infrastructure?"
                   )}
                 </h2>
-                <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-6 md:mb-8 leading-relaxed">
+                <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-6 md:mb-8 leading-relaxed text-left md:text-center">
                   {t(
-                    "Join dozens of successful companies who've modernized their stack with our cloud-native platform.",
-                    "ကျွန်ုပ်တို့၏ Cloud-Native Platform ကို အသုံးပြုပြီး သင်တို့ လုပ်ငန်းအတွက် လုံခြုံစိတ်ချရတဲ့ ခေတ်မီ tech stack များကိုအသုံးပြုလိုက်ပါ။"
+                    "Join dozens of successful companies who've modernized their stack with our cloud-native platform featuring complete DevOps/DevSecOps toolchain.",
+                    "ကျွန်ုပ်တို့၏ Cloud-Native Platform ကို ပြည့်စုံသော DevOps/DevSecOps toolchain များဖြင့် အသုံးပြုပြီး သင်တို့ လုပ်ငန်းအတွက် လုံခြုံစိတ်ချရတဲ့ ခေတ်မီ tech stack များကိုအသုံးပြုလိုက်ပါ။"
                   )}
                 </p>
 
@@ -1514,7 +1559,7 @@ export default function MonolithicToCloudNativePage() {
                       <span className="relative z-10 flex items-center justify-center">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                         {t("Submitting...", "ပေးပို့နေသည်...")}
-                      </span>
+                    </span>
                     ) : (
                       <span className="relative z-10 flex items-center justify-center">
                         <Calendar className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
