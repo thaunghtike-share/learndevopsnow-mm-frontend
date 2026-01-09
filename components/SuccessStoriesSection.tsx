@@ -164,11 +164,6 @@ export function SuccessStoriesSection() {
                                   />
                                 ))}
                               </div>
-                              
-                              {/* Hover Hint */}
-                              <div className="mt-4 text-sm text-gray-200">
-                                Hover to read story
-                              </div>
                             </div>
                           </div>
                         </motion.div>
