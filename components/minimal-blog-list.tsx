@@ -55,7 +55,7 @@ interface MinimalBlogListProps {
   filterTagSlug?: string | null;
 }
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 24;
 
 export function MinimalBlogList({
   searchQuery = "",
@@ -402,7 +402,7 @@ export function MinimalBlogList({
         </div>
       ) : (
         <>
-          {/* Articles Grid - UPDATED: Everything inside the same box */}
+          {/* Articles Grid - NO BOXES */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginatedArticles.map((article) => {
               const author = getAuthor(article.author);
@@ -413,15 +413,12 @@ export function MinimalBlogList({
               const articleTags = article.tags
                 .map((tagId) => getTagById(tagId))
                 .filter(Boolean)
-                .slice(0, 3); // Show max 3 tags
+                .slice(0, 3);
 
               return (
-                <article
-                  key={article.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow"
-                >
+                <article key={article.id} className="group">
                   {/* Cover Image Container */}
-                  <div className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="relative aspect-video overflow-hidden rounded-xl mb-4 bg-gray-100 dark:bg-gray-700">
                     {/* Read time overlay at bottom right */}
                     <div className="absolute bottom-3 right-3 z-10">
                       <div className="bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
@@ -446,8 +443,8 @@ export function MinimalBlogList({
                     </Link>
                   </div>
 
-                  {/* Content - Now inside the same box as the cover image */}
-                  <div className="p-5">
+                  {/* Content - NO BOX, just the content */}
+                  <div>
                     {/* Category and Views */}
                     <div className="flex items-center justify-between mb-3">
                       {category && (
