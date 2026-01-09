@@ -37,7 +37,7 @@ const programmingLanguages: ProgrammingLanguage[] = [
     levelMy: "အစပြုသူမှ အဆင့်မြင့်",
     youtubeVideoId: "QXeEoD0pB3E",
     color: "from-sky-600 to-blue-600",
-    tagColor: "bg-sky-100 text-sky-800 border-sky-200",
+    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
   {
     name: "JavaScript",
@@ -54,8 +54,8 @@ const programmingLanguages: ProgrammingLanguage[] = [
     level: "Beginner to Advanced",
     levelMy: "အစပြုသူမှ အဆင့်မြင့်",
     youtubeVideoId: "EerdGm-ehJQ",
-    color: "from-amber-500 to-yellow-500",
-    tagColor: "bg-amber-100 text-amber-800 border-amber-200",
+    color: "from-sky-600 to-blue-600",
+    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
   {
     name: "Go",
@@ -72,8 +72,8 @@ const programmingLanguages: ProgrammingLanguage[] = [
     level: "Intermediate to Advanced",
     levelMy: "အလယ်အလတ်မှ အဆင့်မြင့်",
     youtubeVideoId: "un6ZyFkqFKo",
-    color: "from-purple-500 to-pink-700",
-    tagColor: "bg-purple-400 text-pink-800 border-purple-300",
+    color: "from-sky-600 to-blue-600",
+    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
   {
     name: "Java",
@@ -90,8 +90,8 @@ const programmingLanguages: ProgrammingLanguage[] = [
     level: "Intermediate to Advanced",
     levelMy: "အလယ်အလတ်မှ အဆင့်မြင့်",
     youtubeVideoId: "xTtL8E4LzTQ",
-    color: "from-red-500 to-orange-500",
-    tagColor: "bg-red-100 text-red-800 border-red-200",
+    color: "from-sky-600 to-blue-600",
+    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
   {
     name: "PHP",
@@ -108,8 +108,8 @@ const programmingLanguages: ProgrammingLanguage[] = [
     level: "Intermediate",
     levelMy: "အလယ်အလတ်",
     youtubeVideoId: "l4_Vn-sTBL8",
-    color: "from-rose-500 to-pink-500",
-    tagColor: "bg-rose-100 text-rose-800 border-rose-200",
+    color: "from-sky-600 to-blue-600",
+    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
 ];
 

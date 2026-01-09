@@ -651,7 +651,7 @@ const difficultyConfig = {
     lightBg: "bg-emerald-50 dark:bg-emerald-900/20",
     textColor: "text-emerald-700 dark:text-emerald-300",
     borderColor: "border-emerald-200 dark:border-emerald-800",
-    icon: Zap,
+    icon: Star,
     position: "left",
   },
   Intermediate: {
@@ -661,7 +661,7 @@ const difficultyConfig = {
     textColor: "text-sky-700 dark:text-sky-300",
     borderColor: "border-sky-200 dark:border-sky-800",
     icon: TrendingUp,
-    position: "right",
+    position: "left", // Changed from "right" to "left"
   },
   Advanced: {
     gradient: "from-pink-500 to-purple-600",
@@ -669,7 +669,7 @@ const difficultyConfig = {
     lightBg: "bg-indigo-50 dark:bg-indigo-900/20",
     textColor: "text-indigo-700 dark:text-indigo-300",
     borderColor: "border-indigo-200 dark:border-indigo-800",
-    icon: Star,
+    icon: Zap,
     position: "left",
   },
 };
@@ -933,17 +933,17 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                   >
                     <div
                       className={`flex flex-col ${
-                        isLeft ? "items-start" : "items-end"
+                        isLeft ? "items-start" : "items-start"
                       } mb-6 md:mb-8`}
                     >
                       <div
                         className={`max-w-full lg:max-w-3xl w-full ${
-                          isLeft ? "text-left" : "text-right"
+                          isLeft ? "text-left" : "text-left"
                         }`}
                       >
                         <div
                           className={`flex items-center gap-3 mb-3 ${
-                            isLeft ? "" : "flex-row-reverse"
+                            isLeft ? "" : "flex-row"
                           }`}
                         >
                           <div
@@ -975,10 +975,10 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                             : path.descriptionMy}
                         </p>
 
-                        {/* Learning Path - Made scrollable on mobile */}
+                        {/* Learning Path - Made scrollable on mobile - REMOVED BOXES */}
                         <div
                           className={`inline-flex flex-col gap-2 w-full ${
-                            isLeft ? "" : "items-end"
+                            isLeft ? "" : "items-start"
                           }`}
                         >
                           <span className="text-sm md:mb-4 font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
@@ -992,15 +992,13 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                   [-ms-overflow-style:none] 
                   [scrollbar-width:none]"
                           >
-                            <div className="flex items-center gap-1 flex-nowrap min-w-max">
+                            <div className="flex items-center gap-2 flex-nowrap min-w-max">
                               {path.learningPath.map((step, index) => (
                                 <div
                                   key={index}
                                   className="flex items-center gap-1 flex-shrink-0"
                                 >
-                                  <div
-                                    className={`flex items-center gap-2 bg-white dark:bg-gray-800 border-2 ${config.borderColor} rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-shadow`}
-                                  >
+                                  <div className="flex items-center gap-2">
                                     <span className="text-lg">{step.icon}</span>
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                       {step.title}{" "}
@@ -1260,30 +1258,7 @@ function PlaylistCard({
           </div>
         </a>
 
-        {toggleComplete && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              toggleComplete(playlist.id);
-            }}
-            className="absolute top-3 right-3 z-10 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-full p-2 shadow-lg hover:scale-110 transition-transform border-2 border-gray-300 dark:border-gray-600"
-            aria-label={
-              isCompleted
-                ? locale === "en"
-                  ? "Mark as incomplete"
-                  : "မပြီးဆုံးသေးဟု မှတ်သားရန်"
-                : locale === "en"
-                ? "Mark as complete"
-                : "ပြီးဆုံးပြီဟု မှတ်သားရန်"
-            }
-          >
-            {isCompleted ? (
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            ) : (
-              <Circle className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-            )}
-          </button>
-        )}
+        {/* Removed the completion circle button */}
       </div>
 
       <div className="mt-4 space-y-2">
@@ -1305,8 +1280,8 @@ function PlaylistCard({
 
         <div className="flex mt-3 items-center justify-between">
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <Users className="w-4 h-4 text-sky-400 dark:text-sky-500" />
-            <span className="text-sm text-sky-400 font-medium">
+            <Users className="w-4 h-4 text-gray-700 dark:text-gray-500" />
+            <span className="text-sm text-gray-700 font-medium">
               {playlist.channel} {/* Always show English channel name */}
             </span>
           </div>
