@@ -37,6 +37,7 @@ import {
   ThumbsUp,
   Lightbulb,
   BarChart2,
+  Search,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -1522,7 +1523,7 @@ export default function AuthorAdminDashboard() {
                                   {readTime} min read
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                  <Eye className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                                  <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
                                   {article.read_count?.toLocaleString()} views
                                 </span>
                                 <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
@@ -1564,7 +1565,7 @@ export default function AuthorAdminDashboard() {
                                 )}
                               </div>
 
-                              <p className="text-slate-600 dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                              <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
                                 {previewText}
                               </p>
 
