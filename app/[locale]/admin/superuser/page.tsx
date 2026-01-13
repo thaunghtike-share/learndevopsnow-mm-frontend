@@ -121,7 +121,7 @@ export default function SuperUserDashboard() {
 
       <ImpersonationBanner />
 
-      <main className="max-w-7xl mx-auto px-4 pt-8 pb-16 relative z-10">
+      <main className="px-6 md:px-11 pt-8 pb-16 relative z-10">
         {/* Header */}
         <div className="w-full mb-16">
           <div className="mb-12">
