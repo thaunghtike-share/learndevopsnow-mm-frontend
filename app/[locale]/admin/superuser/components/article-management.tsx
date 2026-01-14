@@ -1,11 +1,30 @@
 "use client";
-import { useState, useEffect } from "react";
-import { 
-  FileText, Search, Trash2, CheckSquare, Square, AlertTriangle, 
-  Eye, Calendar, User, Loader, Edit, ExternalLink, Clock,
-  Folder, Tag as TagIcon, MessageSquare, Heart, Sparkles, Lightbulb, ThumbsUp,
-  ChevronLeft, ChevronRight, BarChart2,
-  PenSquare
+import { useState, useEffect, useRef } from "react";
+import {
+  FileText,
+  Search,
+  Trash2,
+  CheckSquare,
+  Square,
+  AlertTriangle,
+  Eye,
+  Calendar,
+  User,
+  Loader,
+  Edit,
+  ExternalLink,
+  Clock,
+  Folder,
+  Tag as TagIcon,
+  MessageSquare,
+  Heart,
+  Sparkles,
+  Lightbulb,
+  ThumbsUp,
+  ChevronLeft,
+  ChevronRight,
+  BarChart2,
+  PenSquare,
 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -58,47 +77,54 @@ export default function ArticleManagement() {
   const [selectedArticles, setSelectedArticles] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "search">("all");
-  const [impersonationLoading, setImpersonationLoading] = useState<string | null>(null);
-  const [deletingArticleId, setDeletingArticleId] = useState<number | null>(null);
+  const [impersonationLoading, setImpersonationLoading] = useState<
+    string | null
+  >(null);
+  const [deletingArticleId, setDeletingArticleId] = useState<number | null>(
+    null
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [authors, setAuthors] = useState<Author[]>([]);
-  const articlesPerPage = 10;
+  const articlesPerPage = 6;
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch all articles with engagement data
   const fetchArticles = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       // Fetch articles
       const articlesResponse = await fetch(`${API_BASE_URL}/super/articles/`, {
         headers: { Authorization: `Token ${token}` },
       });
-      
+
       if (articlesResponse.ok) {
         const articlesData = await articlesResponse.json();
-        
+
         // Fetch all authors to get their avatars
         const authorsResponse = await fetch(`${API_BASE_URL}/super/authors/`, {
           headers: { Authorization: `Token ${token}` },
         });
-        
+
         let authorsList: Author[] = [];
         if (authorsResponse.ok) {
           const authorsData = await authorsResponse.json();
           authorsList = Array.isArray(authorsData) ? authorsData : [];
           setAuthors(authorsList);
         }
-        
+
         // Enhance articles with engagement data and author avatars
         const enhancedArticles = await Promise.all(
           articlesData.slice(0, 50).map(async (article: any) => {
             // Find author by name to get avatar
-            const author = authorsList.find(a => 
-              a.name === article.author_name || 
-              a.slug === article.author_name?.toLowerCase().replace(/\s+/g, '-')
+            const author = authorsList.find(
+              (a) =>
+                a.name === article.author_name ||
+                a.slug ===
+                  article.author_name?.toLowerCase().replace(/\s+/g, "-")
             );
-            
+
             try {
               const commentsRes = await fetch(
                 `${API_BASE_URL}/articles/${article.slug}/comments/`
@@ -141,11 +167,17 @@ export default function ArticleManagement() {
                 comment_count,
                 reactions_summary,
                 read_time: calculateReadTime(article.content),
-                author_slug: author?.slug || article.author_name?.toLowerCase().replace(/\s+/g, '-') || 'unknown',
-                author_avatar: author?.avatar || '/placeholder-avatar.jpg'
+                author_slug:
+                  author?.slug ||
+                  article.author_name?.toLowerCase().replace(/\s+/g, "-") ||
+                  "unknown",
+                author_avatar: author?.avatar || "/placeholder-avatar.jpg",
               };
             } catch (error) {
-              console.error(`Failed to fetch engagement for article ${article.slug}:`, error);
+              console.error(
+                `Failed to fetch engagement for article ${article.slug}:`,
+                error
+              );
             }
 
             return {
@@ -158,8 +190,11 @@ export default function ArticleManagement() {
                 insightful: 0,
               },
               read_time: calculateReadTime(article.content),
-              author_slug: author?.slug || article.author_name?.toLowerCase().replace(/\s+/g, '-') || 'unknown',
-              author_avatar: author?.avatar || '/placeholder-avatar.jpg'
+              author_slug:
+                author?.slug ||
+                article.author_name?.toLowerCase().replace(/\s+/g, "-") ||
+                "unknown",
+              author_avatar: author?.avatar || "/placeholder-avatar.jpg",
             };
           })
         );
@@ -190,8 +225,33 @@ export default function ArticleManagement() {
     return Math.max(1, Math.ceil(words / wordsPerMinute));
   };
 
-  // Search articles
-  const handleSearch = async () => {
+  // Local search for instant results
+  const handleLocalSearch = () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setActiveTab("all");
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = articles.filter(
+      (article) =>
+        article.title?.toLowerCase().includes(query) ||
+        article.excerpt?.toLowerCase().includes(query) ||
+        article.author_name?.toLowerCase().includes(query) ||
+        article.content?.toLowerCase().includes(query) ||
+        article.tags?.some((tag) => tag.name.toLowerCase().includes(query)) ||
+        article.category?.name.toLowerCase().includes(query)
+    );
+
+    setSearchResults(filtered);
+    setActiveTab("search");
+    setSelectedArticles([]);
+    setSelectAll(false);
+  };
+
+  // API Search for advanced search (when needed)
+  const handleApiSearch = async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
       setActiveTab("all");
@@ -202,32 +262,39 @@ export default function ArticleManagement() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${API_BASE_URL}/super/articles/search/?q=${encodeURIComponent(searchQuery)}`,
+        `${API_BASE_URL}/super/articles/search/?q=${encodeURIComponent(
+          searchQuery
+        )}`,
         {
           headers: { Authorization: `Token ${token}` },
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
-        
+
         // Enhance search results with author avatars
         const enhancedResults = await Promise.all(
           data.results.slice(0, 15).map(async (article: any) => {
             // Find author by name to get avatar
-            const author = authors.find(a => 
-              a.name === article.author_name || 
-              a.slug === article.author_name?.toLowerCase().replace(/\s+/g, '-')
+            const author = authors.find(
+              (a) =>
+                a.name === article.author_name ||
+                a.slug ===
+                  article.author_name?.toLowerCase().replace(/\s+/g, "-")
             );
-            
+
             return {
               ...article,
-              author_slug: author?.slug || article.author_name?.toLowerCase().replace(/\s+/g, '-') || 'unknown',
-              author_avatar: author?.avatar || '/placeholder-avatar.jpg'
+              author_slug:
+                author?.slug ||
+                article.author_name?.toLowerCase().replace(/\s+/g, "-") ||
+                "unknown",
+              author_avatar: author?.avatar || "/placeholder-avatar.jpg",
             };
           })
         );
-        
+
         setSearchResults(enhancedResults);
         setActiveTab("search");
         setSelectedArticles([]);
@@ -235,16 +302,59 @@ export default function ArticleManagement() {
       }
     } catch (error) {
       console.error("Error searching articles:", error);
+      // Fallback to local search if API fails
+      handleLocalSearch();
     } finally {
       setSearchLoading(false);
     }
   };
 
+  // Handle search input change with debounce
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set a new timeout for debouncing
+    searchTimeoutRef.current = setTimeout(() => {
+      if (value.trim().length > 0) {
+        // Use local search for instant results
+        handleLocalSearch();
+
+        // Also trigger API search in background for more comprehensive results
+        if (value.trim().length >= 3) {
+          handleApiSearch();
+        }
+      } else {
+        // If search is cleared, show all articles
+        setSearchResults([]);
+        setActiveTab("all");
+      }
+    }, 300); // 300ms debounce
+  };
+
+  // Handle manual search button click
+  const handleSearchButtonClick = () => {
+    if (!searchQuery.trim()) return;
+
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Trigger API search
+    handleApiSearch();
+  };
+
   // Selection handlers
   const handleSelectArticle = (articleId: number) => {
-    setSelectedArticles(prev => 
-      prev.includes(articleId) 
-        ? prev.filter(id => id !== articleId)
+    setSelectedArticles((prev) =>
+      prev.includes(articleId)
+        ? prev.filter((id) => id !== articleId)
         : [...prev, articleId]
     );
   };
@@ -254,7 +364,7 @@ export default function ArticleManagement() {
     if (selectAll) {
       setSelectedArticles([]);
     } else {
-      setSelectedArticles(displayArticles.map(article => article.id));
+      setSelectedArticles(displayArticles.map((article) => article.id));
     }
     setSelectAll(!selectAll);
   };
@@ -267,11 +377,15 @@ export default function ArticleManagement() {
     }
 
     const articleTitles = getDisplayArticles()
-      .filter(article => selectedArticles.includes(article.id))
-      .map(article => article.title)
+      .filter((article) => selectedArticles.includes(article.id))
+      .map((article) => article.title)
       .join("\n• ");
 
-    if (!confirm(`Are you sure you want to permanently delete the following ${selectedArticles.length} articles?\n\n• ${articleTitles}\n\nThis action cannot be undone!`)) {
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete the following ${selectedArticles.length} articles?\n\n• ${articleTitles}\n\nThis action cannot be undone!`
+      )
+    ) {
       return;
     }
 
@@ -279,25 +393,33 @@ export default function ArticleManagement() {
       setActionLoading(true);
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`${API_BASE_URL}/super/articles/bulk-delete/`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          article_ids: selectedArticles
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/super/articles/bulk-delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            article_ids: selectedArticles,
+          }),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
         alert(`✅ Successfully deleted ${result.deleted_count} articles`);
-        
+
         // Refresh data
         fetchArticles();
         if (activeTab === "search") {
-          handleSearch();
+          // Refresh search results
+          if (searchQuery.trim().length >= 3) {
+            handleApiSearch();
+          } else {
+            handleLocalSearch();
+          }
         }
         // Reset selection
         setSelectedArticles([]);
@@ -315,17 +437,26 @@ export default function ArticleManagement() {
 
   // Handle view article
   const handleViewArticle = (articleSlug: string) => {
-    window.open(`/articles/${articleSlug}`, '_blank');
+    window.open(`/articles/${articleSlug}`, "_blank");
   };
 
   // Handle impersonate author for editing
-  const handleImpersonateAuthor = async (authorSlug: string, authorName: string) => {
-    if (!authorSlug || authorSlug === 'unknown') {
-      alert(`Cannot impersonate author "${authorName}". Author slug not found.`);
+  const handleImpersonateAuthor = async (
+    authorSlug: string,
+    authorName: string
+  ) => {
+    if (!authorSlug || authorSlug === "unknown") {
+      alert(
+        `Cannot impersonate author "${authorName}". Author slug not found.`
+      );
       return;
     }
 
-    if (!confirm(`Impersonate ${authorName}? You will be logged in as them and redirected to their dashboard to edit articles.`)) {
+    if (
+      !confirm(
+        `Impersonate ${authorName}? You will be logged in as them and redirected to their dashboard to edit articles.`
+      )
+    ) {
       return;
     }
 
@@ -356,20 +487,28 @@ export default function ArticleManagement() {
       localStorage.setItem("token", data.impersonation_token);
       localStorage.setItem("is_impersonating", "true");
       localStorage.setItem("impersonated_author", authorSlug);
-      
+
       // Redirect to the author's dashboard
       window.location.href = `/admin/author/${authorSlug}`;
     } catch (error: any) {
       console.error("Impersonation failed:", error);
-      alert(`Impersonation failed: ${error.message || 'Unknown error'}`);
+      alert(`Impersonation failed: ${error.message || "Unknown error"}`);
     } finally {
       setImpersonationLoading(null);
     }
   };
 
   // Handle delete single article
-  const handleDeleteArticle = async (articleId: number, articleTitle: string, articleSlug: string) => {
-    if (!confirm(`Are you sure you want to delete "${articleTitle}" as superuser? This action cannot be undone!`)) {
+  const handleDeleteArticle = async (
+    articleId: number,
+    articleTitle: string,
+    articleSlug: string
+  ) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${articleTitle}" as superuser? This action cannot be undone!`
+      )
+    ) {
       return;
     }
 
@@ -387,7 +526,7 @@ export default function ArticleManagement() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            article_ids: [articleId]
+            article_ids: [articleId],
           }),
         }
       );
@@ -395,17 +534,22 @@ export default function ArticleManagement() {
       if (response.ok) {
         const result = await response.json();
         alert(`✅ ${result.message}`);
-        
+
         // Refresh data
         fetchArticles();
         if (activeTab === "search") {
-          handleSearch();
+          // Refresh search results
+          if (searchQuery.trim().length >= 3) {
+            handleApiSearch();
+          } else {
+            handleLocalSearch();
+          }
         }
         // Reset selection if needed
-        setSelectedArticles(prev => prev.filter(id => id !== articleId));
+        setSelectedArticles((prev) => prev.filter((id) => id !== articleId));
       } else {
         const error = await response.json();
-        alert(`❌ Failed to delete article: ${error.error || 'Unknown error'}`);
+        alert(`❌ Failed to delete article: ${error.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error deleting article:", error);
@@ -438,7 +582,8 @@ export default function ArticleManagement() {
     if (category.includes("cloud")) return "/cloud.webp";
     if (category.includes("automation")) return "/automation.webp";
     if (category.includes("terraform")) return "/terraform.webp";
-    if (category.includes("devsecops") || category.includes("security")) return "/security.webp";
+    if (category.includes("devsecops") || category.includes("security"))
+      return "/security.webp";
     return "/devops.webp";
   };
 
@@ -461,15 +606,25 @@ export default function ArticleManagement() {
     fetchArticles();
   }, []);
 
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const displayArticles = getDisplayArticles();
-  const totalArticles = activeTab === "search" ? searchResults.length : articles.length;
+  const totalArticles =
+    activeTab === "search" ? searchResults.length : articles.length;
   const totalPages = Math.ceil(totalArticles / articlesPerPage);
 
   return (
     <div className="relative group">
       {/* Glass background */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/20 dark:from-gray-800/40 dark:to-gray-900/20 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-gray-700/30 shadow-2xl" />
-      
+
       <div className="relative">
         {/* Header */}
         <div className="p-6 border-b border-white/20 dark:border-gray-700/30">
@@ -489,7 +644,7 @@ export default function ArticleManagement() {
         </div>
 
         {/* Search Bar */}
-        <div className="p-6 pb-4">
+        <div className="p-6 pb-4 mb-4">
           <div className="flex gap-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -497,14 +652,21 @@ export default function ArticleManagement() {
                 type="text"
                 placeholder="Search articles by title, content, author, or tags..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                className="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-300 dark:border-gray-700/30 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black dark:text-white placeholder-gray-500"
+                onChange={handleSearchChange}
+                onKeyPress={(e) =>
+                  e.key === "Enter" && handleSearchButtonClick()
+                }
+                className="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-300 dark:border-gray-700/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-black dark:text-white placeholder-gray-500"
               />
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
             </div>
             <button
-              onClick={handleSearch}
-              disabled={searchLoading}
+              onClick={handleSearchButtonClick}
+              disabled={searchLoading || !searchQuery.trim()}
               className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
               {searchLoading ? (
@@ -525,7 +687,8 @@ export default function ArticleManagement() {
                   <AlertTriangle className="w-5 h-5 text-red-500" />
                   <div>
                     <p className="font-semibold text-red-700 dark:text-red-400">
-                      {selectedArticles.length} article{selectedArticles.length > 1 ? 's' : ''} selected
+                      {selectedArticles.length} article
+                      {selectedArticles.length > 1 ? "s" : ""} selected
                     </p>
                     <p className="text-sm text-red-600 dark:text-red-300">
                       This will permanently delete all selected articles
@@ -555,18 +718,41 @@ export default function ArticleManagement() {
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
                 <div className="w-8 h-8 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-black dark:text-gray-400">Loading articles...</p>
+                <p className="text-black dark:text-gray-400">
+                  Loading articles...
+                </p>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
+              {/* Active tab indicator */}
+              {searchQuery.trim() && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Showing{" "}
+                    {activeTab === "search" ? "search results" : "all articles"}
+                    {searchQuery.trim() && ` for "${searchQuery}"`}
+                    {activeTab === "search" && searchResults.length > 0 && (
+                      <span className="font-semibold">
+                        {" "}
+                        ({searchResults.length} found)
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
+
               {/* Articles */}
               <div className="space-y-4">
                 {displayArticles.map((article) => {
                   const coverImage = getCoverImage(article);
                   const excerpt = getCleanExcerpt(article);
                   const reactions = article.reactions_summary || {};
-                  const totalReactions = (reactions.like || 0) + (reactions.love || 0) + (reactions.celebrate || 0) + (reactions.insightful || 0);
+                  const totalReactions =
+                    (reactions.like || 0) +
+                    (reactions.love || 0) +
+                    (reactions.celebrate || 0) +
+                    (reactions.insightful || 0);
 
                   return (
                     <div
@@ -598,7 +784,7 @@ export default function ArticleManagement() {
                             <div className="flex-1">
                               {/* Title with hover effect */}
                               <h3 className="text-lg md:text-xl font-bold text-black dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                                <a 
+                                <a
                                   href={`/articles/${article.slug}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -667,7 +853,13 @@ export default function ArticleManagement() {
                               {/* Action Buttons - Beside article preview */}
                               <div className="flex gap-2">
                                 <button
-                                  onClick={() => handleDeleteArticle(article.id, article.title, article.slug)}
+                                  onClick={() =>
+                                    handleDeleteArticle(
+                                      article.id,
+                                      article.title,
+                                      article.slug
+                                    )
+                                  }
                                   disabled={deletingArticleId === article.id}
                                   className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 text-sm font-medium"
                                 >
@@ -688,17 +880,19 @@ export default function ArticleManagement() {
                 })}
 
                 {/* Empty States */}
-                {displayArticles.length === 0 && searchQuery && activeTab === "search" && (
-                  <div className="text-center py-12">
-                    <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-xl font-bold text-black dark:text-white mb-2">
-                      No Articles Found
-                    </h3>
-                    <p className="text-black dark:text-gray-400">
-                      No articles matching "{searchQuery}"
-                    </p>
-                  </div>
-                )}
+                {displayArticles.length === 0 &&
+                  searchQuery &&
+                  activeTab === "search" && (
+                    <div className="text-center py-12">
+                      <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <h3 className="text-xl font-bold text-black dark:text-white mb-2">
+                        No Articles Found
+                      </h3>
+                      <p className="text-black dark:text-gray-400">
+                        No articles matching "{searchQuery}"
+                      </p>
+                    </div>
+                  )}
 
                 {displayArticles.length === 0 && !searchQuery && !loading && (
                   <div className="text-center py-12">
@@ -717,14 +911,16 @@ export default function ArticleManagement() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(1, prev - 1))
+                    }
                     disabled={currentPage === 1}
                     className="flex items-center gap-2 px-4 py-2 text-black dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Previous
                   </button>
-                  
+
                   <div className="flex items-center gap-2">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
@@ -737,7 +933,7 @@ export default function ArticleManagement() {
                       } else {
                         pageNum = currentPage - 2 + i;
                       }
-                      
+
                       return (
                         <button
                           key={pageNum}
@@ -753,9 +949,11 @@ export default function ArticleManagement() {
                       );
                     })}
                   </div>
-                  
+
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                    }
                     disabled={currentPage === totalPages}
                     className="flex items-center gap-2 px-4 py-2 text-black dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
                   >

@@ -8,6 +8,7 @@ import ArticleManagement from "./components/article-management";
 import ImpersonationBanner from "./components/impersonation-banner";
 import { Crown, AlertTriangle, Loader } from "lucide-react";
 import PlatformAnalytics from "./components/platform-analytics";
+import BookingsManagementPage from "./components/bookings";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -162,6 +163,11 @@ export default function SuperUserDashboard() {
               {/* Article Management - NEW */}
               <div className="lg:col-span-2">
                 <ArticleManagement />
+              </div>
+
+              {/* Article Management - NEW */}
+              <div className="lg:col-span-2">
+                <BookingsManagementPage />
               </div>
             </div>
           </div>
