@@ -103,7 +103,10 @@ export function MinimalFooter() {
 
         if (response.ok) {
           setIsSubscribed(false);
-          showMessage("success", "Unsubscribed from notifications");
+          showMessage(
+            "success",
+            "Unsubscribed from notifications. You'll receive a confirmation email."
+          );
         } else {
           showMessage("error", "Failed to unsubscribe");
         }
@@ -117,7 +120,10 @@ export function MinimalFooter() {
 
         if (response.ok) {
           setIsSubscribed(true);
-          showMessage("success", "Subscribed! You'll get email notifications");
+          showMessage(
+            "success",
+            "Subscribed! Check your email for confirmation and future notifications."
+          );
         } else {
           showMessage("error", "Failed to subscribe");
         }
@@ -239,7 +245,7 @@ export function MinimalFooter() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl md:rounded-2xl p-4 md:p-6 border border-blue-100 dark:border-gray-700 shadow-lg">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative">
@@ -257,9 +263,10 @@ export function MinimalFooter() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <p className="text-black dark:text-gray-300 mb-4 md:mb-6 text-sm md:text-sm leading-relaxed">
-                    Get instant email notifications when new DevOps articles are published. Be the first to learn!
+                    Get instant email notifications when new DevOps articles are
+                    published. Be the first to learn!
                   </p>
 
                   <div className="space-y-4">
