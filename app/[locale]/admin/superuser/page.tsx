@@ -9,6 +9,7 @@ import ImpersonationBanner from "./components/impersonation-banner";
 import { Crown, AlertTriangle, Loader } from "lucide-react";
 import PlatformAnalytics from "./components/platform-analytics";
 import BookingsManagementPage from "./components/bookings";
+import SuperUserManagement from "./components/super-user-management";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -153,6 +154,11 @@ export default function SuperUserDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
               <div className="lg:col-span-2">
                 <PlatformAnalytics />
+              </div>
+
+              {/* Super User Management - NEW */}
+              <div className="lg:col-span-2">
+                <SuperUserManagement />
               </div>
 
               {/* User Management */}
