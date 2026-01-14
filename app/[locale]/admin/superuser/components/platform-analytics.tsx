@@ -670,7 +670,7 @@ export default function PlatformAnalytics() {
                   {sortedAuthors.map((author, index) => (
                     <Link
                       key={author.id}
-                      href={`/admin/author/${author.slug}`}
+                      href={`/authors/${author.slug}`}
                       className="group"
                     >
                       <div className="p-4 rounded-2xl border border-blue-200/50 dark:border-blue-800/30 bg-white dark:bg-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] h-full">

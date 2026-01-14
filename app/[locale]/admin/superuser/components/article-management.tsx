@@ -4,7 +4,8 @@ import {
   FileText, Search, Trash2, CheckSquare, Square, AlertTriangle, 
   Eye, Calendar, User, Loader, Edit, ExternalLink, Clock,
   Folder, Tag as TagIcon, MessageSquare, Heart, Sparkles, Lightbulb, ThumbsUp,
-  ChevronLeft, ChevronRight, BarChart2, Users
+  ChevronLeft, ChevronRight, BarChart2,
+  PenSquare
 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -258,7 +259,7 @@ export default function ArticleManagement() {
     setSelectAll(!selectAll);
   };
 
-  // Bulk delete functionality - FIXED: Use proper endpoint
+  // Bulk delete functionality
   const handleBulkDelete = async () => {
     if (selectedArticles.length === 0) {
       alert("Please select at least one article to delete.");
@@ -317,7 +318,7 @@ export default function ArticleManagement() {
     window.open(`/articles/${articleSlug}`, '_blank');
   };
 
-  // Handle impersonate author for editing - FIXED: Use article author slug
+  // Handle impersonate author for editing
   const handleImpersonateAuthor = async (authorSlug: string, authorName: string) => {
     if (!authorSlug || authorSlug === 'unknown') {
       alert(`Cannot impersonate author "${authorName}". Author slug not found.`);
@@ -366,7 +367,7 @@ export default function ArticleManagement() {
     }
   };
 
-  // Handle delete single article - FIXED: Use proper endpoint
+  // Handle delete single article
   const handleDeleteArticle = async (articleId: number, articleTitle: string, articleSlug: string) => {
     if (!confirm(`Are you sure you want to delete "${articleTitle}" as superuser? This action cannot be undone!`)) {
       return;
@@ -481,7 +482,7 @@ export default function ArticleManagement() {
                 Article Management
               </h2>
               <p className="text-black dark:text-gray-400 text-sm">
-                {totalArticles} articles • Superuser privileges
+                Superuser privileges
               </p>
             </div>
           </div>
@@ -515,6 +516,39 @@ export default function ArticleManagement() {
           </div>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {selectedArticles.length > 0 && (
+          <div className="px-6 pb-4">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-800/30 rounded-2xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                  <div>
+                    <p className="font-semibold text-red-700 dark:text-red-400">
+                      {selectedArticles.length} article{selectedArticles.length > 1 ? 's' : ''} selected
+                    </p>
+                    <p className="text-sm text-red-600 dark:text-red-300">
+                      This will permanently delete all selected articles
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={actionLoading}
+                  className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 font-medium"
+                >
+                  {actionLoading ? (
+                    <Loader className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  Delete Selected ({selectedArticles.length})
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Articles List */}
         <div className="p-6 pt-0">
           {loading ? (
@@ -526,12 +560,6 @@ export default function ArticleManagement() {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Header with select all */}
-              {displayArticles.length > 0 && (
-                <div className="">
-                </div>
-              )}
-
               {/* Articles */}
               <div className="space-y-4">
                 {displayArticles.map((article) => {
@@ -568,9 +596,16 @@ export default function ArticleManagement() {
                           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                             {/* Left side: Article preview */}
                             <div className="flex-1">
-                              {/* Title */}
-                              <h3 className="text-lg md:text-xl font-bold text-black dark:text-white mb-2">
-                                {article.title}
+                              {/* Title with hover effect */}
+                              <h3 className="text-lg md:text-xl font-bold text-black dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                                <a 
+                                  href={`/articles/${article.slug}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className=""
+                                >
+                                  {article.title}
+                                </a>
                               </h3>
 
                               {/* Author with Avatar */}
@@ -631,19 +666,6 @@ export default function ArticleManagement() {
                             <div className="flex flex-col items-end gap-3">
                               {/* Action Buttons - Beside article preview */}
                               <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleImpersonateAuthor(article.author_slug, article.author_name)}
-                                  disabled={impersonationLoading === article.author_slug}
-                                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 text-sm font-medium"
-                                >
-                                  {impersonationLoading === article.author_slug ? (
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <Edit className="w-4 h-4" />
-                                  )}
-                                  Edit
-                                </button>
-                                
                                 <button
                                   onClick={() => handleDeleteArticle(article.id, article.title, article.slug)}
                                   disabled={deletingArticleId === article.id}
