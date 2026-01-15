@@ -300,13 +300,6 @@ export default function SignInForm({
           }
         `}</style>
 
-        {/* Google Button with focus fix */}
-        <div
-          ref={googleButtonRef}
-          className="hide-google-focus w-full overflow-hidden rounded-xl py-2"
-          style={{ minHeight: "44px" }}
-        ></div>
-
         {/* GitHub Button with adjusted spacing */}
         <div className="mt-1">
           <GitHubLoginButton
@@ -314,6 +307,13 @@ export default function SignInForm({
             onError={(error) => setError(error)}
           />
         </div>
+
+        {/* Google Button with focus fix */}
+        <div
+          ref={googleButtonRef}
+          className="hide-google-focus w-full overflow-hidden rounded-xl py-2"
+          style={{ minHeight: "44px" }}
+        ></div>
 
         {googleLoading && (
           <div className="text-center">
