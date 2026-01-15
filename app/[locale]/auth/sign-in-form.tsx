@@ -35,7 +35,7 @@ export default function SignInForm({
     setError(null);
     setShowHint(false);
     setPasswordHint("");
-    
+
     // Also clear any localStorage flags
     localStorage.removeItem("force_clear_forms");
   }, []);
@@ -259,33 +259,51 @@ export default function SignInForm({
   };
 
   const handleForgotPassword = () => {
-    setError(
-      "Please contact us to reset your password."
-    );
+    setError("Please contact us to reset your password.");
   };
 
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Fake hidden fields to trick browser autofill */}
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         <input type="text" name="username" autoComplete="username" />
-        <input type="password" name="password" autoComplete="current-password" />
+        <input
+          type="password"
+          name="password"
+          autoComplete="current-password"
+        />
       </div>
 
       <div className="space-y-3">
-        {/* Google Button */}
+        {/* Add this style tag to hide Google focus border */}
+        <style jsx>{`
+          .hide-google-focus :global([role="button"]) {
+            border-color: #d1d5db !important;
+          }
+          .hide-google-focus :global([role="button"]:focus),
+          .hide-google-focus :global([role="button"]:focus-within),
+          .hide-google-focus :global([role="button"]:focus-visible) {
+            outline: none !important;
+            box-shadow: none !important;
+            border-color: #d1d5db !important;
+          }
+        `}</style>
+
+        {/* Google Button with focus fix */}
         <div
           ref={googleButtonRef}
-          className="w-full overflow-hidden rounded-xl"
+          className="hide-google-focus w-full overflow-hidden rounded-xl py-2"
           style={{ minHeight: "44px" }}
         ></div>
-        
-        {/* GitHub Button */}
-        <GitHubLoginButton 
-          onSuccess={onSuccess}
-          onError={(error) => setError(error)}
-        />
-        
+
+        {/* GitHub Button with adjusted spacing */}
+        <div className="mt-1">
+          <GitHubLoginButton
+            onSuccess={onSuccess}
+            onError={(error) => setError(error)}
+          />
+        </div>
+
         {googleLoading && (
           <div className="text-center">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-sky-600 mx-auto mb-1"></div>
