@@ -259,7 +259,7 @@ export default function SignInForm({
 
   const handleForgotPassword = () => {
     setError(
-      "Forgot password? Please contact our team via Messenger or email for assistance."
+      "Please contact us to reset your password."
     );
   };
 
