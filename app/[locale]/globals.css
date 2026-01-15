@@ -265,3 +265,17 @@ div[class*="section"] {
     height: 44px !important;
   }
 }
+
+/* Hide Google button focus styles */
+div[id^="g_id"] [role="button"] {
+  border-color: #d1d5db !important;
+}
+
+div[id^="g_id"] [role="button"]:focus,
+div[id^="g_id"] [role="button"]:focus-within,
+div[id^="g_id"] [role="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #d1d5db !important;
+  border-width: 1px !important;
+}
