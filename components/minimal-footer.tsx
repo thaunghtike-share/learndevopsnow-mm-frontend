@@ -265,7 +265,7 @@ export function MinimalFooter() {
                   </div>
 
                   <p className="text-black dark:text-gray-300 mb-4 md:mb-6 text-sm md:text-sm leading-relaxed">
-                    Get instant email notifications when new DevOps articles are
+                    Get instant email notifications when new articles are
                     published. Be the first to learn!
                   </p>
 

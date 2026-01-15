@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/use-auth";
 
 interface SignUpFormProps {
@@ -12,15 +12,28 @@ export default function SignUpForm({
   switchToSignIn,
 }: SignUpFormProps) {
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password1: "",
-    password2: "",
-    password_hint: "",
+    signup_user: "", // Changed from username
+    signup_email: "", // Changed from email
+    signup_pass1: "", // Changed from password1
+    signup_pass2: "", // Changed from password2
+    signup_hint: "", // Changed from password_hint
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Clear form on mount
+  useEffect(() => {
+    setFormData({
+      signup_user: "",
+      signup_email: "",
+      signup_pass1: "",
+      signup_pass2: "",
+      signup_hint: "",
+    });
+    setError(null);
+    setSuccess(false);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({
@@ -31,35 +44,34 @@ export default function SignUpForm({
   };
 
   const validateForm = () => {
-    if (!formData.username || !formData.password1 || !formData.password2) {
+    if (!formData.signup_user || !formData.signup_pass1 || !formData.signup_pass2) {
       setError("Username and password are required");
       return false;
     }
 
-    // ✅ ADD EMAIL VALIDATION
-    if (!formData.email || !formData.email.trim()) {
+    // Email validation
+    if (!formData.signup_email || !formData.signup_email.trim()) {
       setError("Email is required");
       return false;
     }
 
-    // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(formData.signup_email)) {
       setError("Please enter a valid email address");
       return false;
     }
 
-    if (formData.password1 !== formData.password2) {
+    if (formData.signup_pass1 !== formData.signup_pass2) {
       setError("Passwords do not match");
       return false;
     }
 
-    if (formData.password1.length < 8) {
+    if (formData.signup_pass1.length < 8) {
       setError("Password must be at least 8 characters long");
       return false;
     }
 
-    if (formData.username.length < 3) {
+    if (formData.signup_user.length < 3) {
       setError("Username must be at least 3 characters long");
       return false;
     }
@@ -78,13 +90,13 @@ export default function SignUpForm({
     try {
       console.log("📤 Checking email availability...");
 
-      if (formData.email && formData.email.trim() !== "") {
+      if (formData.signup_email && formData.signup_email.trim() !== "") {
         const emailCheckResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/check-email/`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: formData.email }),
+            body: JSON.stringify({ email: formData.signup_email }),
           }
         );
 
@@ -102,10 +114,10 @@ export default function SignUpForm({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: formData.username,
-            email: formData.email ? formData.email.trim() : "",
-            password1: formData.password1,
-            password2: formData.password2,
+            username: formData.signup_user,
+            email: formData.signup_email ? formData.signup_email.trim() : "",
+            password1: formData.signup_pass1,
+            password2: formData.signup_pass2,
           }),
         }
       );
@@ -115,7 +127,7 @@ export default function SignUpForm({
       if (registerResponse.status === 201) {
         console.log("✅ Account created successfully");
 
-        if (formData.password_hint) {
+        if (formData.signup_hint) {
           try {
             const saveHintResponse = await fetch(
               `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/save-password-hint/`,
@@ -123,8 +135,8 @@ export default function SignUpForm({
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  username: formData.username,
-                  password_hint: formData.password_hint,
+                  username: formData.signup_user,
+                  password_hint: formData.signup_hint,
                 }),
               }
             );
@@ -175,7 +187,7 @@ export default function SignUpForm({
     }
   };
 
-  // Success message - improved mobile sizing
+  // Success message
   if (success) {
     return (
       <div className="text-center py-6 sm:py-8">
@@ -212,11 +224,11 @@ export default function SignUpForm({
             onClick={() => {
               setSuccess(false);
               setFormData({
-                username: "",
-                email: "",
-                password1: "",
-                password2: "",
-                password_hint: "",
+                signup_user: "",
+                signup_email: "",
+                signup_pass1: "",
+                signup_pass2: "",
+                signup_hint: "",
               });
             }}
             className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2.5 sm:py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm sm:text-base"
@@ -230,18 +242,24 @@ export default function SignUpForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-      {" "}
-      {/* Reduced mobile spacing */}
+      {/* Fake hidden fields to trick browser */}
+      <div style={{ display: 'none' }}>
+        <input type="text" name="username" autoComplete="username" />
+        <input type="email" name="email" autoComplete="email" />
+        <input type="password" name="new-password" autoComplete="new-password" />
+      </div>
+
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Username *
         </label>
         <input
           type="text"
-          name="username"
-          value={formData.username}
+          name="signup_user"
+          value={formData.signup_user}
           onChange={handleInputChange}
           required
+          autoComplete="off"
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
           placeholder="Choose a username"
           minLength={3}
@@ -250,14 +268,15 @@ export default function SignUpForm({
       </div>
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Email Address * {/* ADD ASTERISK */}
+          Email Address *
         </label>
         <input
           type="email"
-          name="email"
-          value={formData.email}
+          name="signup_email"
+          value={formData.signup_email}
           onChange={handleInputChange}
           required
+          autoComplete="off"
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
           placeholder="Enter your email (required)"
           disabled={loading}
@@ -266,7 +285,7 @@ export default function SignUpForm({
           Required for notifications
         </p>
       </div>
-      {/* Password fields - stack on mobile, side-by-side on larger screens */}
+      {/* Password fields */}
       <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
         <div>
           <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -274,10 +293,11 @@ export default function SignUpForm({
           </label>
           <input
             type="password"
-            name="password1"
-            value={formData.password1}
+            name="signup_pass1"
+            value={formData.signup_pass1}
             onChange={handleInputChange}
             required
+            autoComplete="new-password"
             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             placeholder="Create password"
             minLength={8}
@@ -290,10 +310,11 @@ export default function SignUpForm({
           </label>
           <input
             type="password"
-            name="password2"
-            value={formData.password2}
+            name="signup_pass2"
+            value={formData.signup_pass2}
             onChange={handleInputChange}
             required
+            autoComplete="new-password"
             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             placeholder="Confirm password"
             minLength={8}
@@ -301,7 +322,7 @@ export default function SignUpForm({
           />
         </div>
       </div>
-      {/* Password Hint Field - OPTIONAL */}
+      {/* Password Hint Field */}
       <div>
         <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Password Hint{" "}
@@ -309,16 +330,14 @@ export default function SignUpForm({
         </label>
         <input
           type="text"
-          name="password_hint"
-          value={formData.password_hint}
+          name="signup_hint"
+          value={formData.signup_hint}
           onChange={handleInputChange}
+          autoComplete="off"
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
           placeholder="e.g., name + date of birth (optional)"
           disabled={loading}
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Optional: Helps you remember your password if you forget it
-        </p>
       </div>
       {error && (
         <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -339,7 +358,7 @@ export default function SignUpForm({
           "Create Account"
         )}
       </button>
-      {/* Sign In Link - adjusted mobile spacing */}
+      {/* Sign In Link */}
       <div className="text-center pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
         <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
           Already have an account?{" "}

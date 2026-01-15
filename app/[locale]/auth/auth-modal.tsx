@@ -14,7 +14,9 @@ export default function AuthModal({ onSuccess }: AuthModalProps) {
   // Load Google Identity Services script (unchanged)
   useEffect(() => {
     const loadGoogleScript = () => {
-      if (document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
+      if (
+        document.querySelector('script[src*="accounts.google.com/gsi/client"]')
+      ) {
         setGoogleScriptLoaded(true);
         return;
       }
@@ -38,26 +40,31 @@ export default function AuthModal({ onSuccess }: AuthModalProps) {
   }, []);
 
   return (
-    <div className="max-w-md mx-auto px-4 sm:px-6"> {/* Added horizontal padding */}
+    <div className="max-w-md mx-auto px-4 sm:px-6">
+      {" "}
+      {/* Added horizontal padding */}
       {/* Reduced padding on mobile, increased shadow for better depth */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-xl sm:shadow-lg p-6 sm:p-8">
-        
         {/* Text sizing improvements for mobile */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
             {activeTab === "signup" ? "Join Our Community" : "Welcome Back"}
           </h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            {activeTab === "signup" 
-              ? "Create an account to share your knowledge" 
+            {activeTab === "signup"
+              ? "Create an account to share your knowledge"
               : "Sign in to your account to continue"}
           </p>
         </div>
-
         {/* Tab Navigation - improved mobile sizing */}
         <div className="flex border-b border-gray-200 dark:border-gray-600 mb-4 sm:mb-6">
           <button
-            onClick={() => setActiveTab("signin")}
+            onClick={() => {
+              setActiveTab("signin");
+              // Trigger a re-initialization of Google script
+              setGoogleScriptLoaded(false);
+              setTimeout(() => setGoogleScriptLoaded(true), 50);
+            }}
             className={`flex-1 py-2 sm:py-3 font-medium text-xs sm:text-sm ${
               activeTab === "signin"
                 ? "text-sky-600 dark:text-sky-400 border-b-2 border-sky-600 dark:border-sky-400"
@@ -67,7 +74,12 @@ export default function AuthModal({ onSuccess }: AuthModalProps) {
             Sign In
           </button>
           <button
-            onClick={() => setActiveTab("signup")}
+            onClick={() => {
+              setActiveTab("signup");
+              // Trigger a re-initialization of Google script
+              setGoogleScriptLoaded(false);
+              setTimeout(() => setGoogleScriptLoaded(true), 50);
+            }}
             className={`flex-1 py-2 sm:py-3 font-medium text-xs sm:text-sm ${
               activeTab === "signup"
                 ? "text-sky-600 dark:text-sky-400 border-b-2 border-sky-600 dark:border-sky-400"
@@ -77,21 +89,28 @@ export default function AuthModal({ onSuccess }: AuthModalProps) {
             Sign Up
           </button>
         </div>
-
         {/* Show loading if Google script isn't ready */}
         {!googleScriptLoaded && (
           <div className="text-center py-4">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-sky-600 dark:border-sky-400 mx-auto mb-2"></div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">Loading authentication...</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Loading authentication...
+            </p>
           </div>
         )}
-
-        {/* Tab Content */}
         <div className={!googleScriptLoaded ? "opacity-50" : ""}>
           {activeTab === "signup" ? (
-            <SignUpForm onSuccess={onSuccess} switchToSignIn={() => setActiveTab("signin")} />
+            <SignUpForm
+              key="signup-form" // Add unique key
+              onSuccess={onSuccess}
+              switchToSignIn={() => setActiveTab("signin")}
+            />
           ) : (
-            <SignInForm onSuccess={onSuccess} switchToSignUp={() => setActiveTab("signup")} />
+            <SignInForm
+              key="signin-form" // Add unique key
+              onSuccess={onSuccess}
+              switchToSignUp={() => setActiveTab("signup")}
+            />
           )}
         </div>
       </div>

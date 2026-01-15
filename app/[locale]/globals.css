@@ -252,3 +252,16 @@ div[class*="section"] {
 .z-\[99999\] {
   z-index: 99999 !important;
 }
+
+/* In your global.css or tailwind.css */
+.google-signin-container iframe {
+  width: 100% !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 640px) {
+  .google-signin-container iframe {
+    height: 44px !important;
+  }
+}

@@ -26,31 +26,46 @@ export function useAuth() {
         return;
       }
 
-      console.log("🔐 Checking auth with token:", token.substring(0, 10) + "...");
+      console.log(
+        "🔐 Checking auth with token:",
+        token.substring(0, 10) + "..."
+      );
 
       // Verify token is valid by checking profile
-      const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/`, {
-        headers: { Authorization: `Token ${token}` },
-      });
+      const profileRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/`,
+        {
+          headers: { Authorization: `Token ${token}` },
+        }
+      );
 
       if (profileRes.ok) {
         const profileData = await profileRes.json();
         console.log("✅ Profile loaded:", profileData.name);
-        
+
         // ✅ DEBUG SUPER USER CHECK
         console.log("🔍 Checking super user status...");
         let isSuperUser = false;
         try {
-          const superCheckRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/super/stats/`, {
-            headers: { Authorization: `Token ${token}` },
-          });
-          
-          console.log("🔍 Super check status:", superCheckRes.status, superCheckRes.ok);
-          console.log("🔍 Super check URL:", `${process.env.NEXT_PUBLIC_API_BASE_URL}/super/stats/`);
-          
+          const superCheckRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/super/stats/`,
+            {
+              headers: { Authorization: `Token ${token}` },
+            }
+          );
+
+          console.log(
+            "🔍 Super check status:",
+            superCheckRes.status,
+            superCheckRes.ok
+          );
+          console.log(
+            "🔍 Super check URL:",
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/super/stats/`
+          );
+
           isSuperUser = superCheckRes.ok;
           console.log("🔍 Super user result:", isSuperUser);
-          
         } catch (error) {
           console.log("❌ Super user check failed:", error);
           isSuperUser = false;
@@ -96,10 +111,13 @@ export function useAuth() {
     localStorage.removeItem("impersonated_author");
     setUser(null);
     setIsAuthenticated(false);
+
+    // Just redirect to home page
+    window.location.href = "/";
   };
 
   const updateProfile = (profileData: Partial<User>) => {
-    setUser(prev => prev ? { ...prev, ...profileData } : null);
+    setUser((prev) => (prev ? { ...prev, ...profileData } : null));
   };
 
   return {
