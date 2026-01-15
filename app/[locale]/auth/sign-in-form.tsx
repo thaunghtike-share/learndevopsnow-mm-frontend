@@ -277,15 +277,26 @@ export default function SignInForm({
       <div className="space-y-3">
         {/* Add this style tag to hide Google focus border */}
         <style jsx>{`
+          /* Lock Google button styling in all states */
           .hide-google-focus :global([role="button"]) {
             border-color: #d1d5db !important;
+            border-width: 1px !important;
+            background-color: white !important;
           }
+
+          .hide-google-focus :global([role="button"]:hover) {
+            border-color: #d1d5db !important;
+            background-color: #f9fafb !important; /* light gray on hover */
+          }
+
+          .hide-google-focus :global([role="button"]:active),
           .hide-google-focus :global([role="button"]:focus),
           .hide-google-focus :global([role="button"]:focus-within),
           .hide-google-focus :global([role="button"]:focus-visible) {
+            border-color: #d1d5db !important;
+            background-color: white !important;
             outline: none !important;
             box-shadow: none !important;
-            border-color: #d1d5db !important;
           }
         `}</style>
 
