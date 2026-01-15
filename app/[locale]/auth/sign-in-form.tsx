@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./hooks/use-auth";
+import GitHubLoginButton from "./github-login-button";
 
 interface SignInFormProps {
   onSuccess?: () => void;
@@ -272,11 +273,19 @@ export default function SignInForm({
       </div>
 
       <div className="space-y-3">
+        {/* Google Button */}
         <div
           ref={googleButtonRef}
           className="w-full overflow-hidden rounded-xl"
           style={{ minHeight: "44px" }}
         ></div>
+        
+        {/* GitHub Button */}
+        <GitHubLoginButton 
+          onSuccess={onSuccess}
+          onError={(error) => setError(error)}
+        />
+        
         {googleLoading && (
           <div className="text-center">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-sky-600 mx-auto mb-1"></div>
