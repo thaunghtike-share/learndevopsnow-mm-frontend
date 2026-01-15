@@ -44,7 +44,11 @@ export default function SignUpForm({
   };
 
   const validateForm = () => {
-    if (!formData.signup_user || !formData.signup_pass1 || !formData.signup_pass2) {
+    if (
+      !formData.signup_user ||
+      !formData.signup_pass1 ||
+      !formData.signup_pass2
+    ) {
       setError("Username and password are required");
       return false;
     }
@@ -243,10 +247,14 @@ export default function SignUpForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
       {/* Fake hidden fields to trick browser */}
-      <div style={{ display: 'none' }}>
+      <div style={{ display: "none" }}>
         <input type="text" name="username" autoComplete="username" />
         <input type="email" name="email" autoComplete="email" />
-        <input type="password" name="new-password" autoComplete="new-password" />
+        <input
+          type="password"
+          name="new-password"
+          autoComplete="new-password"
+        />
       </div>
 
       <div>
@@ -278,15 +286,12 @@ export default function SignUpForm({
           required
           autoComplete="off"
           className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-          placeholder="Enter your email (required)"
+          placeholder="Enter your email"
           disabled={loading}
         />
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Required for notifications
-        </p>
       </div>
-      {/* Password fields */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
+      {/* Password fields - ALWAYS parallel */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <div>
           <label className="block mb-1 sm:mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             Password *
@@ -316,7 +321,7 @@ export default function SignUpForm({
             required
             autoComplete="new-password"
             className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-            placeholder="Confirm password"
+            placeholder="Confirm"
             minLength={8}
             disabled={loading}
           />
