@@ -35,6 +35,7 @@ interface Booking {
   booked_at: string;
   consultation_date: string | null;
   notes: string;
+  meeting_link: string | null;
 }
 
 interface BookingStats {
@@ -63,6 +64,48 @@ export default function BookingsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBookings, setTotalBookings] = useState(0);
   const [pageSize] = useState(10);
+
+  // Add this function inside your component
+  const generateMeetingLink = () => {
+    const platforms = [
+      "https://zoom.us/j/" + Math.random().toString(36).substring(7),
+      "https://meet.google.com/" + Math.random().toString(36).substring(7),
+      "https://teams.microsoft.com/l/meetup-join/" +
+        Math.random().toString(36).substring(7),
+    ];
+    const randomPlatform =
+      platforms[Math.floor(Math.random() * platforms.length)];
+    setEditFormData({
+      ...editFormData,
+      meeting_link: randomPlatform,
+    });
+  };
+
+  // Add this button next to the meeting link input field in the edit form
+  <div className="flex items-center gap-2">
+    <div className="flex-1">
+      <input
+        type="url"
+        value={editFormData.meeting_link || ""}
+        onChange={(e) =>
+          setEditFormData({
+            ...editFormData,
+            meeting_link: e.target.value,
+          })
+        }
+        placeholder="https://zoom.us/j/1234567890 or https://meet.google.com/abc-defg-hij"
+        className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
+      />
+    </div>
+    <button
+      type="button"
+      onClick={generateMeetingLink}
+      className="px-3 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 text-sm font-medium"
+      title="Generate sample meeting link"
+    >
+      <Clock className="w-4 h-4" />
+    </button>
+  </div>;
 
   // Debounced search function
   const debouncedFetchBookings = useCallback(
@@ -580,8 +623,23 @@ export default function BookingsManagement() {
                                 <Calendar className="w-4 h-4" />
                                 {formatDate(booking.booked_at)}
                               </div>
-                            </div>
 
+                              {/* Add meeting link display for confirmed bookings */}
+                              {booking.status === "confirmed" &&
+                                booking.meeting_link && (
+                                  <div className="md:col-span-1">
+                                    <a
+                                      href={booking.meeting_link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-medium hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+                                    >
+                                      <Clock className="w-3 h-3" />
+                                      Join Meeting
+                                    </a>
+                                  </div>
+                                )}
+                            </div>
                             {/* Project Goals */}
                             {booking.project_goals && (
                               <div className="mt-3">
@@ -774,6 +832,26 @@ export default function BookingsManagement() {
                     className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
                   />
                 </div>
+
+                {/* Add Meeting Link Field */}
+                <div>
+                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                    Meeting Link (Zoom/Google Meet/MS Teams)
+                  </label>
+                  <input
+                    type="url"
+                    value={editFormData.meeting_link || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        meeting_link: e.target.value,
+                      })
+                    }
+                    placeholder="https://zoom.us/j/1234567890 or https://meet.google.com/abc-defg-hij"
+                    className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-black dark:text-white"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-black dark:text-white mb-2">
                     Status
@@ -794,6 +872,7 @@ export default function BookingsManagement() {
                     <option value="completed">Completed</option>
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-black dark:text-white mb-2">
                     Notes
@@ -811,6 +890,7 @@ export default function BookingsManagement() {
                     placeholder="Add notes..."
                   />
                 </div>
+
                 <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
