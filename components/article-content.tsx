@@ -21,6 +21,7 @@ import {
   GitBranch,
   PlusCircle,
   User,
+  Home,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { visit } from "unist-util-visit";
@@ -316,6 +317,8 @@ export function ArticleContent({
     src: string;
     alt: string;
   } | null>(null);
+  // Store object URL for any Blob src so we can revoke it when replaced
+  const objectUrlRef = useRef<string | null>(null);
 
   // Define validHeadings - ONLY H2, H3 (removed H1)
   const validHeadings = headings.filter(({ text, level }) => {
@@ -459,34 +462,43 @@ export function ArticleContent({
       <main className="px-6 md:px-11 py-15 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
           <div className="mb-10 md:mb-12">
-            {/* Breadcrumb Navigation */}
-            <div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base font-medium text-black dark:text-white mb-4 sm:mb-6">
-              <Link
-                href="/"
-                className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
-              >
-                Home
-              </Link>
-              <ChevronRight className="w-3 h-3 text-black dark:text-white mx-0.5" />
-              <Link
-                href="/articles"
-                className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
-              >
-                Articles
-              </Link>
-              <ChevronRight className="w-3 h-3 text-black dark:text-white mx-0.5" />
-              <Link
-                href={`/categories/${slugify(categoryName)}`}
-                className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors duration-200 truncate text-black dark:text-white flex items-center"
-              >
-                <span className="hidden sm:inline">{categoryName}</span>
-                <span className="sm:hidden truncate max-w-[80px]">
-                  {categoryName.length > 10
-                    ? `${categoryName.substring(0, 10)}...`
-                    : categoryName}
-                </span>
-              </Link>
-            </div>
+            {/* Breadcrumb Navigation - Enhanced Design with nav element */}
+            <nav aria-label="Breadcrumb" className="mb-5 sm:mb-7 px-4 sm:px-0">
+              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base font-medium">
+                <Link
+                  href="/"
+                  className="group flex items-center text-sky-600 dark:text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate"
+                >
+                  <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 group-hover:scale-110 transition-transform" />
+                  Home
+                </Link>
+
+                <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 dark:text-gray-500 mx-1 flex-shrink-0" />
+
+                <Link
+                  href="/articles"
+                  className="text-gray-700 dark:text-gray-200 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Articles
+                </Link>
+
+                <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 dark:text-gray-500 mx-1 flex-shrink-0" />
+
+                <Link
+                  href={`/categories/${slugify(categoryName)}`}
+                  className="text-black dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1.5 py-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold relative group"
+                  aria-current="page"
+                >
+                  <span className="hidden sm:inline">{categoryName}</span>
+                  <span className="sm:hidden truncate max-w-[80px]">
+                    {categoryName.length > 10
+                      ? `${categoryName.substring(0, 10)}...`
+                      : categoryName}
+                  </span>
+                  <span className="absolute -bottom-1 left-1.5 right-1.5 h-0.5 bg-sky-500 dark:bg-sky-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-250"></span>
+                </Link>
+              </div>
+            </nav>
 
             {/* Main Title */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
@@ -509,7 +521,7 @@ export function ArticleContent({
                   <img
                     src={article.cover_image || "/placeholder.svg"}
                     alt={article.title}
-                    className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-[250px] sm:h-[300px] md:h-[400px] object-cover transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-black/0 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100"></div>
                 </div>
@@ -785,14 +797,39 @@ export function ArticleContent({
                   }
                   return <div {...props} />;
                 },
-                p: ({ children, ...props }) => (
-                  <p
-                    className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
-                    {...props}
-                  >
-                    {children}
-                  </p>
-                ),
+                p: ({ children, node, ...props }) => {
+                  // Check if this paragraph contains only an image
+                  const childrenArray = React.Children.toArray(children);
+                  const hasOnlyImage =
+                    childrenArray.length === 1 &&
+                    React.isValidElement(childrenArray[0]) &&
+                    childrenArray[0].type === "img";
+
+                  // Also check for multiple children where first is an image
+                  const hasImageAsFirstChild =
+                    childrenArray.length > 0 &&
+                    React.isValidElement(childrenArray[0]) &&
+                    childrenArray[0].type === "img";
+
+                  if (hasOnlyImage || hasImageAsFirstChild) {
+                    // For images, render a div wrapper instead of p
+                    return (
+                      <div className="my-8 w-full overflow-hidden cursor-pointer group">
+                        {children}
+                      </div>
+                    );
+                  }
+
+                  // Regular paragraph
+                  return (
+                    <p
+                      className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
+                      {...props}
+                    >
+                      {children}
+                    </p>
+                  );
+                },
                 a: ({ href, children, ...props }) => (
                   <a
                     href={href}
@@ -905,13 +942,43 @@ export function ArticleContent({
                     {...props}
                   />
                 ),
-                img: ({ ...props }) => (
-                  <img
-                    {...props}
-                    className="my-8 max-w-full rounded-2xl shadow-lg mx-auto border border-sky-100 dark:border-gray-600 transition-all duration-500 transform"
-                    alt={props.alt || "Article image"}
-                  />
-                ),
+                img: ({ ...props }) => {
+                  // Simple img component - the wrapper is handled by the p component above
+                  return (
+                    <img
+                      {...props}
+                      className="w-full h-auto max-h-[500px] object-contain transition-all duration-500 group-hover:scale-105"
+                      alt={props.alt || "Article image"}
+                      onClick={() => {
+                        if (props.src) {
+                          // Determine src value: if it's a string use it, otherwise create an object URL for a Blob
+                          let srcValue: string;
+                          if (typeof props.src === "string") {
+                            srcValue = props.src;
+                          } else {
+                            // Revoke previous object URL if present to avoid leaks
+                            if (objectUrlRef.current) {
+                              try {
+                                URL.revokeObjectURL(objectUrlRef.current);
+                              } catch (e) {
+                                /* ignore revoke errors */
+                              }
+                            }
+                            objectUrlRef.current = URL.createObjectURL(
+                              props.src as Blob
+                            );
+                            srcValue = objectUrlRef.current;
+                          }
+
+                          setFullscreenImage({
+                            src: srcValue,
+                            alt: props.alt || "Article image",
+                          });
+                        }
+                      }}
+                    />
+                  );
+                },
               }}
             >
               {fixMarkdownSpacing(article.content)}
@@ -982,12 +1049,12 @@ export function ArticleContent({
                   >
                     <motion.div
                       whileHover={{ y: -8 }}
-                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500"
+                      className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500"
                     >
                       {/* Gradient border effect */}
                       <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-blue-400 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
 
-                      <div className="relative p-5">
+                      <div className="relative">
                         <div className="mb-4 overflow-hidden">
                           <img
                             src={coverImage}
@@ -996,42 +1063,46 @@ export function ArticleContent({
                           />
                         </div>
 
-                        <div className="space-y-3">
-                          <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-lg leading-tight">
-                            {article.title}
-                          </h4>
+                        <div className="p-5">
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-lg leading-tight">
+                              {article.title}
+                            </h4>
 
-                          <p className="text-sm text-black/70 dark:text-gray-400 leading-relaxed line-clamp-2">
-                            {articleExcerpt}
-                          </p>
+                            <p className="text-sm text-black/70 dark:text-gray-400 leading-relaxed line-clamp-2">
+                              {articleExcerpt}
+                            </p>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg">
-                                <img
-                                  src={itemAuthor?.avatar || "/placeholder.svg"}
-                                  alt={itemAuthor?.name}
-                                  className="w-full h-full object-cover"
-                                />
+                            <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg">
+                                  <img
+                                    src={
+                                      itemAuthor?.avatar || "/placeholder.svg"
+                                    }
+                                    alt={itemAuthor?.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <span className="text-sm font-semibold text-black dark:text-white block">
+                                    {itemAuthor?.name || "Unknown"}
+                                  </span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {itemAuthor?.job_title}
+                                  </span>
+                                </div>
                               </div>
-                              <div>
-                                <span className="text-sm font-semibold text-black dark:text-white block">
-                                  {itemAuthor?.name || "Unknown"}
-                                </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                  {itemAuthor?.job_title}
+                              <div className="text-right">
+                                <span className="text-xs font-medium text-sky-600 dark:text-sky-400 px-2 py-1 rounded-full">
+                                  {new Date(
+                                    article.published_at
+                                  ).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
                                 </span>
                               </div>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-xs font-medium text-sky-600 dark:text-sky-400 px-2 py-1 rounded-full">
-                                {new Date(
-                                  article.published_at
-                                ).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </span>
                             </div>
                           </div>
                         </div>

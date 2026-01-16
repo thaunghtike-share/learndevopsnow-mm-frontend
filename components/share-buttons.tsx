@@ -97,40 +97,10 @@ export function ShareButtons({ articleId, title, url }: ShareButtonsProps) {
           ) : (
             <>
               <Copy className="w-4 h-4 mr-2" />
-              Copy Link
+              Copy
             </>
           )}
         </Button>
-
-        {/* More Options */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg w-48"
-          >
-            <DropdownMenuItem
-              onClick={() =>
-                window.open(
-                  `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
-                  "_blank"
-                )
-              }
-              className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <Mail className="w-4 h-4 mr-2 text-gray-600" />
-              Email
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Simple stats */}
