@@ -15,6 +15,7 @@ import {
   X,
   AlertCircle,
   CheckCircle,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,11 +76,11 @@ const ReactionButton = ({
       case "like":
         return "text-blue-600 dark:text-blue-400";
       case "love":
-        return "text-red-600 dark:text-red-400";
+        return "text-rose-600 dark:text-rose-400";
       case "celebrate":
-        return "text-yellow-600 dark:text-yellow-400";
+        return "text-amber-600 dark:text-amber-400";
       case "insightful":
-        return "text-green-600 dark:text-green-400";
+        return "text-emerald-600 dark:text-emerald-400";
       default:
         return "text-gray-600 dark:text-gray-400";
     }
@@ -96,7 +97,7 @@ const ReactionButton = ({
   return (
     <button
       onClick={handleClick}
-      className={`flex items-center gap-2 px-4 py-2.5 transition-all duration-200 ${
+      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
         isActive
           ? `${getReactionColor(type)} font-medium`
           : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
@@ -104,7 +105,7 @@ const ReactionButton = ({
       title={!isAuthenticated ? "Sign in to react" : ""}
     >
       <Icon className="w-5 h-5" />
-      <span className="font-medium">{count}</span>
+      <span className="text-xs font-medium">{count}</span>
     </button>
   );
 };
@@ -122,8 +123,6 @@ export function CommentsReactions({
   });
   const [userReactions, setUserReactions] = useState<string[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [replyTo, setReplyTo] = useState<number | null>(null);
-  const [replyContent, setReplyContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAllComments, setShowAllComments] = useState(false);
   const [editingComment, setEditingComment] = useState<number | null>(null);
@@ -265,8 +264,6 @@ export function CommentsReactions({
       if (response.ok) {
         fetchComments();
         if (parentId) {
-          setReplyContent("");
-          setReplyTo(null);
           toast.success("Reply posted!");
         } else {
           setNewComment("");
@@ -418,7 +415,6 @@ export function CommentsReactions({
     const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Use local state for reply content instead of global state
     const handleStartReply = () => {
       setIsReplying(true);
       setIsEditing(false);
@@ -481,18 +477,39 @@ export function CommentsReactions({
       ? `/authors/${comment.author_slug}`
       : "#";
 
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInHours = Math.floor(
+        (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+      );
+
+      if (diffInHours < 1) {
+        return "Just now";
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInHours < 168) {
+        return `${Math.floor(diffInHours / 24)}d ago`;
+      } else {
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
+      }
+    };
+
     return (
       <div
         className={`mb-4 ${
           depth > 0
-            ? "ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-4"
+            ? "ml-8 border-l-2 border-gray-100 dark:border-gray-700 pl-4"
             : ""
         }`}
       >
         <div className="flex items-start gap-3">
           <Link
             href={authorProfileLink}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 ${
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 ${
               comment.author_avatar ? "bg-transparent" : avatarColor
             }`}
           >
@@ -512,23 +529,21 @@ export function CommentsReactions({
           </Link>
 
           <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1">
               <Link
                 href={authorProfileLink}
-                className="font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm"
               >
                 {comment.author_name || "Anonymous"}
               </Link>
-              <div className="flex items-center gap-2">
-                {comment.is_author && (
-                  <span className="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs rounded-full">
-                    Author
-                  </span>
-                )}
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(comment.created_at).toLocaleDateString()}
+              {comment.is_author && (
+                <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full">
+                  Author
                 </span>
-              </div>
+              )}
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                • {formatDate(comment.created_at)}
+              </span>
             </div>
 
             {isEditing ? (
@@ -537,7 +552,7 @@ export function CommentsReactions({
                   ref={editTextareaRef}
                   value={localEditContent}
                   onChange={(e) => setLocalEditContent(e.target.value)}
-                  className="mb-2 rounded-lg resize-none"
+                  className="mb-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none"
                   rows={3}
                 />
                 <div className="flex gap-2">
@@ -546,29 +561,31 @@ export function CommentsReactions({
                     size="sm"
                     onClick={handleSubmitEdit}
                     disabled={!localEditContent.trim()}
+                    className="rounded-lg text-xs"
                   >
-                    Save
+                    Save Changes
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCancelEdit}
+                    className="rounded-lg text-xs"
                   >
                     Cancel
                   </Button>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">
+              <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed">
                 {comment.content}
               </p>
             )}
 
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap">
               {isAuthenticated ? (
                 <button
                   onClick={handleStartReply}
-                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center gap-1"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center gap-1 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                 >
                   <Reply className="w-3 h-3" />
                   Reply
@@ -576,7 +593,7 @@ export function CommentsReactions({
               ) : (
                 <button
                   onClick={handleAuthRequired}
-                  className="text-xs text-gray-400 cursor-not-allowed flex items-center gap-1"
+                  className="text-xs text-gray-400 cursor-not-allowed flex items-center gap-1 px-2 py-1"
                 >
                   <Reply className="w-3 h-3" />
                   Reply
@@ -586,7 +603,7 @@ export function CommentsReactions({
               {userOwnsComment && !isEditing && (
                 <button
                   onClick={handleStartEdit}
-                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 font-medium transition-colors flex items-center gap-1"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-medium transition-colors flex items-center gap-1 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                 >
                   <Edit className="w-3 h-3" />
                   Edit
@@ -596,26 +613,36 @@ export function CommentsReactions({
               {comment.replies && comment.replies.length > 0 && (
                 <button
                   onClick={() => setShowReplies(!showReplies)}
-                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center gap-1"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors flex items-center gap-1 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                 >
                   {showReplies ? (
                     <ChevronUp className="w-3 h-3" />
                   ) : (
                     <ChevronDown className="w-3 h-3" />
                   )}
-                  {comment.replies.length}{" "}
-                  {comment.replies.length === 1 ? "reply" : "replies"}
+                  <span className="font-medium">
+                    {comment.replies.length}{" "}
+                    {comment.replies.length === 1 ? "reply" : "replies"}
+                  </span>
                 </button>
               )}
             </div>
 
             {isReplying && (
-              <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Reply className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    Replying to {comment.author_name}
+                  </span>
+                </div>
                 <Textarea
                   ref={replyTextareaRef}
                   value={localReplyContent}
                   onChange={(e) => setLocalReplyContent(e.target.value)}
-                  className="mb-2 rounded-lg"
+                  className="mb-3 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                   rows={2}
                   placeholder="Write your reply..."
                 />
@@ -624,6 +651,7 @@ export function CommentsReactions({
                     variant="outline"
                     size="sm"
                     onClick={handleCancelReply}
+                    className="rounded-lg text-xs"
                   >
                     Cancel
                   </Button>
@@ -631,7 +659,7 @@ export function CommentsReactions({
                     size="sm"
                     onClick={handleSubmitReply}
                     disabled={!localReplyContent.trim() || loading}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs"
                   >
                     {loading ? "Posting..." : "Post Reply"}
                   </Button>
@@ -659,10 +687,13 @@ export function CommentsReactions({
   const displayedComments = showAllComments ? comments : comments.slice(0, 5);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Reactions Section */}
-      <div className="text-center p-4 md:p-6">
-        <div className="flex justify-center flex-wrap gap-2">
+      <div className="text-center">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
+          How do you feel about this article?
+        </h3>
+        <div className="flex justify-center flex-wrap gap-3">
           <ReactionButton
             type="like"
             count={reactions.like}
@@ -703,106 +734,113 @@ export function CommentsReactions({
       </div>
 
       {/* Comments Section */}
-      <Card className="border border-gray-200 dark:border-gray-600 shadow-sm rounded-2xl dark:bg-gray-800">
-        <CardContent className="p-4 md:p-6">
-          <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 dark:text-gray-100">
-            Comments ({comments.length})
-          </h3>
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                comments
+              </h3>
+            </div>
+          </div>
+          {comments.length > 5 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAllComments(!showAllComments)}
+              className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs"
+            >
+              {showAllComments ? (
+                <>
+                  <ChevronUp className="w-3 h-3 mr-1" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-3 h-3 mr-1" />
+                  Show All
+                </>
+              )}
+            </Button>
+          )}
+        </div>
 
-          {/* Comment Form */}
+        {/* Comment Form */}
+        <div className="mb-6">
           {isAuthenticated ? (
-            <div className="mb-4 md:mb-6 p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+            <div className="space-y-3">
               <Textarea
-                placeholder="Share your thoughts..."
+                placeholder="What are your thoughts?"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="mb-2 md:mb-3 text-sm rounded-xl resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+                className="rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none min-h-[100px] text-sm"
                 rows={3}
               />
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Commenting as{" "}
-                  <span className="font-medium text-gray-700 dark:text-gray-300">
-                    {user?.username || "User"}
-                  </span>
-                </div>
+              <div className="flex justify-end">
                 <Button
                   onClick={() => submitComment(newComment)}
                   disabled={!newComment.trim() || loading}
-                  size="sm"
-                  className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
+                  className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6"
                 >
-                  <Send className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                  <Send className="w-4 h-4 mr-2" />
                   {loading ? "Posting..." : "Post Comment"}
                 </Button>
               </div>
             </div>
           ) : (
-            <div className="mb-4 md:mb-6 p-4 md:p-6 text-center bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
-              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Please sign in to leave a comment
+            <div className="p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                Sign in to join the conversation
               </p>
               <Button
                 onClick={() => setShowAuthModal(true)}
-                size="sm"
-                className="rounded-lg w-full sm:w-auto text-xs md:text-sm"
+                className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Sign In to Comment
               </Button>
             </div>
           )}
+        </div>
 
-          {/* Comments List */}
-          <div className="space-y-4">
-            {displayedComments.length === 0 ? (
-              <div className="text-center py-6 md:py-8">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
-                  <Edit className="w-5 h-5 md:w-6 md:h-6 text-gray-400 dark:text-gray-500" />
-                </div>
-                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                  {isAuthenticated
-                    ? "Be the first to share your thoughts!"
-                    : "Sign in to be the first to comment!"}
-                </p>
+        {/* Comments List */}
+        <div className="space-y-6">
+          {displayedComments.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-6 h-6 text-gray-400 dark:text-gray-500" />
               </div>
-            ) : (
-              <>
-                {displayedComments.map((comment) => (
-                  <CommentItem key={comment.id} comment={comment} />
-                ))}
-
-                {/* Show More/Less Button - Only show if there are more than 5 comments */}
-                {comments.length > 5 && (
-                  <div className="flex justify-center pt-3 md:pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAllComments(!showAllComments)}
-                      className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-xs md:text-sm"
-                    >
-                      {showAllComments ? (
-                        <>
-                          <ChevronUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          Show Less Comments
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                          Show All {comments.length} Comments
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {isAuthenticated
+                  ? "Be the first to share your thoughts!"
+                  : "Sign in to be the first to comment!"}
+              </p>
+            </div>
+          ) : (
+            <>
+              {displayedComments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0"
+                >
+                  <CommentItem comment={comment} />
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Auth Modal */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 Sign In Required
@@ -814,14 +852,20 @@ export function CommentsReactions({
                 <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
               Please sign in to react to articles and leave comments.
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
+              Join our community of readers and share your thoughts!
             </p>
             <Button
               onClick={() => setShowAuthModal(false)}
-              className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg"
             >
-              Close
+              Got it, I'll sign in
             </Button>
           </div>
         </div>

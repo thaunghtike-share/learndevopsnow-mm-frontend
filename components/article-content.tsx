@@ -309,6 +309,7 @@ export function ArticleContent({
   const [topReadArticles, setTopReadArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeHeadingId, setActiveHeadingId] = useState<string>("");
+  const [tocVisible, setTocVisible] = useState(false);
 
   // Add fullscreen image state
   const [fullscreenImage, setFullscreenImage] = useState<{
@@ -316,27 +317,21 @@ export function ArticleContent({
     alt: string;
   } | null>(null);
 
-  // Define validHeadings early so useEffect can use it
+  // Define validHeadings - ONLY H2, H3 (removed H1)
   const validHeadings = headings.filter(({ text, level }) => {
     const cleanText = text.trim();
-
-    // Only include H1, H2, H3
-    const isLevelValid = level <= 3; // <-- Add this line
-
+    // ONLY include levels 2, 3 (removed H1)
+    const isLevelValid = level >= 2 && level <= 3;
     const isValidHeading =
       cleanText.length > 0 &&
-      isLevelValid && // <-- Add this condition
-      level >= 1 &&
-      level <= 6 &&
+      isLevelValid &&
       !cleanText.startsWith("```") &&
       !cleanText.match(/^[#`\s]*$/);
-
     return isValidHeading;
   });
 
   // Add loading state at the component level
   useEffect(() => {
-    // Simulate loading or check if essential data is available
     if (article && article.content) {
       setIsLoading(false);
     }
@@ -387,49 +382,42 @@ export function ArticleContent({
     fetchTopReadArticles();
   }, []);
 
-  // Effect for tracking active heading
+  // FIXED: Effect for tracking active heading - PROPERLY FIXED
   useEffect(() => {
-    const handleScroll = () => {
-      const headings = validHeadings
-        .map(({ id }) => {
-          const element = document.getElementById(id);
-          if (!element) return null;
-
-          const rect = element.getBoundingClientRect();
-          return {
-            id,
-            top: rect.top,
-          };
-        })
-        .filter(Boolean) as { id: string; top: number }[];
-
-      if (headings.length === 0) return;
-
-      // Find the heading that's closest to the top but not past it too much
-      let activeId = "";
-      const offset = 100; // Adjust this value based on your header height
-
-      for (let i = headings.length - 1; i >= 0; i--) {
-        if (headings[i].top < offset + 50) {
-          activeId = headings[i].id;
-          break;
-        }
-      }
-
-      // If no heading is above the threshold, use the first one
-      if (!activeId && headings.length > 0) {
-        activeId = headings[0].id;
-      }
-
-      setActiveHeadingId(activeId);
+    const observerOptions = {
+      root: null,
+      rootMargin: "-100px 0px -60% 0px",
+      threshold: 0.1,
     };
 
-    window.addEventListener("scroll", handleScroll);
-    // Initial check
-    handleScroll();
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveHeadingId(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions
+    );
+
+    // Observe all heading elements
+    validHeadings.forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      validHeadings.forEach(({ id }) => {
+        const element = document.getElementById(id);
+        if (element) {
+          observer.unobserve(element);
+        }
+      });
     };
   }, [validHeadings]);
 
@@ -449,14 +437,12 @@ export function ArticleContent({
   const remarkYouTube = () => {
     return (tree: any) => {
       visit(tree, "paragraph", (node) => {
-        // Check if paragraph has only one child that's a link
         if (node.children.length === 1 && node.children[0].type === "link") {
           const link = node.children[0];
           const url = link.url || "";
           const youtubeId = extractYouTubeId(url);
 
           if (youtubeId) {
-            // Transform this node
             node.type = "html";
             node.value = `<div data-youtube-id="${youtubeId}" data-youtube-title="${
               link.children[0]?.value || ""
@@ -472,9 +458,8 @@ export function ArticleContent({
     <div className="relative">
       <main className="px-6 md:px-11 py-15 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
-          {/* REMOVED: bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl p-6 md:p-8 lg:p-10 */}
           <div className="mb-10 md:mb-12">
-            {/* Breadcrumb Navigation - Mobile responsive - SIMPLE FIX */}
+            {/* Breadcrumb Navigation */}
             <div className="flex items-center gap-1 sm:gap-2 text-sm sm:text-base font-medium text-black dark:text-white mb-4 sm:mb-6">
               <Link
                 href="/"
@@ -503,7 +488,7 @@ export function ArticleContent({
               </Link>
             </div>
 
-            {/* Main Title with Bell Button */}
+            {/* Main Title */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
               <h1 className="text-2xl sm:text-3xl md:text-4xl text-black dark:text-white leading-[1.2] sm:leading-[1.15] tracking-tight flex-1">
                 {article.title}
@@ -531,7 +516,7 @@ export function ArticleContent({
               </div>
             )}
 
-            {/* Author Info and Date - Mobile responsive */}
+            {/* Author Info and Date */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="flex items-center gap-3">
                 {/* Author Avatar */}
@@ -571,7 +556,7 @@ export function ArticleContent({
                     </div>
                   </div>
 
-                  {/* Views count with BarChart icon */}
+                  {/* Views count */}
                   <div className="flex items-center gap-1.5 mt-1">
                     <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 text-black dark:text-gray-400" />
                     <span className="text-black dark:text-gray-400 text-sm sm:text-base">
@@ -592,7 +577,7 @@ export function ArticleContent({
               />
             </div>
 
-            {/* Tags with reduced gap for mobile */}
+            {/* Tags */}
             {tagNames.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                 {tagNames.map((tag, index) => (
@@ -615,12 +600,10 @@ export function ArticleContent({
 
           <div className="prose prose-lg max-w-none dark:prose-invert">
             <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkYouTube]} // ← ADDED remarkYouTube
+              remarkPlugins={[remarkGfm, remarkYouTube]}
               rehypePlugins={[rehypeHighlight, rehypeRaw]}
               components={{
-                // Use separate component for inline code
                 code: InlineCode,
-
                 pre: ({ children, ...props }: any) => {
                   const child = React.Children.only(children) as any;
                   const codeProps = child?.props || {};
@@ -651,7 +634,6 @@ export function ArticleContent({
 
                   const getLanguageName = (lang: string): string => {
                     if (!lang || lang.trim() === "") return "Code";
-
                     const langMap: { [key: string]: string } = {
                       js: "JavaScript",
                       ts: "TypeScript",
@@ -695,7 +677,6 @@ export function ArticleContent({
 
                   return (
                     <div className="relative my-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
-                      {/* Language header - cleaner design */}
                       <div className="flex items-center justify-between bg-gray-900 text-gray-300 px-4 py-2.5 border-b border-gray-800">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full bg-gray-600"></div>
@@ -708,7 +689,6 @@ export function ArticleContent({
                         </span>
                       </div>
 
-                      {/* Code block */}
                       <div className="relative">
                         <pre
                           className={`p-6 overflow-x-auto bg-gray-950 text-gray-100 text-sm font-mono leading-relaxed`}
@@ -744,13 +724,12 @@ export function ArticleContent({
                     </div>
                   );
                 },
-
                 h1: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
                     <h1
                       id={id}
-                      className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-10 mb-6 pb-3 border-b-2 border-sky-100 dark:border-sky-900"
+                      className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-10 mb-6"
                       {...props}
                     >
                       {children}
@@ -793,7 +772,6 @@ export function ArticleContent({
                     </h4>
                   );
                 },
-
                 div: ({ ...props }: any) => {
                   if (props["data-youtube-id"]) {
                     const youtubeId = props["data-youtube-id"];
@@ -807,8 +785,6 @@ export function ArticleContent({
                   }
                   return <div {...props} />;
                 },
-
-                // Keep p and a components simple
                 p: ({ children, ...props }) => (
                   <p
                     className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
@@ -817,7 +793,6 @@ export function ArticleContent({
                     {children}
                   </p>
                 ),
-
                 a: ({ href, children, ...props }) => (
                   <a
                     href={href}
@@ -829,7 +804,6 @@ export function ArticleContent({
                     {children}
                   </a>
                 ),
-
                 ul: ({ children, ...props }) => (
                   <ul
                     className="mb-6 space-y-3 pl-6 text-gray-700 dark:text-gray-300 text-base list-disc marker:text-sky-600 dark:marker:text-sky-400"
@@ -854,7 +828,6 @@ export function ArticleContent({
                     {children}
                   </li>
                 ),
-
                 blockquote: ({ children, ...props }) => (
                   <blockquote
                     className="border-l-4 border-sky-500 dark:border-sky-400 pl-6 pr-4 py-4 italic text-gray-700 dark:text-gray-300 my-6 text-sm md:text-base bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-blue-50 dark:to-blue-900/20 rounded-r-2xl shadow-sm"
@@ -863,7 +836,6 @@ export function ArticleContent({
                     {children}
                   </blockquote>
                 ),
-
                 em: ({ children, ...props }) => (
                   <em
                     className="italic text-gray-800 dark:text-gray-200"
@@ -872,7 +844,6 @@ export function ArticleContent({
                     {children}
                   </em>
                 ),
-
                 strong: ({ children, ...props }) => (
                   <strong
                     className="font-semibold text-gray-900 dark:text-white"
@@ -881,7 +852,6 @@ export function ArticleContent({
                     {children}
                   </strong>
                 ),
-
                 table: ({ children, ...props }) => (
                   <div className="overflow-x-auto my-8 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                     <table
@@ -929,14 +899,12 @@ export function ArticleContent({
                     {children}
                   </td>
                 ),
-
                 hr: ({ ...props }) => (
                   <hr
                     className="my-8 border-gray-300 dark:border-gray-600"
                     {...props}
                   />
                 ),
-
                 img: ({ ...props }) => (
                   <img
                     {...props}
@@ -950,22 +918,129 @@ export function ArticleContent({
             </ReactMarkdown>
           </div>
 
-          <div className="mt-12 mb-6">
-            <CommentsReactions
-              articleSlug={article.slug}
-              currentUser={{
-                isAuthenticated: true,
-                authorSlug: effectiveAuthor?.slug,
-              }}
-            />
+          {/* Enhanced Comments Box Design */}
+          <div className="mt-12">
+            <div className="">
+              <div className="flex items-center gap-3 mb-6 pb-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-black dark:text-white">
+                    Discussion
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Join the conversation
+                  </p>
+                </div>
+              </div>
+              <CommentsReactions
+                articleSlug={article.slug}
+                currentUser={{
+                  isAuthenticated: true,
+                  authorSlug: effectiveAuthor?.slug,
+                }}
+              />
+            </div>
           </div>
 
-          <div className="mb-2 hidden md:block">
+          <div className="mb-8 hidden md:block">
             <ShareButtons
               articleId={article.id}
               title={article.title}
               url={typeof window !== "undefined" ? window.location.href : ""}
             />
+          </div>
+
+          {/* Recent Articles - Beautiful React-like design */}
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-black dark:text-white">
+                Recent Articles
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recentArticles.slice(0, 5).map((article) => {
+                const itemAuthor = authors.find((a) => a.id === article.author);
+                const coverImage = article.cover_image || "/devops.webp";
+                const articleExcerpt = excerpt(article.content || "");
+
+                return (
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    key={article.id}
+                    className="block group"
+                  >
+                    <motion.div
+                      whileHover={{ y: -8 }}
+                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500"
+                    >
+                      {/* Gradient border effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-blue-400 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+
+                      <div className="relative p-5">
+                        <div className="mb-4 overflow-hidden">
+                          <img
+                            src={coverImage}
+                            alt={article.title}
+                            className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-700"
+                          />
+                        </div>
+
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-lg leading-tight">
+                            {article.title}
+                          </h4>
+
+                          <p className="text-sm text-black/70 dark:text-gray-400 leading-relaxed line-clamp-2">
+                            {articleExcerpt}
+                          </p>
+
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg">
+                                <img
+                                  src={itemAuthor?.avatar || "/placeholder.svg"}
+                                  alt={itemAuthor?.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div>
+                                <span className="text-sm font-semibold text-black dark:text-white block">
+                                  {itemAuthor?.name || "Unknown"}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  {itemAuthor?.job_title}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-xs font-medium text-sky-600 dark:text-sky-400 px-2 py-1 rounded-full">
+                                {new Date(
+                                  article.published_at
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           <div className="mt-12 flex items-center justify-between gap-4">
@@ -1009,7 +1084,7 @@ export function ArticleContent({
           </div>
         </article>
 
-        {/* Sidebar inside the grid column */}
+        {/* Beautiful Blue Theme TOC Sidebar - FIXED Scroll Tracking */}
         <aside
           className="hidden lg:block lg:col-span-1"
           style={{
@@ -1023,256 +1098,91 @@ export function ArticleContent({
           }}
         >
           <div className="space-y-4">
-            {/* Table of Contents with auto-focus */}
-            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-2xl bg-white dark:bg-gray-900">
-              <CardContent className="">
-                <div className="flex items-center gap-3 mb-4 pb-3 ">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <ListOrdered className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <h3 className="text-base font-semibold text-black dark:text-white">
+            {/* Beautiful Blue Theme Table of Contents */}
+            <div className="bg-white dark:bg-gray-900 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                  <ListOrdered className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-black dark:text-white">
                     Table of Contents
                   </h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Navigate through sections
+                  </p>
                 </div>
+              </div>
 
-                {validHeadings.length > 0 ? (
-                  <div className="max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
-                    <nav className="space-y-1">
-                      {validHeadings.map(({ id, text, level }) => {
-                        // Indentation
-                        const indent =
-                          level === 1
-                            ? "pl-0"
-                            : level === 2
-                            ? "pl-4"
-                            : level === 3
-                            ? "pl-6"
-                            : level === 4
-                            ? "pl-8"
-                            : level === 5
-                            ? "pl-10"
-                            : "pl-12";
+              {validHeadings.length > 0 ? (
+                <div className="max-h-[500px] overflow-y-auto pr-2 scrollbar-hide">
+                  <nav className="space-y-1">
+                    {validHeadings.map(({ id, text, level }) => {
+                      // Indentation - H2 is now top level, H3 indented
+                      const indent =
+                        level === 2
+                          ? "pl-0 font-semibold"
+                          : level === 3
+                          ? "pl-4 font-medium"
+                          : "pl-0";
 
-                        const isActive = activeHeadingId === id;
+                      const isActive = activeHeadingId === id;
 
-                        return (
-                          <a
-                            key={id}
-                            href={`#${id}`}
-                            className={`${indent} py-2 px-2 rounded-lg transition-colors group block ${
+                      return (
+                        <a
+                          key={id}
+                          href={`#${id}`}
+                          className={`${indent} py-2.5 px-3 rounded-xl transition-all duration-300 group block ${
+                            isActive
+                              ? "" // No background
+                              : "hover:bg-gray-50 dark:hover:bg-gray-800 hover:translate-x-1"
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const target = document.getElementById(id);
+                            if (target) {
+                              const headerOffset = 100;
+                              const elementPosition =
+                                target.getBoundingClientRect().top;
+                              const offsetPosition =
+                                elementPosition +
+                                window.pageYOffset -
+                                headerOffset;
+
+                              window.scrollTo({
+                                top: offsetPosition,
+                                behavior: "smooth",
+                              });
+
+                              history.replaceState(null, "", `#${id}`);
+                            }
+                          }}
+                        >
+                          <span
+                            className={`text-sm truncate transition-colors ${
                               isActive
-                                ? "bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 border-l-2 border-sky-500"
-                                : "hover:bg-gray-50 dark:hover:bg-gray-800"
+                                ? "text-blue-600 dark:text-blue-400 font-semibold" // Just blue text
+                                : "text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                             }`}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const target = document.getElementById(id);
-                              if (target) {
-                                const headerOffset = 80;
-                                const elementPosition =
-                                  target.getBoundingClientRect().top;
-                                const offsetPosition =
-                                  elementPosition +
-                                  window.pageYOffset -
-                                  headerOffset;
-
-                                window.scrollTo({
-                                  top: offsetPosition,
-                                  behavior: "smooth",
-                                });
-
-                                history.replaceState(null, "", `#${id}`);
-                              }
-                            }}
                           >
-                            <span
-                              className={`text-sm font-medium truncate transition-colors ${
-                                isActive
-                                  ? "text-sky-600 dark:text-sky-400"
-                                  : "text-gray-700 dark:text-gray-300 group-hover:text-sky-600 dark:group-hover:text-sky-400"
-                              }`}
-                            >
-                              {text}
-                            </span>
-                          </a>
-                        );
-                      })}
-                    </nav>
+                            {text}
+                          </span>
+                        </a>
+                      );
+                    })}
+                  </nav>
+                </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <div className="w-12 h-12 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full flex items-center justify-center mb-4">
+                    <FileText className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
-                ) : (
-                  <div className="py-6 text-center">
-                    <div className="w-10 h-10 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
-                      <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      No headings found
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Recent Articles */}
-            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-              <CardContent className="">
-                <div className="flex items-center gap-3 mb-4 pb-3">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <h3 className="text-base font-semibold text-black dark:text-white">
-                    Recent Articles
-                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No headings found
+                  </p>
                 </div>
-                <div className="space-y-4">
-                  {recentArticles.slice(0, 4).map((article) => {
-                    const itemAuthor = authors.find(
-                      (a) => a.id === article.author
-                    );
-                    const coverImage = article.cover_image || "/devops.webp";
-                    const articleExcerpt = excerpt(article.content || "");
-
-                    return (
-                      <Link
-                        href={`/articles/${article.slug}`}
-                        key={article.id}
-                        className="block group"
-                      >
-                        <div className="bg-white dark:bg-gray-800 p-3 hover:shadow-md dark:hover:border-sky-600 transition-all duration-300">
-                          <div className="mb-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 shadow-sm">
-                            <img
-                              src={coverImage}
-                              alt={article.title}
-                              className="w-full h-20 object-cover transform group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-sm leading-tight">
-                              {article.title}
-                            </h4>
-
-                            <p className="text-xs text-black/70 dark:text-gray-400 leading-relaxed line-clamp-2">
-                              {articleExcerpt}
-                            </p>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border border-white dark:border-gray-800 shadow-sm">
-                                  <img
-                                    src={
-                                      itemAuthor?.avatar || "/placeholder.svg"
-                                    }
-                                    alt={itemAuthor?.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <span className="text-xs font-medium text-black/80 dark:text-gray-300">
-                                  {itemAuthor?.name || "Unknown"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Featured Authors */}
-            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-              <CardContent className="">
-                <div className="flex items-center gap-3 mb-4 pb-3">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <Star className="w-4 h-4 text-sky-600" />
-                  </div>
-                  <h3 className="text-base font-semibold text-black dark:text-white">
-                    Featured Authors
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  {authors
-                    .sort(
-                      (a, b) =>
-                        (b.articles_count || 0) - (a.articles_count || 0)
-                    )
-                    .slice(0, 3)
-                    .map((author, index) => (
-                      <Link
-                        href={`/authors/${author.slug}`}
-                        key={author.id}
-                        className="block group"
-                      >
-                        <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-sky-50 dark:hover:bg-gray-800 transition-all duration-300">
-                          {/* Author Avatar */}
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border border-white dark:border-gray-800 shadow-sm flex-shrink-0">
-                            <img
-                              src={author.avatar || "/placeholder.svg"}
-                              alt={author.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "/placeholder.svg";
-                              }}
-                            />
-                          </div>
-
-                          {/* Author Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-1 text-sm">
-                              {author.name}
-                            </h4>
-                            <div className="flex items-center gap-2 text-xs text-black dark:text-gray-400">
-                              {author.job_title}
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Popular Reads */}
-            <Card className="border border-gray-200 dark:border-gray-700 transition-all duration-300 rounded-3xl bg-white dark:bg-gray-900">
-              <CardContent className="">
-                <div className="flex items-center gap-3 mb-4 pb-3">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-sky-600" />
-                  </div>
-                  <h3 className="text-base font-semibold text-black dark:text-white">
-                    Popular Reads
-                  </h3>
-                </div>
-                <div className="space-y-3">
-                  {topReadArticles.map((article) => {
-                    const itemAuthor = authors.find(
-                      (a) => a.id === article.author
-                    );
-
-                    return (
-                      <Link
-                        href={`/articles/${article.slug}`}
-                        key={article.id}
-                        className="block group"
-                      >
-                        <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-sky-50 dark:hover:bg-gray-800 transition-all duration-300">
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-sm leading-tight mb-1">
-                              {article.title}
-                            </h4>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1 text-xs text-black/70 dark:text-gray-400"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           </div>
         </aside>
       </main>
