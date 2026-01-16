@@ -688,7 +688,7 @@ export function MinimalHeader() {
       <header className="sticky top-0 z-50 bg-white dark:bg-[#000000] backdrop-blur-sm">
         {/* MOBILE HEADER - Simple: Logo, Search, Menu */}
         <div className="md:hidden">
-          <div className="flex items-center justify-between px-6 gap-3">
+          <div className="flex items-center justify-between px-2 gap-3">
             {/* Logo - KEEP ORIGINAL SIZE */}
             <Link
               href={`/${currentLocale}`}
@@ -698,7 +698,7 @@ export function MinimalHeader() {
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="h-24 w-22 transition-transform group-hover:scale-105"
+                className="h-24 w-24 transition-transform group-hover:scale-105"
               />
             </Link>
 
