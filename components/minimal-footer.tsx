@@ -143,7 +143,7 @@ export function MinimalFooter() {
 
   return (
     <footer className="bg-white dark:bg-[#000000] relative z-10 transition-colors duration-300 overflow-hidden">
-      <div className="px-6 md:px-11 relative z-10 py-12 md:py-16">
+      <div className="px-6 md:px-11 relative z-10 py-1 md:py-10">
         {/* Subscription Message Alert */}
         {subscriptionMessage && (
           <div

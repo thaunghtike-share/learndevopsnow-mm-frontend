@@ -93,24 +93,6 @@ const programmingLanguages: ProgrammingLanguage[] = [
     color: "from-sky-600 to-blue-600",
     tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
   },
-  {
-    name: "PHP",
-    icon: "php.png",
-    description: "PHP Web Applications",
-    descriptionMy: "PHP Web Applications",
-    fullDescription:
-      "PHP is a popular server-side scripting language primarily used for web development. In DevOps, PHP is crucial for deploying and managing web applications, automating server configurations, and integrating with various web services. Its ease of use, extensive documentation, and large community support make it a go-to choice for building dynamic websites and web-based DevOps tools.",
-    fullDescriptionMy:
-      "PHP ဆိုတာ Web Development လောကမှာတော့ ဝါရင့် လူကြိုက်များတဲ့ Server-side ဘာသာစကားတစ်ခုပါ။ အခုခေတ် DevOps ပိုင်းမှာဆိုရင်လည်း Web app တွေကို Deploy လုပ်ဖို့၊ Server configuration တွေနဲ့ Web service တွေကို တစ်ခုနဲ့တစ်ခု ချိတ်ဆက်ဖို့အတွက် PHP ကို တော်တော်လေး သုံးဖြစ်ကြတယ်။ သူက လေ့လာရတာ လွယ်ကူတဲ့အပြင် Community ကလည်း တအားကြီးတော့ တစ်ခုခုဆို အဖြေရှာရတာ အရမ်းအဆင်ပြေတယ်။ Dynamic ဖြစ်တဲ့ Website တွေနဲ့ Web-based DevOps tool တွေ တည်ဆောက်မယ်ဆိုရင် PHP က အခုထိ အားကိုးရတဲ့ ရွေးချယ်မှုပါပဲ။",
-    officialLink: "https://laravel.com",
-    frameworks: ["Laravel", "Symfony", "Composer"],
-    frameworksMy: ["Laravel", "Symfony", "Composer"],
-    level: "Intermediate",
-    levelMy: "အလယ်အလတ်",
-    youtubeVideoId: "l4_Vn-sTBL8",
-    color: "from-sky-600 to-blue-600",
-    tagColor: "bg-gray-300 md:bg-white/70 text-gray-800 border-gray-400",
-  },
 ];
 
 interface ProgrammingLanguagesRoadmapProps {

@@ -27,6 +27,12 @@ import {
   Moon,
   Sun,
   Globe,
+  ChevronRight,
+  LogIn,
+  BookOpen,
+  Briefcase,
+  MoreHorizontal,
+  Book,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -682,7 +688,7 @@ export function MinimalHeader() {
       <header className="sticky top-0 z-50 bg-white dark:bg-[#000000] backdrop-blur-sm">
         {/* MOBILE HEADER - Simple: Logo, Search, Menu */}
         <div className="md:hidden">
-          <div className="flex items-center justify-between py-4 px-6 gap-3">
+          <div className="flex items-center justify-between px-6 gap-3">
             {/* Logo - KEEP ORIGINAL SIZE */}
             <Link
               href={`/${currentLocale}`}
@@ -692,45 +698,59 @@ export function MinimalHeader() {
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="h-23 w-21 transition-transform group-hover:scale-105"
+                className="h-24 w-22 transition-transform group-hover:scale-105"
               />
             </Link>
 
-            {/* Search Bar - WIDER */}
-            <div className="flex-1 relative max-w-[200px] ml-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-4 h-4" />
+            {/* Search Bar - Using Inline Styles to Prevent Shift */}
+            <div
+              className="flex-1 ml-2"
+              style={{
+                minWidth: "220px",
+                width: "220px",
+                flexShrink: 0,
+              }}
+            >
+              <div className="relative w-full">
+                <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 w-3.5 h-3.5" />
                 <Input
                   type="text"
                   placeholder={getNavText(
-                    "Search articles...",
+                    "search articles...",
                     "စာများရှာဖွေရန်..."
                   )}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl text-sm pl-10 pr-8 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 font-medium h-10 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
+                  className="w-full rounded-full text-[11px] pl-9 pr-7 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-black dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 h-8 focus:border-blue-500 dark:focus:border-blue-400 transition-colors font-normal"
+                  style={{
+                    width: "100%",
+                    minWidth: "100%",
+                    boxSizing: "border-box",
+                  }}
                   autoComplete="off"
                   spellCheck={false}
                 />
                 {searchQuery && (
                   <button
                     onClick={handleClear}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 w-4 h-4 flex items-center justify-center"
+                    className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 w-3.5 h-3.5 flex items-center justify-center"
                     aria-label="Clear"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3.5 h-3.5 text-gray-500" />
                   </button>
                 )}
               </div>
-
               {/* Search Results Dropdown */}
               {searchQuery && searchResults.length > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                <div
+                  className="absolute z-50 mt-2 bg-white dark:bg-[#000000] border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto"
+                  style={{ width: "220px" }}
+                >
                   {searchResults.map((article) => (
                     <Link
                       key={article.id}
                       href={`/${currentLocale}/articles/${article.slug}`}
-                      className="block px-4 py-3 text-sm text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all font-medium hover:text-blue-700 dark:hover:text-blue-300"
+                      className="block px-4 py-3 text-sm text-black dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-all hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                       onClick={() => {
                         handleClear();
                         setIsMobileMenuOpen(false);
@@ -1168,251 +1188,236 @@ export function MinimalHeader() {
 
       {/* MOBILE MENU COMPONENTS */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden" />
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" />
       )}
 
       <div
         ref={mobileMenuRef}
-        className={`fixed top-0 right-0 z-50 h-full w-80 bg-white dark:bg-[#000000] transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-50 h-full w-[320px] bg-white dark:bg-gray-900 transform transition-all duration-300 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
-            <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {getNavText("Menu", "မီနူး")}
-            </span>
+          {/* Minimal Header */}
+          <div className="flex items-center justify-between p-6 bg-white dark:bg-gray-900">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Menu className="w-4 h-4 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                {getNavText("Menu", "မီနူး")}
+              </h2>
+            </div>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label="Close menu"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
 
-          {/* Menu Content */}
-          <div className="flex-1 overflow-y-auto py-6">
-            {/* Language Switcher - Mobile Menu */}
-            <div className="px-6 mb-4">
-              <div className="space-y-2">
-                {languageOptions.map((lang) => (
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-5 pb-5">
+            {/* User Section - Simplified */}
+            <div className="mb-8">
+              {isAuthenticated ? (
+                <MobileUserDropdown />
+              ) : (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <User className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                    {getNavText("Welcome!", "ကြိုဆိုပါတယ်")}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-5 text-sm">
+                    {getNavText(
+                      "Sign in to access all features",
+                      "အားလုံးသော စွမ်းရည်များကို ဝင်ရောက်အသုံးပြုရန်"
+                    )}
+                  </p>
                   <button
-                    key={lang.code}
-                    onClick={() => switchLanguage(lang.code as "en" | "my")}
-                    className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-                      currentLocale === lang.code
-                        ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    }`}
+                    onClick={handleSignInClick}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors active:scale-[0.98]"
                   >
-                    <span className="text-lg mr-3">{lang.flag}</span>
-                    <span className="text-lg font-medium">{lang.name}</span>
+                    {getNavText("Sign In", "ဝင်ရောက်ပါ")}
                   </button>
+                </div>
+              )}
+            </div>
+
+            {/* Navigation - Clean & Minimal */}
+            <div className="space-y-6">
+              {/* Main Navigation */}
+              <div>
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                  {getNavText("Navigation", "လမ်းညွှန်")}
+                </h4>
+                <div className="space-y-1">
+                  {mobileNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center p-4 rounded-xl transition-all duration-200 ${
+                          isActive
+                            ? "bg-blue-50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-300"
+                            : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Icon className="w-5 h-5 mr-3" />
+                        <span className="font-medium">{item.label}</span>
+                        {isActive && (
+                          <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Categories - Clean Accordion */}
+              <div>
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                  {getNavText("Categories", "အမျိုးအစားများ")}
+                </h4>
+
+                {[
+                  {
+                    id: "articles",
+                    icon: FileText,
+                    label: getNavText("Articles", "ဆောင်းပါးများ"),
+                    items: mobileArticlesItems,
+                  },
+                  {
+                    id: "resources",
+                    icon: Book,
+                    label: getNavText("Resources", "အရင်းအမြစ်များ"),
+                    items: mobileResourcesItems,
+                  },
+                  {
+                    id: "services",
+                    icon: Briefcase,
+                    label: getNavText("Services", "ဝန်ဆောင်မှုများ"),
+                    items: mobileServicesItems,
+                  },
+                  {
+                    id: "others",
+                    icon: MoreHorizontal,
+                    label: getNavText("More", "အခြားများ"),
+                    items: mobileOthersItems,
+                  },
+                ].map((section) => (
+                  <div key={section.id} className="mb-2">
+                    <button
+                      onClick={() => toggleMobileDropdown(section.id)}
+                      className="flex items-center justify-between w-full p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                    >
+                      <div className="flex items-center">
+                        <section.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-3" />
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {section.label}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                          activeMobileDropdown === section.id
+                            ? "rotate-180"
+                            : ""
+                        }`}
+                      />
+                    </button>
+
+                    {activeMobileDropdown === section.id && (
+                      <div className="ml-4 pl-4 mt-2 space-y-2">
+                        {section.items.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="block py-2.5 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            onClick={() => {
+                              setIsMobileMenuOpen(false);
+                              setActiveMobileDropdown(null);
+                            }}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
-            </div>
 
-            {/* Dark Mode Toggle - Mobile Menu */}
-            <div className="px-6 mb-6">
-              <button
-                onClick={toggleDarkMode}
-                className="w-full py-3 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium flex items-center justify-center gap-3 border border-gray-200 dark:border-gray-700"
-              >
-                {darkMode ? (
-                  <>
-                    <Sun className="w-5 h-5" />
-                    <span>{getNavText("Light Mode", "အလင်းပုံစံ")}</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="w-5 h-5" />
-                    <span>{getNavText("Dark Mode", "အနက်ပုံစံ")}</span>
-                  </>
-                )}
-              </button>
-            </div>
+              {/* Settings - Clean Toggles */}
+              <div className="bg-gray-50 dark:bg-gray-800/30 rounded-2xl p-5">
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                  {getNavText("Preferences", "အကြိုက်များ")}
+                </h4>
 
-            {/* Show User Dropdown when logged in */}
-            {isAuthenticated ? (
-              <MobileUserDropdown />
-            ) : (
-              /* Show Write Article Button for Non-logged in users */
-              <div className="px-6 mb-6">
-                <button
-                  onClick={handleSignInClick}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg font-medium flex items-center justify-center gap-2"
-                >
-                  <PenSquare className="w-5 h-5" />
-                  {getNavText("Write Article", "စာရေးရန်")}
-                </button>
+                {/* Language */}
+                <div className="mb-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <Globe className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2" />
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {getNavText("Language", "ဘာသာစကား")}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {currentLocale.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {languageOptions.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => switchLanguage(lang.code as "en" | "my")}
+                        className={`flex-1 py-3 rounded-lg text-sm font-medium transition-colors ${
+                          currentLocale === lang.code
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Theme */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      {darkMode ? (
+                        <Moon className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2" />
+                      ) : (
+                        <Sun className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2" />
+                      )}
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {darkMode
+                          ? getNavText("Dark Mode", "အနက်ပုံစံ")
+                          : getNavText("Light Mode", "အလင်းပုံစံ")}
+                      </span>
+                    </div>
+                    <button
+                      onClick={toggleDarkMode}
+                      className="w-12 h-6 bg-gray-200 dark:bg-gray-700 rounded-full relative"
+                      aria-label="Toggle theme"
+                    >
+                      <div
+                        className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
+                          darkMode ? "translate-x-7" : "translate-x-0.5"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
               </div>
-            )}
-
-            {/* Main Navigation */}
-            <div className="space-y-2 px-6 mt-6">
-              {mobileNavItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center px-4 py-4 rounded-xl transition-all duration-200 font-medium text-lg ${
-                      pathname === item.href
-                        ? "bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Icon className="w-6 h-6 mr-3" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Articles Dropdown */}
-            <div className="mt-6 px-6">
-              <button
-                onClick={() => toggleMobileDropdown("articles")}
-                className="flex items-center justify-between w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
-              >
-                <div className="flex items-center">
-                  <FileText className="w-6 h-6 mr-3" />
-                  {getNavText("Articles", "စာဖတ်ရန်")}
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform ${
-                    activeMobileDropdown === "articles" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {activeMobileDropdown === "articles" && (
-                <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-                  {mobileArticlesItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setActiveMobileDropdown(null);
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Resources Dropdown */}
-            <div className="mt-2 px-6">
-              <button
-                onClick={() => toggleMobileDropdown("resources")}
-                className="flex items-center justify-between w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
-              >
-                <div className="flex items-center">
-                  <Zap className="w-6 h-6 mr-3" />
-                  {getNavText("Resources", "အရင်းအမြစ်များ")}
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform ${
-                    activeMobileDropdown === "resources" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {activeMobileDropdown === "resources" && (
-                <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-                  {mobileResourcesItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setActiveMobileDropdown(null);
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Services Dropdown */}
-            <div className="mt-2 px-6">
-              <button
-                onClick={() => toggleMobileDropdown("services")}
-                className="flex items-center justify-between w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
-              >
-                <div className="flex items-center">
-                  <Server className="w-6 h-6 mr-3" />
-                  {getNavText("Services", "ဝန်ဆောင်မှုများ")}
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform ${
-                    activeMobileDropdown === "services" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {activeMobileDropdown === "services" && (
-                <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-                  {mobileServicesItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setActiveMobileDropdown(null);
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Others Dropdown */}
-            <div className="mt-2 px-6">
-              <button
-                onClick={() => toggleMobileDropdown("others")}
-                className="flex items-center justify-between w-full px-4 py-4 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium text-lg"
-              >
-                <div className="flex items-center">
-                  <HelpCircle className="w-6 h-6 mr-3" />
-                  {getNavText("Others", "အခြားများ")}
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform ${
-                    activeMobileDropdown === "others" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {activeMobileDropdown === "others" && (
-                <div className="mt-2 ml-4 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-                  {mobileOthersItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-3 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg transition-colors font-medium"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setActiveMobileDropdown(null);
-                      }}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>

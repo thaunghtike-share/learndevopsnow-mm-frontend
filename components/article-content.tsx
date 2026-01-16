@@ -459,7 +459,7 @@ export function ArticleContent({
 
   return (
     <div className="relative">
-      <main className="px-6 md:px-11 py-15 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <main className="px-6 md:px-11 py-5 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
           <div className="mb-10 md:mb-12">
             {/* Breadcrumb Navigation - Enhanced Design with nav element */}
