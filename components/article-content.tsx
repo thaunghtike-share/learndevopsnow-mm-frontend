@@ -462,9 +462,9 @@ export function ArticleContent({
       <main className="px-6 md:px-11 py-5 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
           <div className="mb-10 md:mb-12">
-            {/* Breadcrumb Navigation - Enhanced Design with nav element */}
+            {/* Breadcrumb Navigation - Fixed Alignment */}
             <nav aria-label="Breadcrumb" className="mb-5 sm:mb-7 px-4 sm:px-0">
-              <div className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base font-medium">
+              <div className="flex items-baseline gap-2 sm:gap-3 text-sm sm:text-base font-medium">
                 <Link
                   href="/"
                   className="group flex items-center text-sky-600 dark:text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate"
@@ -583,10 +583,13 @@ export function ArticleContent({
                 </div>
               </div>
 
-              <SimpleTTSPlayer
-                text={article.content}
-                articleTitle={article.title}
-              />
+              {/* TTS Player - HIDDEN ON MOBILE */}
+              <div className="hidden sm:block">
+                <SimpleTTSPlayer
+                  text={article.content}
+                  articleTitle={article.title}
+                />
+              </div>
             </div>
 
             {/* Tags */}

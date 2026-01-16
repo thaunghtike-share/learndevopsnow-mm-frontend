@@ -296,3 +296,9 @@ div[id^="g_id"] [role="button"]:focus-visible {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 1;
+}
