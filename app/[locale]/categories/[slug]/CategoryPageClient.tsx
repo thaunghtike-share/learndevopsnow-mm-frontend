@@ -90,8 +90,7 @@ interface ApiResponse {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 8;
 
-export default function CategoryPageClient() {
-  const { slug } = useParams();
+export default function CategoryPageClient({ slug }: { slug: string }) {
   const [category, setCategory] = useState<Category | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [stats, setStats] = useState({
