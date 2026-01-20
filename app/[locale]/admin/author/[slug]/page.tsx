@@ -643,6 +643,8 @@ export default function AuthorAdminDashboard() {
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [loadingCharts, setLoadingCharts] = useState(false);
   const [chartsError, setChartsError] = useState<string | null>(null);
+  const [initialAuthCheck, setInitialAuthCheck] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false); // Add this
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -764,15 +766,26 @@ export default function AuthorAdminDashboard() {
   }, [showRestoreSuccess]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Quick token check - no delay
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginModal(true);
+      setError("Please login to access your dashboard");
+      setLoading(false);
+      return;
+    }
+    setInitialAuthCheck(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && initialAuthCheck) {
       setShowLoginModal(true);
       setError("Please login to access your dashboard");
       setLoading(false);
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, initialAuthCheck]);
 
   useEffect(() => {
-    // Update your fetchAuthorData function to this:
     async function fetchAuthorData() {
       if (!isAuthenticated || isLoading) return;
 
@@ -786,56 +799,32 @@ export default function AuthorAdminDashboard() {
           throw new Error("No authentication token found");
         }
 
-        // SINGLE API CALL instead of multiple calls
-        const res = await fetch(
-          `${API_BASE_URL}/authors/me/dashboard/optimized/`,
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-              "Content-Type": "application/json",
-            },
+        // Check cache first for faster loading
+        const cacheKey = `author_dashboard_cache_${slug}`;
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // Use cache if less than 30 seconds old
+          if (Date.now() - timestamp < 30000) {
+            if (data.author.slug !== slug) {
+              router.push(`/admin/author/${data.author.slug}`);
+              return;
+            }
+
+            setAuthor({
+              ...data.author,
+              articles: data.articles || [],
+            });
+
+            // Load fresh data in background
+            setTimeout(() => fetchFreshData(token, cacheKey), 100);
+            return;
           }
-        );
-
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          setShowLoginModal(true);
-          return;
         }
 
-        if (res.status === 403) {
-          throw new Error("You don't have permission to access this dashboard");
-        }
-
-        if (!res.ok) {
-          throw new Error(`Failed to load author data: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (data.author.slug !== slug) {
-          router.push(`/admin/author/${data.author.slug}`);
-          return;
-        }
-
-        // Set all data from single response
-        setAuthor({
-          ...data.author,
-          articles: data.articles || [],
-        });
-
-        // REMOVE THIS LINE - charts are loaded separately
-        // setAllArticlesStats(data.charts_data.platform_stats || []);
-
-        // REMOVE THESE LINES - charts are loaded separately via loadChartsData()
-        // setArticlesByAuthorData(data.charts_data.articles_by_author);
-        // setViewsByAuthorData(data.charts_data.views_by_author);
-        // setYourTopArticlesData(data.charts_data.your_top_articles);
-
-        await checkBanStatus();
-
-        // Fetch trash articles separately (they're lightweight)
-        await fetchTrashArticles();
+        // SINGLE API CALL - no artificial delays
+        await fetchFreshData(token, cacheKey);
       } catch (err) {
         console.error("Error fetching author data:", err);
         setError((err as Error).message);
@@ -848,6 +837,65 @@ export default function AuthorAdminDashboard() {
       fetchAuthorData();
     }
   }, [slug, isAuthenticated, isLoading, router]);
+
+  // Helper function for fresh data
+  const fetchFreshData = async (token: string, cacheKey?: string) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/dashboard/optimized/`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        // Use cache for faster subsequent loads
+        next: { revalidate: 30 },
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (res.status === 403) {
+      throw new Error("You don't have permission to access this dashboard");
+    }
+
+    if (!res.ok) {
+      throw new Error(`Failed to load author data: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (data.author.slug !== slug) {
+      router.push(`/admin/author/${data.author.slug}`);
+      return;
+    }
+
+    // Set all data from single response
+    setAuthor({
+      ...data.author,
+      articles: data.articles || [],
+    });
+
+    // Cache the data for faster future loads
+    if (cacheKey) {
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          data,
+          timestamp: Date.now(),
+        })
+      );
+    }
+
+    // Parallel loading of non-critical data
+    Promise.all([checkBanStatus(), fetchTrashArticles()]).catch((error) => {
+      console.error("Error loading additional data:", error);
+      // Non-critical errors - don't block the UI
+    });
+  };
 
   const handleDeleteArticle = async (articleSlug: string) => {
     setDeleteModal((prev) => ({ ...prev, isLoading: true }));
@@ -1242,7 +1290,6 @@ export default function AuthorAdminDashboard() {
             </p>
           </div>
         )}
-
         {isAuthenticated && loading && (
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
@@ -1253,7 +1300,6 @@ export default function AuthorAdminDashboard() {
             </div>
           </div>
         )}
-
         {isAuthenticated && error && !loading && (
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
@@ -1285,7 +1331,6 @@ export default function AuthorAdminDashboard() {
             </div>
           </div>
         )}
-
         {isAuthenticated && author && !loading && !error && (
           <>
             {/* MOBILE OPTIMIZED HEADER SECTION */}

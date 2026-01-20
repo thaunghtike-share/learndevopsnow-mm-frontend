@@ -42,12 +42,12 @@ export default function ProfileForm() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          await new Promise((resolve) => setTimeout(resolve, 5000));
+          // REMOVED: await new Promise((resolve) => setTimeout(resolve, 5000));
           setIsLoadingProfile(false);
           return;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // REMOVED: await new Promise((resolve) => setTimeout(resolve, 3000));
 
         const profileRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/`,
@@ -217,10 +217,9 @@ export default function ProfileForm() {
           window.history.back();
         } else {
           // If no history, go to home
-          router.push('/');
+          router.push("/");
         }
       }, 1500);
-
     } catch (error: any) {
       setError(error.message || "An error occurred while saving");
     } finally {
