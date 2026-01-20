@@ -346,8 +346,8 @@ export function MinimalHeader() {
       label: getNavText("About", "ကျွန်ုပ်တို့အကြောင်း"),
     },
     {
-      href: `/${currentLocale}/faqs`,
-      label: getNavText("FAQs", "အမေးများသောမေးခွန်းများ"),
+      href: `/${currentLocale}/privacy`,
+      label: getNavText("Privacy Policy", "စည်းကမ်းချက်များ"),
     },
     {
       href: `/${currentLocale}/user-guide`,
@@ -698,7 +698,7 @@ export function MinimalHeader() {
               <img
                 src="/logo.png"
                 alt="Logo"
-                className="h-24 w-24 transition-transform group-hover:scale-105"
+                className="h-23 w-21 transition-transform group-hover:scale-105"
               />
             </Link>
 
@@ -706,8 +706,8 @@ export function MinimalHeader() {
             <div
               className="flex-1 ml-2"
               style={{
-                minWidth: "220px",
-                width: "220px",
+                minWidth: "210px",
+                width: "210px",
                 flexShrink: 0,
               }}
             >
