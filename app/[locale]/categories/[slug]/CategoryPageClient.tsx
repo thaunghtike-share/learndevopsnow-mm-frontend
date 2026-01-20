@@ -27,6 +27,7 @@ import {
   Sparkles,
   Lightbulb,
   Tag as TagIcon,
+  Search,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
@@ -112,47 +113,65 @@ export default function CategoryPageClient() {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Use the optimized endpoint - single API call
         const res = await fetch(`${API_BASE_URL}/categories/${slug}/public/`);
-        
+
         if (!res.ok) {
           if (res.status === 404) {
             throw new Error("Category not found");
           }
           throw new Error("Failed to load category");
         }
-        
+
         const data: ApiResponse = await res.json();
-        
+
         console.log("API Response:", data); // Debug log
-        
+
         // Set category data
         setCategory(data.category);
-        
+
         // Set articles - sort by published date
-        const sortedArticles = [...(data.articles || [])].sort((a, b) => 
-          new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+        const sortedArticles = [...(data.articles || [])].sort(
+          (a, b) =>
+            new Date(b.published_at).getTime() -
+            new Date(a.published_at).getTime()
         );
         setArticles(sortedArticles);
-        
+
         // Set stats
-        setStats(data.stats || {
-          total_articles: sortedArticles.length,
-          total_views: sortedArticles.reduce((sum, a) => sum + (a.read_count || 0), 0),
-          total_comments: sortedArticles.reduce((sum, a) => sum + (a.comment_count || 0), 0),
-          total_reactions: sortedArticles.reduce((sum, a) => {
-            const reactions = a.reactions_summary || {};
-            return sum + (reactions.like || 0) + (reactions.love || 0) + 
-                   (reactions.celebrate || 0) + (reactions.insightful || 0);
-          }, 0),
-          total_authors: new Set(sortedArticles.map(a => a.author?.id).filter(Boolean)).size,
-          avg_read_time: Math.round(sortedArticles.reduce((sum, a) => {
-            const words = a.content ? a.content.split(/\s+/).length : 0;
-            return sum + Math.max(1, Math.ceil(words / 200));
-          }, 0) / (sortedArticles.length || 1)),
-        });
-        
+        setStats(
+          data.stats || {
+            total_articles: sortedArticles.length,
+            total_views: sortedArticles.reduce(
+              (sum, a) => sum + (a.read_count || 0),
+              0
+            ),
+            total_comments: sortedArticles.reduce(
+              (sum, a) => sum + (a.comment_count || 0),
+              0
+            ),
+            total_reactions: sortedArticles.reduce((sum, a) => {
+              const reactions = a.reactions_summary || {};
+              return (
+                sum +
+                (reactions.like || 0) +
+                (reactions.love || 0) +
+                (reactions.celebrate || 0) +
+                (reactions.insightful || 0)
+              );
+            }, 0),
+            total_authors: new Set(
+              sortedArticles.map((a) => a.author?.id).filter(Boolean)
+            ).size,
+            avg_read_time: Math.round(
+              sortedArticles.reduce((sum, a) => {
+                const words = a.content ? a.content.split(/\s+/).length : 0;
+                return sum + Math.max(1, Math.ceil(words / 200));
+              }, 0) / (sortedArticles.length || 1)
+            ),
+          }
+        );
       } catch (err) {
         console.error("Error fetching category:", err);
         setError((err as Error).message);
@@ -160,7 +179,7 @@ export default function CategoryPageClient() {
         setLoading(false);
       }
     }
-    
+
     if (slug) fetchCategory();
   }, [slug]);
 
@@ -239,11 +258,14 @@ export default function CategoryPageClient() {
     if (article.cover_image && article.cover_image.trim() !== "") {
       return article.cover_image;
     }
-    
+
     const categoryName = category?.name?.toLowerCase() || "";
     if (categoryName.includes("kubernetes")) {
       return "/kubernetes.webp";
-    } else if (categoryName.includes("cicd") || categoryName.includes("ci/cd")) {
+    } else if (
+      categoryName.includes("cicd") ||
+      categoryName.includes("ci/cd")
+    ) {
       return "/cicd.webp";
     } else if (categoryName.includes("python")) {
       return "/python.webp";
@@ -266,7 +288,9 @@ export default function CategoryPageClient() {
 
     if (article.content) {
       const cleanContent = stripMarkdown(article.content);
-      return cleanContent.length > 150 ? cleanContent.slice(0, 150) + "..." : cleanContent;
+      return cleanContent.length > 150
+        ? cleanContent.slice(0, 150) + "..."
+        : cleanContent;
     }
 
     return "Read the full article to learn more...";
@@ -287,8 +311,8 @@ export default function CategoryPageClient() {
   );
 
   const CategoryIcon = category ? getCategoryIcon(category.name) : Wrench;
-  const categoryGradient = category 
-    ? getCategoryGradient(category.name) 
+  const categoryGradient = category
+    ? getCategoryGradient(category.name)
     : "from-slate-500 to-slate-600";
 
   // Loading state (same as your author page)
@@ -366,7 +390,7 @@ export default function CategoryPageClient() {
               </span>
             </div>
             <h1 className="text-3xl md:text-7xl font-light text-black dark:text-white md:mb-6 tracking-tight">
-              {category.name}
+              Articles in the {category.name} Category
             </h1>
           </div>
 
@@ -380,25 +404,28 @@ export default function CategoryPageClient() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex-1">
               <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed mb-6 md:mb-8 max-w-2xl">
-                Explore all articles in the {category.name} category. Stay updated with the latest insights, tutorials, and best practices.
+                Explore all articles in the {category.name} category. Stay
+                updated with the latest insights, tutorials, and best practices.
               </p>
 
               <div className="flex flex-wrap gap-2 md:gap-3">
-                <span className={`px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${categoryGradient} text-white text-xs md:text-sm font-medium rounded-full shadow-sm`}>
-                  {stats.total_articles} Articles
+                <span
+                  className={`px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${categoryGradient} text-white text-xs md:text-sm font-medium rounded-full shadow-sm`}
+                >
+                  {stats.total_articles} Related Articles
                 </span>
                 <span className="px-3 py-1.5 md:px-4 md:py-2 bg-black dark:bg-gray-700 text-white dark:text-gray-300 text-xs md:text-sm font-medium rounded-full shadow-sm">
-                  {stats.total_authors} Authors
+                  {stats.total_authors} Related Authors
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-6 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
+          {/* Stats Grid - Matches author detail page spacing */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
             <div className="space-y-2 md:space-y-3">
               <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
                 {stats.total_articles}
@@ -413,22 +440,6 @@ export default function CategoryPageClient() {
               </div>
               <div className="text-xs md:text-sm text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">
                 Total Views
-              </div>
-            </div>
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                {stats.avg_read_time}m
-              </div>
-              <div className="text-xs md:text-sm text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider">
-                Avg Read Time
-              </div>
-            </div>
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                {stats.total_authors}
-              </div>
-              <div className="text-xs md:text-sm text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
-                Authors
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
@@ -464,7 +475,8 @@ export default function CategoryPageClient() {
                   Latest Articles
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {stats.total_articles} articles • {stats.total_views.toLocaleString()} reads
+                  {stats.total_articles} articles •{" "}
+                  {stats.total_views.toLocaleString()} reads
                 </p>
               </div>
               <div className="flex items-center gap-2 md:gap-3">
@@ -484,7 +496,8 @@ export default function CategoryPageClient() {
                 No Articles Yet
               </h3>
               <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                Stay tuned! We're preparing amazing {category.name} content for you.
+                Stay tuned! We're preparing amazing {category.name} content for
+                you.
               </p>
             </div>
           ) : (
@@ -535,7 +548,7 @@ export default function CategoryPageClient() {
                               {readTime} min read
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-sky-600 dark:text-sky-400" />
+                              <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600 dark:text-sky-400" />
                               {article.read_count?.toLocaleString()} views
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
@@ -557,12 +570,15 @@ export default function CategoryPageClient() {
                               <div className="flex items-center gap-2 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                                 <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 p-0.5">
                                   <img
-                                    src={article.author.avatar || "/placeholder.svg"}
+                                    src={
+                                      article.author.avatar ||
+                                      "/placeholder.svg"
+                                    }
                                     alt={article.author.name}
                                     className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
                                   />
                                 </div>
-                                <Link 
+                                <Link
                                   href={`/authors/${article.author.slug}`}
                                   className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
                                 >
@@ -647,12 +663,15 @@ export default function CategoryPageClient() {
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                      Showing {paginatedArticles.length} of {stats.total_articles} articles
+                      Showing {paginatedArticles.length} of{" "}
+                      {stats.total_articles} articles
                     </div>
 
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(1, prev - 1))
+                        }
                         disabled={currentPage === 1}
                         className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
                       >
@@ -662,31 +681,39 @@ export default function CategoryPageClient() {
 
                       {/* Page Numbers */}
                       <div className="hidden xs:flex items-center gap-1">
-                        {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 3) pageNum = i + 1;
-                          else if (currentPage <= 2) pageNum = i + 1;
-                          else if (currentPage >= totalPages - 1) pageNum = totalPages - 2 + i;
-                          else pageNum = currentPage - 1 + i;
-                          
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => setCurrentPage(pageNum)}
-                              className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
-                                currentPage === pageNum
-                                  ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
-                                  : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
+                        {Array.from(
+                          { length: Math.min(3, totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 3) pageNum = i + 1;
+                            else if (currentPage <= 2) pageNum = i + 1;
+                            else if (currentPage >= totalPages - 1)
+                              pageNum = totalPages - 2 + i;
+                            else pageNum = currentPage - 1 + i;
+
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
+                                  currentPage === pageNum
+                                    ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                    : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          }
+                        )}
                       </div>
 
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(totalPages, prev + 1)
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
                       >
