@@ -640,6 +640,9 @@ export default function AuthorAdminDashboard() {
   const [articlesByAuthorData, setArticlesByAuthorData] = useState([]);
   const [viewsByAuthorData, setViewsByAuthorData] = useState([]);
   const [yourTopArticlesData, setYourTopArticlesData] = useState([]);
+  const [chartsLoaded, setChartsLoaded] = useState(false);
+  const [loadingCharts, setLoadingCharts] = useState(false);
+  const [chartsError, setChartsError] = useState<string | null>(null);
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -683,95 +686,50 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // Fetch all articles for bar charts
-  const fetchAllArticlesStats = async () => {
+  // Add this function to lazy load charts
+  const loadChartsData = async () => {
+    if (chartsLoaded || loadingCharts) return;
+
     try {
-      setChartsLoading(true);
-      const res = await fetch(`${API_BASE_URL}/articles/`);
-      if (!res.ok) throw new Error("Failed to fetch articles");
-      const data = await res.json();
+      setLoadingCharts(true);
+      setChartsError(null);
 
-      const articles = Array.isArray(data)
-        ? data
-        : Array.isArray(data.results)
-        ? data.results
-        : [];
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/authors/me/dashboard/charts/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      const stats = articles.map((article: any) => ({
-        id: article.id,
-        title: article.title,
-        read_count: article.read_count || 0,
-        author_name: article.author_name || "Unknown",
-        slug: article.slug,
-      }));
-
-      setAllArticlesStats(stats);
+      if (res.ok) {
+        const data = await res.json();
+        setArticlesByAuthorData(data.articles_by_author || []);
+        setViewsByAuthorData(data.views_by_author || []);
+        setYourTopArticlesData(data.your_top_articles || []);
+        setChartsLoaded(true);
+      } else {
+        throw new Error("Failed to load charts");
+      }
     } catch (err) {
-      console.error("Error fetching all article stats:", err);
-      // Fallback data if API fails
-      const fallbackStats = [
-        {
-          id: 1,
-          title: "Kubernetes Guide",
-          read_count: 1250,
-          author_name: "Thaung Htike Oo",
-          slug: "kubernetes-guide",
-        },
-        {
-          id: 2,
-          title: "AWS Tutorial",
-          read_count: 980,
-          author_name: "Sandar Win",
-          slug: "aws-tutorial",
-        },
-        {
-          id: 3,
-          title: "Terraform Basics",
-          read_count: 1560,
-          author_name: "Aung Myint Myat",
-          slug: "terraform-basics",
-        },
-        {
-          id: 4,
-          title: "Docker Security",
-          read_count: 890,
-          author_name: "Thaung Htike Oo",
-          slug: "docker-security",
-        },
-        {
-          id: 5,
-          title: "CI/CD Pipeline",
-          read_count: 1120,
-          author_name: "Sandar Win",
-          slug: "ci-cd-pipeline",
-        },
-        {
-          id: 6,
-          title: "Cloud Native",
-          read_count: 1340,
-          author_name: "Aung Myint Myat",
-          slug: "cloud-native",
-        },
-        {
-          id: 7,
-          title: "DevOps Best Practices",
-          read_count: 760,
-          author_name: "Thaung Htike Oo",
-          slug: "devops-best-practices",
-        },
-        {
-          id: 8,
-          title: "Infrastructure as Code",
-          read_count: 1040,
-          author_name: "Aung Myint Myat",
-          slug: "infrastructure-as-code",
-        },
-      ];
-      setAllArticlesStats(fallbackStats);
+      console.error("Error loading charts:", err);
+      setChartsError("Failed to load analytics");
     } finally {
-      setChartsLoading(false);
+      setLoadingCharts(false);
     }
   };
+
+  // Add this useEffect to load charts when component mounts
+  useEffect(() => {
+    if (author && !chartsLoaded && !loadingCharts) {
+      // Load charts after a short delay to prioritize main content
+      const timer = setTimeout(() => {
+        loadChartsData();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [author, chartsLoaded, loadingCharts]);
 
   // NEW: Fetch trash articles
   const fetchTrashArticles = async () => {
@@ -814,7 +772,7 @@ export default function AuthorAdminDashboard() {
   }, [isAuthenticated, isLoading]);
 
   useEffect(() => {
-    // Replace the entire fetchAuthorData function with this:
+    // Update your fetchAuthorData function to this:
     async function fetchAuthorData() {
       if (!isAuthenticated || isLoading) return;
 
@@ -866,13 +824,13 @@ export default function AuthorAdminDashboard() {
           articles: data.articles || [],
         });
 
-        // Set stats for charts
-        setAllArticlesStats(data.charts_data.platform_stats || []);
+        // REMOVE THIS LINE - charts are loaded separately
+        // setAllArticlesStats(data.charts_data.platform_stats || []);
 
-        // Set charts data directly
-        setArticlesByAuthorData(data.charts_data.articles_by_author);
-        setViewsByAuthorData(data.charts_data.views_by_author);
-        setYourTopArticlesData(data.charts_data.your_top_articles);
+        // REMOVE THESE LINES - charts are loaded separately via loadChartsData()
+        // setArticlesByAuthorData(data.charts_data.articles_by_author);
+        // setViewsByAuthorData(data.charts_data.views_by_author);
+        // setYourTopArticlesData(data.charts_data.your_top_articles);
 
         await checkBanStatus();
 
@@ -1205,17 +1163,15 @@ export default function AuthorAdminDashboard() {
       currentPage * articlesPerPage
     ) || [];
 
-  // Replace prepareArticlesByAuthorData with:
+  // These should work with the lazy-loaded data:
   const prepareArticlesByAuthorData = () => {
     return articlesByAuthorData || [];
   };
 
-  // Replace prepareViewsByAuthorData with:
   const prepareViewsByAuthorData = () => {
     return viewsByAuthorData || [];
   };
 
-  // Replace prepareViewsData with:
   const prepareViewsData = () => {
     return yourTopArticlesData || [];
   };
@@ -1487,7 +1443,7 @@ export default function AuthorAdminDashboard() {
                 </div>
               </div>
 
-              {/* BAR CHARTS SECTION - Changed from pie to bar charts */}
+              {/* BAR CHARTS SECTION - Lazy Loaded */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1508,25 +1464,70 @@ export default function AuthorAdminDashboard() {
                   </div>
                 </div>
 
-                {/* Bar Charts Section */}
-                {chartsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-                      <p className="mt-4 text-gray-600 dark:text-gray-400">
-                        Loading analytics...
-                      </p>
+                {/* Lazy Loading Charts */}
+                {!chartsLoaded ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Placeholder for first chart */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 text-blue-500" />
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Articles Distribution
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Loader className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-2" />
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Loading analytics...
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Placeholder for second chart */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5 text-emerald-500" />
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Your Top Articles
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Loader className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-2" />
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Loading top articles...
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : chartsError ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                    </div>
+                    <p className="text-red-600 dark:text-red-400">
+                      {chartsError}
+                    </p>
+                    <button
+                      onClick={loadChartsData}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Retry
+                    </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Chart 1: Articles Distribution (Pie Chart) */}
                     <AuthorStatsPieChart
                       data={prepareArticlesByAuthorData()}
                       title="Articles Distribution"
                     />
-
-                    {/* Chart 2: Your Top Articles (Bar Chart) */}
                     <AuthorViewsBarChart
                       data={prepareViewsData()}
                       title="Your Top Articles"
