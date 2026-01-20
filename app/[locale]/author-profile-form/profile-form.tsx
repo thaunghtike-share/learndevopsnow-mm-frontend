@@ -3,15 +3,18 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import {
-  Award,
-  Crown,
   Zap,
   Upload,
-  User,
-  Briefcase,
-  LinkIcon,
-  FileText,
+  Mail,
+  Globe,
+  Building,
+  Briefcase as BriefcaseIcon,
+  UserCircle,
+  Link as LinkIcon,
   Hash,
+  Save,
+  ArrowLeft,
+  CheckCircle,
 } from "lucide-react";
 
 export default function ProfileForm() {
@@ -36,18 +39,16 @@ export default function ProfileForm() {
 
   const [hasCompletedProfile, setHasCompletedProfile] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          // REMOVED: await new Promise((resolve) => setTimeout(resolve, 5000));
           setIsLoadingProfile(false);
           return;
         }
-
-        // REMOVED: await new Promise((resolve) => setTimeout(resolve, 3000));
 
         const profileRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/`,
@@ -75,6 +76,13 @@ export default function ProfileForm() {
           if (profileData.profile_complete) {
             setHasCompletedProfile(true);
           }
+
+          // Get email from user data
+          if (user?.email) {
+            setUserEmail(user.email);
+          } else if (profileData.email) {
+            setUserEmail(profileData.email);
+          }
         }
       } catch (error) {
         console.error("Failed to load profile:", error);
@@ -84,7 +92,7 @@ export default function ProfileForm() {
     };
 
     loadProfile();
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,9 +148,8 @@ export default function ProfileForm() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null); // Reset success state
+    setSuccess(null);
 
-    // Validation checks
     if (
       !formData.name?.trim() ||
       !formData.bio?.trim() ||
@@ -201,7 +208,6 @@ export default function ProfileForm() {
 
       const savedProfile = await response.json();
 
-      // Update auth state
       updateProfile({
         profileComplete: true,
         username: savedProfile.name || user?.username,
@@ -210,13 +216,10 @@ export default function ProfileForm() {
 
       setSuccess("stay");
 
-      // Wait for success message to show, then navigate
       setTimeout(() => {
-        // Use window.history for more reliable navigation
         if (window.history.length > 1) {
           window.history.back();
         } else {
-          // If no history, go to home
           router.push("/");
         }
       }, 1500);
@@ -361,13 +364,25 @@ export default function ProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
+      <div className="max-w-5xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 border-t-blue-500 dark:border-t-blue-400 animate-spin">
+                  <img
+                    src="/logo.png"
+                    alt="Loading"
+                    className="w-16 h-16 object-contain animate-pulse"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <h1 className="text-xl font-semibold text-black dark:text-white mb-2 mt-6">
             Loading Your Profile
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-black dark:text-gray-300">
             Please wait while we load your profile data...
           </p>
         </div>
@@ -377,15 +392,17 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
+      <div className="max-w-5xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl">
+            <CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-white" />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-light text-black dark:text-white mb-4">
             {success === "stay"
               ? "Happy Reading! 🎉"
               : "Welcome to the Community!"}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
             {success === "stay"
               ? "Your profile is saved. Taking you back to continue reading..."
               : "Your profile has been saved successfully. Redirecting to your dashboard..."}
@@ -396,129 +413,90 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="px-4 md:px-11 md:py-7 mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg p-4 md:p-8">
-        {/* Mobile Header */}
-        <div className="mb-6 md:mb-8">
-          <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-3 md:mb-4 w-fit mx-auto">
-            <Zap className="w-4 h-4 md:w-5 md:h-5" />
-            <span className="text-sm md:text-base">Complete Your Profile</span>
-          </div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white text-center mb-2">
-            Tell Us About Yourself
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-center text-sm md:text-base">
-            Complete your author profile to start writing articles
-          </p>
+    <div className="px-4 sm:px-6 md:px-11 ">
+      {/* Header Section */}
+      <div className="mb-8 md:mb-12">
+        <div className="flex items-center gap-4 mb-4 md:mb-6">
+          <div className="h-px w-12 md:w-16 bg-gradient-to-r from-sky-500 to-blue-600"></div>
+          <span className="text-xs md:text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
+            Complete Your Profile
+          </span>
         </div>
+        <h1 className="text-3xl md:text-6xl font-light text-black dark:text-white md:mb-6 tracking-tight">
+          Tell Us About Yourself
+        </h1>
+        <p className="text-base md:text-xl text-black dark:text-gray-400">
+          Complete your author profile to start writing articles
+        </p>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-          {/* Display Name */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              Display Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-              placeholder="Your Name - eg. John Doe"
-            />
-          </div>
-
-          {/* Professional Information */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              Professional Information <span className="text-red-500">*</span>
-            </label>
-            <div className="space-y-3 md:space-y-0 md:flex md:gap-4 md:items-end">
-              <div className="md:flex-1">
-                <input
-                  type="text"
-                  name="job_title"
-                  value={formData.job_title}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                  placeholder="Job title"
-                />
+      <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
+        {/* Email Section - Read Only */}
+        {userEmail && (
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+                <Mail className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <div className="hidden md:flex items-center h-12 text-gray-500 dark:text-gray-400 font-medium px-2">
-                at
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                  Email Address
+                </h3>
+                <p className="text-sm text-black/60 dark:text-gray-400">
+                  Your registered email (cannot be changed)
+                </p>
               </div>
-              <div className="md:flex-1">
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-                  placeholder="Company name (optional)"
-                />
+            </div>
+            <div className="relative">
+              <div className="w-full px-4 md:px-6 py-3 md:py-4 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-200/50 dark:border-gray-600 rounded-xl md:rounded-2xl text-black dark:text-gray-300 font-medium">
+                {userEmail}
               </div>
             </div>
           </div>
+        )}
 
-          {/* Bio */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              Bio <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base resize-none"
-              required
-              placeholder="Tell us about yourself, your expertise, and experience..."
-            />
+        {/* Profile Photo Section */}
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+              <UserCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                Profile Photo <span className="text-red-500">*</span>
+              </h3>
+              <p className="text-sm text-black/60 dark:text-gray-400">
+                Upload a professional photo or enter a URL
+              </p>
+            </div>
           </div>
 
-          {/* LinkedIn URL */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              LinkedIn URL <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="url"
-              name="linkedin"
-              value={formData.linkedin}
-              onChange={handleInputChange}
-              required
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-              placeholder="https://linkedin.com/in/your-profile"
-            />
-          </div>
-
-          {/* Avatar Section */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              Profile Photo <span className="text-red-500">*</span>
-            </label>
-
+          <div className="space-y-6 md:space-y-8">
             {formData.avatar && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Current Avatar:
-                </p>
-                <div className="flex items-center gap-3">
-                  <img
-                    src={formData.avatar}
-                    alt="Current avatar"
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
-                  />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Current photo
-                  </span>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
+                <div className="flex-shrink-0">
+                  <div className="relative">
+                    <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
+                      <img
+                        src={formData.avatar}
+                        alt="Current avatar"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm md:text-base font-medium text-black dark:text-white mb-2">
+                    Current Avatar
+                  </p>
+                  <p className="text-xs md:text-sm text-black/60 dark:text-gray-400">
+                    Your current profile photo
+                  </p>
                 </div>
               </div>
             )}
 
-            <div className="mb-4">
+            <div className="space-y-4">
               <label className="cursor-pointer">
                 <input
                   type="file"
@@ -526,122 +504,287 @@ export default function ProfileForm() {
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-                <div className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-4 md:p-6 text-center hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all duration-300">
-                  <div className="flex flex-col items-center gap-2">
-                    <Upload className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Click to upload photo
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      JPEG, PNG, GIF, WebP (max 5MB)
-                    </span>
+                <div className="w-full border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-xl md:rounded-2xl p-6 md:p-8 text-center hover:border-sky-500 dark:hover:border-sky-400 hover:bg-sky-50/50 dark:hover:bg-sky-900/10 transition-all duration-300">
+                  <div className="flex flex-col items-center gap-3">
+                    <Upload className="w-8 h-8 md:w-10 md:h-10 text-slate-400 dark:text-gray-500" />
+                    <div>
+                      <span className="text-base md:text-lg font-medium text-black dark:text-white">
+                        Click to upload photo
+                      </span>
+                      <p className="text-xs md:text-sm text-black/60 dark:text-gray-400 mt-1">
+                        JPEG, PNG, GIF, WebP (max 5MB)
+                      </p>
+                    </div>
                   </div>
                 </div>
               </label>
+
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div className="mt-4">
+                  <div className="flex justify-between text-sm text-black dark:text-gray-300 mb-2">
+                    <span>Uploading...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-sky-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                  <p className="text-red-600 dark:text-red-400 text-sm">
+                    {uploadError}
+                  </p>
+                </div>
+              )}
+
+              {hasExistingAvatar && (
+                <div className="mt-6">
+                  <label className="block mb-3 text-sm font-medium text-black dark:text-white">
+                    Or use custom URL:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="url"
+                      name="avatar"
+                      value={formData.avatar}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white"
+                      placeholder="https://example.com/avatar.jpg"
+                    />
+                  </div>
+                  <p className="text-xs text-black/60 dark:text-gray-400 mt-2">
+                    Keep your existing avatar URL or change it
+                  </p>
+                </div>
+              )}
             </div>
+          </div>
+        </div>
 
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <div className="mt-3">
-                <div className="flex justify-between text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  <span>Uploading...</span>
-                  <span>{uploadProgress}%</span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
-                  <div
-                    className="bg-sky-600 h-1.5 md:h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  ></div>
-                </div>
+        {/* Personal Information */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          {/* Display Name */}
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+                <UserCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-            )}
-
-            {uploadError && (
-              <p className="text-red-600 dark:text-red-400 text-xs md:text-sm mt-2">
-                {uploadError}
-              </p>
-            )}
-
-            {hasExistingAvatar && (
-              <div className="mt-4">
-                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Or use custom URL:
-                </label>
-                <input
-                  type="url"
-                  name="avatar"
-                  value={formData.avatar}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2 md:py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-                  placeholder="https://example.com/avatar.jpg"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Keep your existing avatar URL or change it
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                  Display Name <span className="text-red-500">*</span>
+                </h3>
+                <p className="text-sm text-black/60 dark:text-gray-400">
+                  Your name as it will appear publicly
                 </p>
               </div>
-            )}
+            </div>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500"
+              placeholder="John Doe"
+            />
           </div>
 
           {/* Profile Slug */}
-          <div>
-            <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300 text-sm md:text-base">
-              Profile Slug <span className="text-red-500">*</span>
-            </label>
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+                <Hash className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                  Profile Slug <span className="text-red-500">*</span>
+                </h3>
+                <p className="text-sm text-black/60 dark:text-gray-400">
+                  Your unique profile URL identifier
+                </p>
+              </div>
+            </div>
             <input
               type="text"
               name="slug"
               value={formData.slug}
               onChange={handleInputChange}
               required
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
-              placeholder="your-unique-profile-slug"
+              className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500"
+              placeholder="your-unique-slug"
             />
-            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Don't change auto-generated slug. This will be used in your
-              profile URL (e.g., /authors/your-slug)
+            <p className="text-xs text-black/60 dark:text-gray-400 mt-3">
+              Don't change auto-generated slug. This will be used in your profile URL
             </p>
           </div>
+        </div>
 
-          {error && (
-            <div className="p-3 md:p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-xl text-sm border border-red-200 dark:border-red-800">
-              {error}
+        {/* Professional Information */}
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+              <BriefcaseIcon className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
-          )}
+            <div>
+              <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                Professional Information
+              </h3>
+              <p className="text-sm text-black/60 dark:text-gray-400">
+                Tell us about your professional background
+              </p>
+            </div>
+          </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3 pt-4">
-            <button
-              type="submit"
-              disabled={loading || isUploading}
-              className="w-full bg-gradient-to-r from-sky-500 to-blue-600 text-white py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-            >
-              {loading
-                ? "Saving Profile..."
-                : "Save Profile & Go to Admin Dashboard"}
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div>
+              <label className="block mb-3 text-sm font-medium text-black dark:text-white">
+                Job Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="job_title"
+                value={formData.job_title}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500"
+                placeholder="Senior DevOps Engineer"
+              />
+            </div>
 
-            <button
-              type="button"
-              onClick={handleSaveAndStay}
-              disabled={loading || isUploading}
-              className="w-full border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 py-3 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-            >
-              {loading
-                ? "Saving Profile..."
-                : "Save Profile & Back to Previous Page"}
-            </button>
+            <div>
+              <label className="block mb-3 text-sm font-medium text-black dark:text-white">
+                Company (Optional)
+              </label>
+              <input
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500"
+                placeholder="TechCorp Inc."
+              />
+            </div>
+          </div>
+        </div>
 
-            {!hasCompletedProfile && (
+        {/* LinkedIn URL */}
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+              <LinkIcon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                LinkedIn URL <span className="text-red-500">*</span>
+              </h3>
+              <p className="text-sm text-black/60 dark:text-gray-400">
+                Connect your professional profile
+              </p>
+            </div>
+          </div>
+          <input
+            type="url"
+            name="linkedin"
+            value={formData.linkedin}
+            onChange={handleInputChange}
+            required
+            className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500"
+            placeholder="https://linkedin.com/in/your-profile"
+          />
+        </div>
+
+        {/* Bio */}
+        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg">
+              <Globe className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg md:text-xl font-semibold text-black dark:text-white">
+                Bio <span className="text-red-500">*</span>
+              </h3>
+              <p className="text-sm text-black/60 dark:text-gray-400">
+                Tell the community about yourself, your expertise, and experience
+              </p>
+            </div>
+          </div>
+          <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleInputChange}
+            rows={4}
+            className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white placeholder-black/40 dark:placeholder-gray-500 resize-none"
+            required
+            placeholder="I'm a passionate DevOps engineer with 8 years of experience in cloud infrastructure, CI/CD pipelines, and containerization..."
+          />
+        </div>
+
+        {error && (
+          <div className="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
+            <p className="text-red-600 dark:text-red-400 text-base font-medium">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="space-y-4 pt-4">
+          <button
+            type="submit"
+            disabled={loading || isUploading}
+            className="w-full px-6 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg hover:scale-[1.02] flex items-center justify-center gap-3"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                Saving Profile...
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                Save Profile & Go to Admin Dashboard
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSaveAndStay}
+            disabled={loading || isUploading}
+            className="w-full px-6 py-4 border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/10 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base hover:scale-[1.02] flex items-center justify-center gap-3"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-sky-600"></div>
+                Saving Profile...
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="w-5 h-5" />
+                Save Profile & Back to Previous Page
+              </>
+            )}
+          </button>
+
+          {!hasCompletedProfile && (
+            <div className="text-center pt-4">
               <button
                 type="button"
                 onClick={handleSkip}
-                className="w-full text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-2 text-sm md:text-base transition-colors"
+                className="text-black/60 dark:text-gray-400 hover:text-black dark:hover:text-gray-300 py-2 text-base transition-colors font-medium inline-flex items-center gap-2"
               >
-                Skip for now →
+                Skip for now
+                <span className="text-lg">→</span>
               </button>
-            )}
-          </div>
-        </form>
-      </div>
+            </div>
+          )}
+        </div>
+      </form>
     </div>
   );
 }

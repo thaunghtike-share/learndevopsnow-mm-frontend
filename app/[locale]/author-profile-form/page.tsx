@@ -7,7 +7,7 @@ export default function AuthorProfileFormPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white/95 dark:bg-[#000000] relative">
       <MinimalHeader />
-      <main className="flex-grow max-w-7xl mx-auto px-6 md:px-11 w-full">
+      <main className="px-4 sm:px-6 md:px-11 ">
         <ProfileForm />
       </main>
       <MinimalFooter />
