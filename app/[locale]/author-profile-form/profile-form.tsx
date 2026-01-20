@@ -364,25 +364,13 @@ export default function ProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="max-w-5xl mx-auto px-4 md:px-11 py-16 mb-40">
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
-          <div className="relative">
-            <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 border-t-blue-500 dark:border-t-blue-400 animate-spin">
-                  <img
-                    src="/logo.png"
-                    alt="Loading"
-                    className="w-16 h-16 object-contain animate-pulse"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <h1 className="text-xl font-semibold text-black dark:text-white mb-2 mt-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             Loading Your Profile
           </h1>
-          <p className="text-black dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300">
             Please wait while we load your profile data...
           </p>
         </div>
@@ -392,17 +380,15 @@ export default function ProfileForm() {
 
   if (success) {
     return (
-      <div className="max-w-5xl mx-auto px-4 md:px-11 py-16 mb-40">
+      <div className="max-w-2xl mx-auto px-4 md:px-11 py-16 mb-40">
         <div className="text-center">
-          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl">
-            <CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-white" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-light text-black dark:text-white mb-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             {success === "stay"
               ? "Happy Reading! 🎉"
               : "Welcome to the Community!"}
           </h1>
-          <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
+          <p className="text-gray-600 dark:text-gray-300">
             {success === "stay"
               ? "Your profile is saved. Taking you back to continue reading..."
               : "Your profile has been saved successfully. Redirecting to your dashboard..."}
@@ -619,7 +605,8 @@ export default function ProfileForm() {
               placeholder="your-unique-slug"
             />
             <p className="text-xs text-black/60 dark:text-gray-400 mt-3">
-              Don't change auto-generated slug. This will be used in your profile URL
+              Don't change auto-generated slug. This will be used in your
+              profile URL
             </p>
           </div>
         </div>
@@ -709,7 +696,8 @@ export default function ProfileForm() {
                 Bio <span className="text-red-500">*</span>
               </h3>
               <p className="text-sm text-black/60 dark:text-gray-400">
-                Tell the community about yourself, your expertise, and experience
+                Tell the community about yourself, your expertise, and
+                experience
               </p>
             </div>
           </div>
