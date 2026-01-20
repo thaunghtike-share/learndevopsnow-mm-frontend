@@ -504,7 +504,8 @@ function DeleteConfirmationModal({
               Delete Article
             </h3>
             <p className="text-slate-500 dark:text-gray-400 text-sm">
-              This article will be moved to Trash and can be restored within 7 days.
+              This article will be moved to Trash and can be restored within 7
+              days.
             </p>
           </div>
         </div>
@@ -550,6 +551,54 @@ function DeleteConfirmationModal({
   );
 }
 
+function RestoreSuccessAlert({
+  message,
+  isVisible,
+}: {
+  message: string | null;
+  isVisible: boolean;
+}) {
+  if (!isVisible || !message) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100]"
+    >
+      <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl shadow-2xl p-4 max-w-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+            <svg
+              className="w-4 h-4 text-emerald-600 dark:text-emerald-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="text-emerald-800 dark:text-emerald-200 font-medium">
+              {message}
+            </p>
+            <p className="text-emerald-600 dark:text-emerald-400 text-sm">
+              The article will appear in your articles list shortly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function AuthorAdminDashboard() {
   const { slug } = useParams();
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -571,6 +620,9 @@ export default function AuthorAdminDashboard() {
     }>
   >([]);
   const [chartsLoading, setChartsLoading] = useState(false);
+  const [restoringSlug, setRestoringSlug] = useState<string | null>(null);
+  const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
+  const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -739,6 +791,16 @@ export default function AuthorAdminDashboard() {
       setTrashLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (showRestoreSuccess) {
+      const timer = setTimeout(() => {
+        setShowRestoreSuccess(false);
+        setRestoreSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showRestoreSuccess]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -939,60 +1001,94 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // NEW: Handle restore article from trash
   const handleRestoreArticle = async (articleSlug: string) => {
     try {
+      setRestoringSlug(articleSlug);
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/articles/${articleSlug}/restore/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        // Remove from trash list
-        setTrashArticles(prev => prev.filter(article => article.slug !== articleSlug));
-        
-        // Refresh author articles
-        const authorRes = await fetch(`${API_BASE_URL}/authors/me/dashboard/`, {
+      const response = await fetch(
+        `${API_BASE_URL}/articles/${articleSlug}/restore/`,
+        {
+          method: "POST",
           headers: {
             Authorization: `Token ${token}`,
           },
-        });
-        
-        if (authorRes.ok) {
-          const data = await authorRes.json();
-          setAuthor({
-            ...data,
-            articles: data.articles || [],
-          });
         }
+      );
+
+      if (response.ok) {
+        // Remove from trash list
+        setTrashArticles((prev) =>
+          prev.filter((article) => article.slug !== articleSlug)
+        );
+
+        // Show success message
+        const restoredArticle = trashArticles.find(
+          (a) => a.slug === articleSlug
+        );
+        setRestoreSuccess(
+          `"${restoredArticle?.title}" has been restored successfully!`
+        );
+        setShowRestoreSuccess(true);
+
+        // Add a small delay to show the success message before refreshing
+        setTimeout(async () => {
+          // Refresh author articles
+          const authorRes = await fetch(
+            `${API_BASE_URL}/authors/me/dashboard/`,
+            {
+              headers: {
+                Authorization: `Token ${token}`,
+              },
+            }
+          );
+
+          if (authorRes.ok) {
+            const data = await authorRes.json();
+            setAuthor({
+              ...data,
+              articles: data.articles || [],
+            });
+          }
+
+          setRestoringSlug(null);
+        }, 1500);
+      } else {
+        throw new Error("Failed to restore article");
       }
     } catch (error) {
       console.error("Error restoring article:", error);
       alert("Failed to restore article");
+      setRestoringSlug(null);
     }
   };
 
   // NEW: Handle permanent delete from trash
   const handlePermanentDelete = async (articleSlug: string) => {
-    if (!confirm("Are you sure you want to permanently delete this article? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to permanently delete this article? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/articles/${articleSlug}/permanent-delete/`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/articles/${articleSlug}/permanent-delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         // Remove from trash list
-        setTrashArticles(prev => prev.filter(article => article.slug !== articleSlug));
+        setTrashArticles((prev) =>
+          prev.filter((article) => article.slug !== articleSlug)
+        );
       }
     } catch (error) {
       console.error("Error permanently deleting article:", error);
@@ -1257,6 +1353,11 @@ export default function AuthorAdminDashboard() {
         onConfirm={() => handleDeleteArticle(deleteModal.article?.slug || "")}
         article={deleteModal.article}
         isLoading={deleteModal.isLoading}
+      />
+
+      <RestoreSuccessAlert
+        message={restoreSuccess}
+        isVisible={showRestoreSuccess}
       />
 
       <main className="px-6 md:px-11 md:py-8 relative z-10">
@@ -1836,7 +1937,8 @@ export default function AuthorAdminDashboard() {
                     Trash is Empty
                   </h3>
                   <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                    Articles you delete will appear here and can be restored within 7 days
+                    Articles you delete will appear here and can be restored
+                    within 7 days
                   </p>
                 </div>
               ) : (
@@ -1858,15 +1960,16 @@ export default function AuthorAdminDashboard() {
                           {/* Article Info */}
                           <div className="flex-1 min-w-0 w-full">
                             <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
-                              <span className={`inline-flex items-center gap-1.5 font-medium text-xs md:text-sm px-2 py-1 rounded-lg ${
-                                canRestore 
-                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-                                  : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                              }`}>
-                                {canRestore 
+                              <span
+                                className={`inline-flex items-center gap-1.5 font-medium text-xs md:text-sm px-2 py-1 rounded-lg ${
+                                  canRestore
+                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                                }`}
+                              >
+                                {canRestore
                                   ? `🗑️ ${daysRemaining} days remaining`
-                                  : "⏰ Expired - Cannot restore"
-                                }
+                                  : "⏰ Expired - Cannot restore"}
                               </span>
                               <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                                 <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -1884,7 +1987,8 @@ export default function AuthorAdminDashboard() {
 
                             {article.excerpt && (
                               <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
-                                {stripMarkdown(article.excerpt).slice(0, 120)}...
+                                {stripMarkdown(article.excerpt).slice(0, 120)}
+                                ...
                               </p>
                             )}
 
@@ -1907,17 +2011,44 @@ export default function AuthorAdminDashboard() {
                           <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
                             {canRestore && (
                               <button
-                                onClick={() => handleRestoreArticle(article.slug)}
-                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                onClick={() =>
+                                  handleRestoreArticle(article.slug)
+                                }
+                                disabled={
+                                  restoringSlug === article.slug || !canRestore
+                                }
+                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                </svg>
-                                Restore
+                                {restoringSlug === article.slug ? (
+                                  <>
+                                    <Loader className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
+                                    Restoring...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg
+                                      className="w-3 h-3 md:w-4 md:h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                                      />
+                                    </svg>
+                                    Restore
+                                  </>
+                                )}
                               </button>
                             )}
                             <button
-                              onClick={() => handlePermanentDelete(article.slug)}
+                              onClick={() =>
+                                handlePermanentDelete(article.slug)
+                              }
                               className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
                             >
                               <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
