@@ -637,6 +637,9 @@ export default function AuthorAdminDashboard() {
   // NEW: Trash articles state
   const [trashArticles, setTrashArticles] = useState<TrashArticle[]>([]);
   const [trashLoading, setTrashLoading] = useState(false);
+  const [articlesByAuthorData, setArticlesByAuthorData] = useState([]);
+  const [viewsByAuthorData, setViewsByAuthorData] = useState([]);
+  const [yourTopArticlesData, setYourTopArticlesData] = useState([]);
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -811,6 +814,7 @@ export default function AuthorAdminDashboard() {
   }, [isAuthenticated, isLoading]);
 
   useEffect(() => {
+    // Replace the entire fetchAuthorData function with this:
     async function fetchAuthorData() {
       if (!isAuthenticated || isLoading) return;
 
@@ -824,12 +828,16 @@ export default function AuthorAdminDashboard() {
           throw new Error("No authentication token found");
         }
 
-        const res = await fetch(`${API_BASE_URL}/authors/me/dashboard/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        // SINGLE API CALL instead of multiple calls
+        const res = await fetch(
+          `${API_BASE_URL}/authors/me/dashboard/optimized/`,
+          {
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (res.status === 401) {
           localStorage.removeItem("token");
@@ -847,94 +855,28 @@ export default function AuthorAdminDashboard() {
 
         const data = await res.json();
 
-        if (data.slug !== slug) {
-          router.push(`/admin/author/${data.slug}`);
+        if (data.author.slug !== slug) {
+          router.push(`/admin/author/${data.author.slug}`);
           return;
         }
 
-        if (data.articles) {
-          const articlesWithEngagement = await Promise.all(
-            data.articles.map(async (article: Article) => {
-              try {
-                const commentsRes = await fetch(
-                  `${API_BASE_URL}/articles/${article.slug}/comments/`
-                );
-
-                const reactionsRes = await fetch(
-                  `${API_BASE_URL}/articles/${article.slug}/reactions/`
-                );
-
-                let comment_count = 0;
-                let reactions_summary = {
-                  like: 0,
-                  love: 0,
-                  celebrate: 0,
-                  insightful: 0,
-                };
-
-                if (commentsRes.ok) {
-                  const commentsData = await commentsRes.json();
-                  comment_count = commentsData.reduce(
-                    (total: number, comment: any) => {
-                      return total + 1 + (comment.replies?.length || 0);
-                    },
-                    0
-                  );
-                }
-
-                if (reactionsRes.ok) {
-                  const reactionsData = await reactionsRes.json();
-                  reactions_summary = {
-                    like: reactionsData.summary?.like || 0,
-                    love: reactionsData.summary?.love || 0,
-                    celebrate: reactionsData.summary?.celebrate || 0,
-                    insightful: reactionsData.summary?.insightful || 0,
-                  };
-                }
-
-                return {
-                  ...article,
-                  comment_count,
-                  reactions_summary,
-                  read_time: calculateReadTime(article.content),
-                };
-              } catch (error) {
-                console.error(
-                  `Failed to fetch engagement for article ${article.slug}:`,
-                  error
-                );
-              }
-
-              return {
-                ...article,
-                comment_count: 0,
-                reactions_summary: {
-                  like: 0,
-                  love: 0,
-                  celebrate: 0,
-                  insightful: 0,
-                },
-                read_time: calculateReadTime(article.content),
-              };
-            })
-          );
-
-          data.articles = articlesWithEngagement.sort(
-            (a: Article, b: Article) =>
-              new Date(b.published_at).getTime() -
-              new Date(a.published_at).getTime()
-          );
-        }
-
+        // Set all data from single response
         setAuthor({
-          ...data,
+          ...data.author,
           articles: data.articles || [],
         });
 
+        // Set stats for charts
+        setAllArticlesStats(data.charts_data.platform_stats || []);
+
+        // Set charts data directly
+        setArticlesByAuthorData(data.charts_data.articles_by_author);
+        setViewsByAuthorData(data.charts_data.views_by_author);
+        setYourTopArticlesData(data.charts_data.your_top_articles);
+
         await checkBanStatus();
-        // Fetch all articles for bar charts
-        await fetchAllArticlesStats();
-        // Fetch trash articles
+
+        // Fetch trash articles separately (they're lightweight)
         await fetchTrashArticles();
       } catch (err) {
         console.error("Error fetching author data:", err);
@@ -1263,49 +1205,19 @@ export default function AuthorAdminDashboard() {
       currentPage * articlesPerPage
     ) || [];
 
-  // Prepare articles by author data
+  // Replace prepareArticlesByAuthorData with:
   const prepareArticlesByAuthorData = () => {
-    const authorMap = new Map<string, number>();
-
-    allArticlesStats.forEach((article) => {
-      const author = article.author_name;
-      const current = authorMap.get(author) || 0;
-      authorMap.set(author, current + 1);
-    });
-
-    return Array.from(authorMap.entries())
-      .map(([author, count]) => ({ author, count }))
-      .sort((a, b) => b.count - a.count);
+    return articlesByAuthorData || [];
   };
 
-  // Prepare views by author data
+  // Replace prepareViewsByAuthorData with:
   const prepareViewsByAuthorData = () => {
-    const authorMap = new Map<string, number>();
-
-    allArticlesStats.forEach((article) => {
-      const author = article.author_name;
-      const current = authorMap.get(author) || 0;
-      authorMap.set(author, current + article.read_count);
-    });
-
-    return Array.from(authorMap.entries())
-      .map(([author, views]) => ({ author, views }))
-      .sort((a, b) => b.views - a.views);
+    return viewsByAuthorData || [];
   };
 
+  // Replace prepareViewsData with:
   const prepareViewsData = () => {
-    if (!author?.articles || author.articles.length === 0) {
-      return [];
-    }
-
-    // Get top 8 articles by views
-    return [...author.articles]
-      .sort((a, b) => b.read_count - a.read_count)
-      .slice(0, 8)
-      .map((article) => ({
-        author: article.title,
-        views: article.read_count,
-      }));
+    return yourTopArticlesData || [];
   };
 
   if (isLoading) {
@@ -1372,12 +1284,6 @@ export default function AuthorAdminDashboard() {
             <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
               Please login to access your admin dashboard
             </p>
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Open Login
-            </button>
           </div>
         )}
 
