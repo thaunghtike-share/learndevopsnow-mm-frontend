@@ -95,6 +95,15 @@ interface Article {
   };
 }
 
+interface TrashArticle extends Article {
+  days_in_trash: number;
+  days_remaining: number;
+  can_restore: boolean;
+  author_name: string;
+  author_avatar: string;
+  deleted_at?: string;
+}
+
 interface Author {
   id: number;
   name: string;
@@ -495,7 +504,7 @@ function DeleteConfirmationModal({
               Delete Article
             </h3>
             <p className="text-slate-500 dark:text-gray-400 text-sm">
-              This action cannot be undone
+              This article will be moved to Trash and can be restored within 7 days.
             </p>
           </div>
         </div>
@@ -506,7 +515,7 @@ function DeleteConfirmationModal({
           </p>
           <p className="text-slate-500 dark:text-gray-400 text-sm">
             This article has {article.read_count?.toLocaleString()} views and
-            will be permanently removed from your blog.
+            will be moved to the trash.
           </p>
         </div>
 
@@ -572,6 +581,10 @@ export default function AuthorAdminDashboard() {
     article: null,
     isLoading: false,
   });
+
+  // NEW: Trash articles state
+  const [trashArticles, setTrashArticles] = useState<TrashArticle[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -702,6 +715,28 @@ export default function AuthorAdminDashboard() {
       setAllArticlesStats(fallbackStats);
     } finally {
       setChartsLoading(false);
+    }
+  };
+
+  // NEW: Fetch trash articles
+  const fetchTrashArticles = async () => {
+    try {
+      setTrashLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/articles/trash/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTrashArticles(data);
+      }
+    } catch (error) {
+      console.error("Error fetching trash articles:", error);
+    } finally {
+      setTrashLoading(false);
     }
   };
 
@@ -837,6 +872,8 @@ export default function AuthorAdminDashboard() {
         await checkBanStatus();
         // Fetch all articles for bar charts
         await fetchAllArticlesStats();
+        // Fetch trash articles
+        await fetchTrashArticles();
       } catch (err) {
         console.error("Error fetching author data:", err);
         setError((err as Error).message);
@@ -890,12 +927,76 @@ export default function AuthorAdminDashboard() {
           : null
       );
 
+      // Refresh trash articles after deletion
+      await fetchTrashArticles();
+
       setDeleteModal({ isOpen: false, article: null, isLoading: false });
       console.log("Article deleted successfully");
     } catch (err) {
       console.error("Error deleting article:", err);
       setError((err as Error).message);
       setDeleteModal((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  // NEW: Handle restore article from trash
+  const handleRestoreArticle = async (articleSlug: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/articles/${articleSlug}/restore/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Remove from trash list
+        setTrashArticles(prev => prev.filter(article => article.slug !== articleSlug));
+        
+        // Refresh author articles
+        const authorRes = await fetch(`${API_BASE_URL}/authors/me/dashboard/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        
+        if (authorRes.ok) {
+          const data = await authorRes.json();
+          setAuthor({
+            ...data,
+            articles: data.articles || [],
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error restoring article:", error);
+      alert("Failed to restore article");
+    }
+  };
+
+  // NEW: Handle permanent delete from trash
+  const handlePermanentDelete = async (articleSlug: string) => {
+    if (!confirm("Are you sure you want to permanently delete this article? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/articles/${articleSlug}/permanent-delete/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Remove from trash list
+        setTrashArticles(prev => prev.filter(article => article.slug !== articleSlug));
+      }
+    } catch (error) {
+      console.error("Error permanently deleting article:", error);
+      alert("Failed to delete article");
     }
   };
 
@@ -1691,6 +1792,148 @@ export default function AuthorAdminDashboard() {
                 </>
               )}
             </motion.section>
+
+            {/* TRASH SECTION - ADDED AT THE END */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
+            >
+              <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
+                  <div>
+                    <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
+                      Trash Bin
+                    </h2>
+                    <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
+                      Articles in trash are automatically deleted after 7 days
+                    </p>
+                  </div>
+                  {trashArticles.length > 0 && (
+                    <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
+                      {trashArticles.length} articles in trash
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {trashLoading ? (
+                <div className="flex items-center justify-center py-12 md:py-20">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-6"></div>
+                    <p className="text-slate-700 dark:text-gray-300 text-lg font-medium">
+                      Loading trash articles...
+                    </p>
+                  </div>
+                </div>
+              ) : trashArticles.length === 0 ? (
+                <div className="text-center py-12 md:py-20">
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-slate-500 to-slate-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+                    <Trash2 className="w-6 h-6 md:w-10 md:h-10 text-white" />
+                  </div>
+                  <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
+                    Trash is Empty
+                  </h3>
+                  <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
+                    Articles you delete will appear here and can be restored within 7 days
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
+                  {trashArticles.map((article, index) => {
+                    const daysRemaining = article.days_remaining;
+                    const daysInTrash = article.days_in_trash;
+                    const canRestore = article.can_restore;
+
+                    return (
+                      <motion.div
+                        key={article.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+                      >
+                        <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
+                          {/* Article Info */}
+                          <div className="flex-1 min-w-0 w-full">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
+                              <span className={`inline-flex items-center gap-1.5 font-medium text-xs md:text-sm px-2 py-1 rounded-lg ${
+                                canRestore 
+                                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                  : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                              }`}>
+                                {canRestore 
+                                  ? `🗑️ ${daysRemaining} days remaining`
+                                  : "⏰ Expired - Cannot restore"
+                                }
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                Deleted {daysInTrash} days ago
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                                {article.read_count?.toLocaleString()} views
+                              </span>
+                            </div>
+
+                            <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2">
+                              {article.title}
+                            </h3>
+
+                            {article.excerpt && (
+                              <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                                {stripMarkdown(article.excerpt).slice(0, 120)}...
+                              </p>
+                            )}
+
+                            {article.tags && article.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 md:gap-2">
+                                {article.tags.slice(0, 3).map((tag) => (
+                                  <span
+                                    key={tag.id}
+                                    className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
+                                  >
+                                    <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                    {tag.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
+                            {canRestore && (
+                              <button
+                                onClick={() => handleRestoreArticle(article.slug)}
+                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                              >
+                                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                </svg>
+                                Restore
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handlePermanentDelete(article.slug)}
+                              className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                              Delete Permanently
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.section>
+
+            {/* Bottom spacing */}
+            <div className="h-8 md:h-16"></div>
           </>
         )}
       </main>
