@@ -4,8 +4,6 @@
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import {
-  FileText,
-  Scale,
   BookOpen,
   Code,
   Shield,
@@ -13,17 +11,11 @@ import {
   AlertTriangle,
   CheckCircle,
   Copyright,
-  Mail,
   MessageSquare,
-  Sparkles,
-  Zap,
-  ArrowRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function TermsOfService() {
   const [mounted, setMounted] = useState(false);

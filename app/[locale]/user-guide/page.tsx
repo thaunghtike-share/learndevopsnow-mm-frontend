@@ -1,4 +1,3 @@
-// app/docs/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -8,31 +7,22 @@ import {
   BookOpen,
   User,
   LogIn,
-  FileText,
-  LayoutDashboard,
   Edit3,
+  LayoutDashboard,
   ChevronRight,
   Plus,
-  ArrowRight,
   GraduationCap,
   Code,
   Video,
-  School,
   Map,
   Crown,
   Users,
   Settings,
   Trash2,
   Rocket,
-  Award,
   Container,
-  Ship,
   Zap,
   Layout,
-  GitBranch,
-  RefreshCcw,
-  TrendingUp,
-  Star,
   Menu,
   X,
 } from "lucide-react";

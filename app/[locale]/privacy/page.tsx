@@ -8,7 +8,6 @@ import {
   Lock,
   User,
   Database,
-  Eye,
   Mail,
   CheckCircle,
   Server,
@@ -18,16 +17,12 @@ import {
   ShieldCheck,
   Globe,
   MessageSquare,
-  Sparkles,
-  Zap,
-  Cpu,
   Cloud,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export default function PrivacyPolicy() {
   const [mounted, setMounted] = useState(false);

@@ -22,8 +22,6 @@ import {
   CheckCircle2,
   Zap,
   ArrowRight,
-  Play,
-  ExternalLink,
   Users,
   Workflow,
   Cloud,
@@ -34,9 +32,6 @@ import {
   MessageSquare,
   ChevronDown,
   ShieldCheck,
-  Activity,
-  Layers,
-  Dock,
   Clock,
 } from "lucide-react";
 import Image from "next/image";
