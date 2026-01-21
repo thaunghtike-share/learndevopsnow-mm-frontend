@@ -459,15 +459,15 @@ export function ArticleContent({
 
   return (
     <div className="relative">
-      <main className="px-6 md:px-11 py-5 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <main className="px-4 md:px-11 py-5 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
           <div className="mb-10 md:mb-12">
             {/* Breadcrumb Navigation - Fixed Alignment */}
-            <nav aria-label="Breadcrumb" className="mb-5 sm:mb-7 px-4 sm:px-0">
+            <nav aria-label="Breadcrumb" className="mb-5 sm:mb-7 px-2 sm:px-0">
               <div className="flex items-baseline gap-2 sm:gap-3 text-sm sm:text-base font-medium">
                 <Link
                   href="/"
-                  className="group flex items-center text-sky-600 dark:text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate"
+                  className="group flex items-center text-sky-600 dark:text-sky-600 hover:text-sky-600 font-medium dark:hover:text-sky-400 transition-all duration-250 truncate"
                 >
                   <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 group-hover:scale-110 transition-transform" />
                   Home
@@ -477,7 +477,7 @@ export function ArticleContent({
 
                 <Link
                   href="/articles"
-                  className="text-gray-700 dark:text-gray-200 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="text-black dark:text-gray-200 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Articles
                 </Link>
@@ -744,7 +744,7 @@ export function ArticleContent({
                   return (
                     <h1
                       id={id}
-                      className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-10 mb-6"
+                      className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-6"
                       {...props}
                     >
                       {children}
@@ -756,7 +756,7 @@ export function ArticleContent({
                   return (
                     <h2
                       id={id}
-                      className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-6 pb-2 border-l-4 border-sky-500 dark:border-sky-400 pl-4 bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-transparent rounded-r-lg"
+                      className="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-8 mb-6 pb-2 border-l-4 border-sky-500 dark:border-sky-400 pl-4 bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-transparent rounded-r-lg"
                       {...props}
                     >
                       {children}
@@ -768,7 +768,7 @@ export function ArticleContent({
                   return (
                     <h3
                       id={id}
-                      className="text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200 mt-8 mb-4 pl-4 border-l-4 border-sky-400 dark:border-sky-500 bg-gradient-to-r from-sky-50 dark:from-sky-900/10 to-transparent rounded-r-lg py-2"
+                      className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 mt-8 mb-4 pl-4 border-l-4 border-sky-400 dark:border-sky-500 bg-gradient-to-r from-sky-50 dark:from-sky-900/10 to-transparent rounded-r-lg py-2"
                       {...props}
                     >
                       {children}
@@ -780,7 +780,7 @@ export function ArticleContent({
                   return (
                     <h4
                       id={id}
-                      className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200 mt-6 mb-3 pl-4 border-l-2 border-sky-300 dark:border-sky-600 bg-gradient-to-r from-sky-50/50 dark:from-sky-900/5 to-transparent rounded-r-lg py-1"
+                      className="text-base md:text-lg font-medium text-gray-800 dark:text-gray-200 mt-6 mb-3 pl-4 border-l-2 border-sky-300 dark:border-sky-600 bg-gradient-to-r from-sky-50/50 dark:from-sky-900/5 to-transparent rounded-r-lg py-1"
                       {...props}
                     >
                       {children}
@@ -826,7 +826,7 @@ export function ArticleContent({
                   // Regular paragraph
                   return (
                     <p
-                      className="mb-6 text-base leading-relaxed text-gray-700 dark:text-gray-300"
+                      className="mb-6 text-base leading-relaxed text-black dark:text-gray-300"
                       {...props}
                     >
                       {children}
@@ -846,7 +846,7 @@ export function ArticleContent({
                 ),
                 ul: ({ children, ...props }) => (
                   <ul
-                    className="mb-6 space-y-3 pl-6 text-gray-700 dark:text-gray-300 text-base list-disc marker:text-sky-600 dark:marker:text-sky-400"
+                    className="mb-6 space-y-3 pl-6 text-black dark:text-gray-300 text-base list-disc marker:text-sky-600 dark:marker:text-sky-400"
                     {...props}
                   >
                     {children}
@@ -854,7 +854,7 @@ export function ArticleContent({
                 ),
                 ol: ({ children, ...props }) => (
                   <ol
-                    className="mb-6 space-y-3 pl-6 text-gray-700 dark:text-gray-300 text-base list-decimal marker:text-sky-600 dark:marker:text-sky-400 marker:font-semibold"
+                    className="mb-6 space-y-3 pl-6 text-black dark:text-gray-300 text-base list-decimal marker:text-sky-600 dark:marker:text-sky-400 marker:font-semibold"
                     {...props}
                   >
                     {children}
@@ -862,7 +862,7 @@ export function ArticleContent({
                 ),
                 li: ({ children, ...props }) => (
                   <li
-                    className="mb-2 text-gray-700 dark:text-gray-300 leading-relaxed pl-2"
+                    className="mb-2 text-black dark:text-gray-300 leading-relaxed pl-2"
                     {...props}
                   >
                     {children}
@@ -870,7 +870,7 @@ export function ArticleContent({
                 ),
                 blockquote: ({ children, ...props }) => (
                   <blockquote
-                    className="border-l-4 border-sky-500 dark:border-sky-400 pl-6 pr-4 py-4 italic text-gray-700 dark:text-gray-300 my-6 text-sm md:text-base bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-blue-50 dark:to-blue-900/20 rounded-r-2xl shadow-sm"
+                    className="border-l-4 border-sky-500 dark:border-sky-400 pl-6 pr-4 py-4 italic text-black dark:text-gray-300 my-6 text-sm md:text-base bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-blue-50 dark:to-blue-900/20 rounded-r-2xl shadow-sm"
                     {...props}
                   >
                     {children}
@@ -1020,7 +1020,7 @@ export function ArticleContent({
             </div>
           </div>
 
-          <div className="mb-8 hidden md:block">
+          <div className="mb-8">
             <ShareButtons
               articleId={article.id}
               title={article.title}
