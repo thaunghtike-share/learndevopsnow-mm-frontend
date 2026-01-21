@@ -527,27 +527,6 @@ export default function ProfileForm() {
                   </p>
                 </div>
               )}
-
-              {hasExistingAvatar && (
-                <div className="mt-6">
-                  <label className="block mb-3 text-sm font-medium text-black dark:text-white">
-                    Or use custom URL:
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="url"
-                      name="avatar"
-                      value={formData.avatar}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-slate-50/80 dark:bg-gray-700/50 border border-slate-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all duration-300 text-black dark:text-white"
-                      placeholder="https://example.com/avatar.jpg"
-                    />
-                  </div>
-                  <p className="text-xs text-black/60 dark:text-gray-400 mt-2">
-                    Keep your existing avatar URL or change it
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -721,21 +700,23 @@ export default function ProfileForm() {
         )}
 
         {/* Action Buttons */}
-        <div className="space-y-4 pt-4">
+        <div className="space-y-3 sm:space-y-4 pt-4">
           <button
             type="submit"
             disabled={loading || isUploading}
-            className="w-full px-6 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl hover:shadow-2xl transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg hover:scale-[1.02] flex items-center justify-center gap-3"
+            className="w-full px-4 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg sm:rounded-xl hover:shadow-xl sm:hover:shadow-2xl transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base shadow-md sm:shadow-lg hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                Saving Profile...
+                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
+                <span className="whitespace-nowrap">Saving Profile...</span>
               </>
             ) : (
               <>
-                <Save className="w-5 h-5" />
-                Save Profile & Go to Admin Dashboard
+                <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">
+                  Save Profile & Go to Admin Dashboard
+                </span>
               </>
             )}
           </button>
@@ -744,30 +725,32 @@ export default function ProfileForm() {
             type="button"
             onClick={handleSaveAndStay}
             disabled={loading || isUploading}
-            className="w-full px-6 py-4 border-2 border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/10 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-base hover:scale-[1.02] flex items-center justify-center gap-3"
+            className="w-full px-4 py-3 sm:px-6 sm:py-4 border border-sky-500 text-sky-600 dark:text-sky-400 bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl hover:bg-sky-50 dark:hover:bg-sky-900/10 hover:border-sky-600 dark:hover:border-sky-400 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base hover:scale-[1.02] flex items-center justify-center gap-2 sm:gap-3"
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-sky-600"></div>
-                Saving Profile...
+                <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-sky-600"></div>
+                <span className="whitespace-nowrap">Saving Profile...</span>
               </>
             ) : (
               <>
-                <ArrowLeft className="w-5 h-5" />
-                Save Profile & Back to Previous Page
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">
+                  Save Profile & Back to Previous Page
+                </span>
               </>
             )}
           </button>
 
           {!hasCompletedProfile && (
-            <div className="text-center pt-4">
+            <div className="text-center pt-2 sm:pt-4">
               <button
                 type="button"
                 onClick={handleSkip}
-                className="text-black/60 dark:text-gray-400 hover:text-black dark:hover:text-gray-300 py-2 text-base transition-colors font-medium inline-flex items-center gap-2"
+                className="text-black/60 dark:text-gray-400 hover:text-black dark:hover:text-gray-300 py-2 text-sm sm:text-base transition-colors font-medium inline-flex items-center gap-1 sm:gap-2"
               >
-                Skip for now
-                <span className="text-lg">→</span>
+                <span className="whitespace-nowrap">Skip for now</span>
+                <span className="text-base sm:text-lg">→</span>
               </button>
             </div>
           )}
