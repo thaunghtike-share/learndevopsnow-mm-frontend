@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calendar,
   ArrowRight,
-  Eye,
   TrendingUp,
   Clock,
   MessageSquare,
@@ -16,15 +14,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Tag as TagIcon,
-  Folder,
   FileText,
-  Code,
   Cloud,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Article {
   id: number;
@@ -70,9 +66,8 @@ export default function HundredDaysCloudChallenge() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
 
-  const router = useRouter();
   const topRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
 
@@ -242,7 +237,6 @@ export default function HundredDaysCloudChallenge() {
   }, [currentPage]);
 
   // Helper functions
-  const getAuthor = (id: number) => authors.find((a) => a.id === id);
   const getTagById = (id: number) => tags.find((t) => t.id === id);
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -531,7 +525,6 @@ export default function HundredDaysCloudChallenge() {
                 {paginatedArticles.map((article, index) => {
                   const dayNumber = (article as any).day_number;
                   const previewText = getCleanExcerpt(article);
-                  const author = getAuthor(article.author);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};

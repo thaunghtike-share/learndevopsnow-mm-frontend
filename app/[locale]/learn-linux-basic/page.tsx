@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calendar,
   ArrowRight,
@@ -67,9 +66,8 @@ export default function LinuxEssentialsSeries() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
 
-  const router = useRouter();
   const topRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
 
