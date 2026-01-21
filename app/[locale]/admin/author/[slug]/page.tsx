@@ -95,6 +95,15 @@ interface Article {
   };
 }
 
+interface TrashArticle extends Article {
+  days_in_trash: number;
+  days_remaining: number;
+  can_restore: boolean;
+  author_name: string;
+  author_avatar: string;
+  deleted_at?: string;
+}
+
 interface Author {
   id: number;
   name: string;
@@ -495,7 +504,8 @@ function DeleteConfirmationModal({
               Delete Article
             </h3>
             <p className="text-slate-500 dark:text-gray-400 text-sm">
-              This action cannot be undone
+              This article will be moved to Trash and can be restored within 7
+              days.
             </p>
           </div>
         </div>
@@ -506,7 +516,7 @@ function DeleteConfirmationModal({
           </p>
           <p className="text-slate-500 dark:text-gray-400 text-sm">
             This article has {article.read_count?.toLocaleString()} views and
-            will be permanently removed from your blog.
+            will be moved to the trash.
           </p>
         </div>
 
@@ -541,6 +551,54 @@ function DeleteConfirmationModal({
   );
 }
 
+function RestoreSuccessAlert({
+  message,
+  isVisible,
+}: {
+  message: string | null;
+  isVisible: boolean;
+}) {
+  if (!isVisible || !message) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100]"
+    >
+      <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl shadow-2xl p-4 max-w-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+            <svg
+              className="w-4 h-4 text-emerald-600 dark:text-emerald-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="text-emerald-800 dark:text-emerald-200 font-medium">
+              {message}
+            </p>
+            <p className="text-emerald-600 dark:text-emerald-400 text-sm">
+              The article will appear in your articles list shortly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function AuthorAdminDashboard() {
   const { slug } = useParams();
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -562,6 +620,9 @@ export default function AuthorAdminDashboard() {
     }>
   >([]);
   const [chartsLoading, setChartsLoading] = useState(false);
+  const [restoringSlug, setRestoringSlug] = useState<string | null>(null);
+  const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
+  const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -572,6 +633,18 @@ export default function AuthorAdminDashboard() {
     article: null,
     isLoading: false,
   });
+
+  // NEW: Trash articles state
+  const [trashArticles, setTrashArticles] = useState<TrashArticle[]>([]);
+  const [trashLoading, setTrashLoading] = useState(false);
+  const [articlesByAuthorData, setArticlesByAuthorData] = useState([]);
+  const [viewsByAuthorData, setViewsByAuthorData] = useState([]);
+  const [yourTopArticlesData, setYourTopArticlesData] = useState([]);
+  const [chartsLoaded, setChartsLoaded] = useState(false);
+  const [loadingCharts, setLoadingCharts] = useState(false);
+  const [chartsError, setChartsError] = useState<string | null>(null);
+  const [initialAuthCheck, setInitialAuthCheck] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false); // Add this
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -615,103 +688,102 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // Fetch all articles for bar charts
-  const fetchAllArticlesStats = async () => {
+  // Add this function to lazy load charts
+  const loadChartsData = async () => {
+    if (chartsLoaded || loadingCharts) return;
+
     try {
-      setChartsLoading(true);
-      const res = await fetch(`${API_BASE_URL}/articles/`);
-      if (!res.ok) throw new Error("Failed to fetch articles");
-      const data = await res.json();
+      setLoadingCharts(true);
+      setChartsError(null);
 
-      const articles = Array.isArray(data)
-        ? data
-        : Array.isArray(data.results)
-        ? data.results
-        : [];
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/authors/me/dashboard/charts/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      const stats = articles.map((article: any) => ({
-        id: article.id,
-        title: article.title,
-        read_count: article.read_count || 0,
-        author_name: article.author_name || "Unknown",
-        slug: article.slug,
-      }));
-
-      setAllArticlesStats(stats);
+      if (res.ok) {
+        const data = await res.json();
+        setArticlesByAuthorData(data.articles_by_author || []);
+        setViewsByAuthorData(data.views_by_author || []);
+        setYourTopArticlesData(data.your_top_articles || []);
+        setChartsLoaded(true);
+      } else {
+        throw new Error("Failed to load charts");
+      }
     } catch (err) {
-      console.error("Error fetching all article stats:", err);
-      // Fallback data if API fails
-      const fallbackStats = [
-        {
-          id: 1,
-          title: "Kubernetes Guide",
-          read_count: 1250,
-          author_name: "Thaung Htike Oo",
-          slug: "kubernetes-guide",
-        },
-        {
-          id: 2,
-          title: "AWS Tutorial",
-          read_count: 980,
-          author_name: "Sandar Win",
-          slug: "aws-tutorial",
-        },
-        {
-          id: 3,
-          title: "Terraform Basics",
-          read_count: 1560,
-          author_name: "Aung Myint Myat",
-          slug: "terraform-basics",
-        },
-        {
-          id: 4,
-          title: "Docker Security",
-          read_count: 890,
-          author_name: "Thaung Htike Oo",
-          slug: "docker-security",
-        },
-        {
-          id: 5,
-          title: "CI/CD Pipeline",
-          read_count: 1120,
-          author_name: "Sandar Win",
-          slug: "ci-cd-pipeline",
-        },
-        {
-          id: 6,
-          title: "Cloud Native",
-          read_count: 1340,
-          author_name: "Aung Myint Myat",
-          slug: "cloud-native",
-        },
-        {
-          id: 7,
-          title: "DevOps Best Practices",
-          read_count: 760,
-          author_name: "Thaung Htike Oo",
-          slug: "devops-best-practices",
-        },
-        {
-          id: 8,
-          title: "Infrastructure as Code",
-          read_count: 1040,
-          author_name: "Aung Myint Myat",
-          slug: "infrastructure-as-code",
-        },
-      ];
-      setAllArticlesStats(fallbackStats);
+      console.error("Error loading charts:", err);
+      setChartsError("Failed to load analytics");
     } finally {
-      setChartsLoading(false);
+      setLoadingCharts(false);
+    }
+  };
+
+  // Add this useEffect to load charts when component mounts
+  useEffect(() => {
+    if (author && !chartsLoaded && !loadingCharts) {
+      // Load charts after a short delay to prioritize main content
+      const timer = setTimeout(() => {
+        loadChartsData();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [author, chartsLoaded, loadingCharts]);
+
+  // NEW: Fetch trash articles
+  const fetchTrashArticles = async () => {
+    try {
+      setTrashLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/articles/trash/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTrashArticles(data);
+      }
+    } catch (error) {
+      console.error("Error fetching trash articles:", error);
+    } finally {
+      setTrashLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (showRestoreSuccess) {
+      const timer = setTimeout(() => {
+        setShowRestoreSuccess(false);
+        setRestoreSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showRestoreSuccess]);
+
+  useEffect(() => {
+    // Quick token check - no delay
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginModal(true);
+      setError("Please login to access your dashboard");
+      setLoading(false);
+      return;
+    }
+    setInitialAuthCheck(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && initialAuthCheck) {
       setShowLoginModal(true);
       setError("Please login to access your dashboard");
       setLoading(false);
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, initialAuthCheck]);
 
   useEffect(() => {
     async function fetchAuthorData() {
@@ -727,116 +799,32 @@ export default function AuthorAdminDashboard() {
           throw new Error("No authentication token found");
         }
 
-        const res = await fetch(`${API_BASE_URL}/authors/me/dashboard/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        // Check cache first for faster loading
+        const cacheKey = `author_dashboard_cache_${slug}`;
+        const cached = localStorage.getItem(cacheKey);
 
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          setShowLoginModal(true);
-          return;
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          // Use cache if less than 30 seconds old
+          if (Date.now() - timestamp < 30000) {
+            if (data.author.slug !== slug) {
+              router.push(`/admin/author/${data.author.slug}`);
+              return;
+            }
+
+            setAuthor({
+              ...data.author,
+              articles: data.articles || [],
+            });
+
+            // Load fresh data in background
+            setTimeout(() => fetchFreshData(token, cacheKey), 100);
+            return;
+          }
         }
 
-        if (res.status === 403) {
-          throw new Error("You don't have permission to access this dashboard");
-        }
-
-        if (!res.ok) {
-          throw new Error(`Failed to load author data: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        if (data.slug !== slug) {
-          router.push(`/admin/author/${data.slug}`);
-          return;
-        }
-
-        if (data.articles) {
-          const articlesWithEngagement = await Promise.all(
-            data.articles.map(async (article: Article) => {
-              try {
-                const commentsRes = await fetch(
-                  `${API_BASE_URL}/articles/${article.slug}/comments/`
-                );
-
-                const reactionsRes = await fetch(
-                  `${API_BASE_URL}/articles/${article.slug}/reactions/`
-                );
-
-                let comment_count = 0;
-                let reactions_summary = {
-                  like: 0,
-                  love: 0,
-                  celebrate: 0,
-                  insightful: 0,
-                };
-
-                if (commentsRes.ok) {
-                  const commentsData = await commentsRes.json();
-                  comment_count = commentsData.reduce(
-                    (total: number, comment: any) => {
-                      return total + 1 + (comment.replies?.length || 0);
-                    },
-                    0
-                  );
-                }
-
-                if (reactionsRes.ok) {
-                  const reactionsData = await reactionsRes.json();
-                  reactions_summary = {
-                    like: reactionsData.summary?.like || 0,
-                    love: reactionsData.summary?.love || 0,
-                    celebrate: reactionsData.summary?.celebrate || 0,
-                    insightful: reactionsData.summary?.insightful || 0,
-                  };
-                }
-
-                return {
-                  ...article,
-                  comment_count,
-                  reactions_summary,
-                  read_time: calculateReadTime(article.content),
-                };
-              } catch (error) {
-                console.error(
-                  `Failed to fetch engagement for article ${article.slug}:`,
-                  error
-                );
-              }
-
-              return {
-                ...article,
-                comment_count: 0,
-                reactions_summary: {
-                  like: 0,
-                  love: 0,
-                  celebrate: 0,
-                  insightful: 0,
-                },
-                read_time: calculateReadTime(article.content),
-              };
-            })
-          );
-
-          data.articles = articlesWithEngagement.sort(
-            (a: Article, b: Article) =>
-              new Date(b.published_at).getTime() -
-              new Date(a.published_at).getTime()
-          );
-        }
-
-        setAuthor({
-          ...data,
-          articles: data.articles || [],
-        });
-
-        await checkBanStatus();
-        // Fetch all articles for bar charts
-        await fetchAllArticlesStats();
+        // SINGLE API CALL - no artificial delays
+        await fetchFreshData(token, cacheKey);
       } catch (err) {
         console.error("Error fetching author data:", err);
         setError((err as Error).message);
@@ -849,6 +837,65 @@ export default function AuthorAdminDashboard() {
       fetchAuthorData();
     }
   }, [slug, isAuthenticated, isLoading, router]);
+
+  // Helper function for fresh data
+  const fetchFreshData = async (token: string, cacheKey?: string) => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/dashboard/optimized/`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+        // Use cache for faster subsequent loads
+        next: { revalidate: 30 },
+      }
+    );
+
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (res.status === 403) {
+      throw new Error("You don't have permission to access this dashboard");
+    }
+
+    if (!res.ok) {
+      throw new Error(`Failed to load author data: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (data.author.slug !== slug) {
+      router.push(`/admin/author/${data.author.slug}`);
+      return;
+    }
+
+    // Set all data from single response
+    setAuthor({
+      ...data.author,
+      articles: data.articles || [],
+    });
+
+    // Cache the data for faster future loads
+    if (cacheKey) {
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          data,
+          timestamp: Date.now(),
+        })
+      );
+    }
+
+    // Parallel loading of non-critical data
+    Promise.all([checkBanStatus(), fetchTrashArticles()]).catch((error) => {
+      console.error("Error loading additional data:", error);
+      // Non-critical errors - don't block the UI
+    });
+  };
 
   const handleDeleteArticle = async (articleSlug: string) => {
     setDeleteModal((prev) => ({ ...prev, isLoading: true }));
@@ -890,12 +937,110 @@ export default function AuthorAdminDashboard() {
           : null
       );
 
+      // Refresh trash articles after deletion
+      await fetchTrashArticles();
+
       setDeleteModal({ isOpen: false, article: null, isLoading: false });
       console.log("Article deleted successfully");
     } catch (err) {
       console.error("Error deleting article:", err);
       setError((err as Error).message);
       setDeleteModal((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  const handleRestoreArticle = async (articleSlug: string) => {
+    try {
+      setRestoringSlug(articleSlug);
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/articles/${articleSlug}/restore/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove from trash list
+        setTrashArticles((prev) =>
+          prev.filter((article) => article.slug !== articleSlug)
+        );
+
+        // Show success message
+        const restoredArticle = trashArticles.find(
+          (a) => a.slug === articleSlug
+        );
+        setRestoreSuccess(
+          `"${restoredArticle?.title}" has been restored successfully!`
+        );
+        setShowRestoreSuccess(true);
+
+        // Add a small delay to show the success message before refreshing
+        setTimeout(async () => {
+          // Refresh author articles
+          const authorRes = await fetch(
+            `${API_BASE_URL}/authors/me/dashboard/`,
+            {
+              headers: {
+                Authorization: `Token ${token}`,
+              },
+            }
+          );
+
+          if (authorRes.ok) {
+            const data = await authorRes.json();
+            setAuthor({
+              ...data,
+              articles: data.articles || [],
+            });
+          }
+
+          setRestoringSlug(null);
+        }, 1500);
+      } else {
+        throw new Error("Failed to restore article");
+      }
+    } catch (error) {
+      console.error("Error restoring article:", error);
+      alert("Failed to restore article");
+      setRestoringSlug(null);
+    }
+  };
+
+  // NEW: Handle permanent delete from trash
+  const handlePermanentDelete = async (articleSlug: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to permanently delete this article? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/articles/${articleSlug}/permanent-delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove from trash list
+        setTrashArticles((prev) =>
+          prev.filter((article) => article.slug !== articleSlug)
+        );
+      }
+    } catch (error) {
+      console.error("Error permanently deleting article:", error);
+      alert("Failed to delete article");
     }
   };
 
@@ -1066,49 +1211,17 @@ export default function AuthorAdminDashboard() {
       currentPage * articlesPerPage
     ) || [];
 
-  // Prepare articles by author data
+  // These should work with the lazy-loaded data:
   const prepareArticlesByAuthorData = () => {
-    const authorMap = new Map<string, number>();
-
-    allArticlesStats.forEach((article) => {
-      const author = article.author_name;
-      const current = authorMap.get(author) || 0;
-      authorMap.set(author, current + 1);
-    });
-
-    return Array.from(authorMap.entries())
-      .map(([author, count]) => ({ author, count }))
-      .sort((a, b) => b.count - a.count);
+    return articlesByAuthorData || [];
   };
 
-  // Prepare views by author data
   const prepareViewsByAuthorData = () => {
-    const authorMap = new Map<string, number>();
-
-    allArticlesStats.forEach((article) => {
-      const author = article.author_name;
-      const current = authorMap.get(author) || 0;
-      authorMap.set(author, current + article.read_count);
-    });
-
-    return Array.from(authorMap.entries())
-      .map(([author, views]) => ({ author, views }))
-      .sort((a, b) => b.views - a.views);
+    return viewsByAuthorData || [];
   };
 
   const prepareViewsData = () => {
-    if (!author?.articles || author.articles.length === 0) {
-      return [];
-    }
-
-    // Get top 8 articles by views
-    return [...author.articles]
-      .sort((a, b) => b.read_count - a.read_count)
-      .slice(0, 8)
-      .map((article) => ({
-        author: article.title,
-        views: article.read_count,
-      }));
+    return yourTopArticlesData || [];
   };
 
   if (isLoading) {
@@ -1158,6 +1271,11 @@ export default function AuthorAdminDashboard() {
         isLoading={deleteModal.isLoading}
       />
 
+      <RestoreSuccessAlert
+        message={restoreSuccess}
+        isVisible={showRestoreSuccess}
+      />
+
       <main className="px-6 md:px-11 md:py-8 relative z-10">
         {!isAuthenticated && (
           <div className="text-center py-20">
@@ -1170,15 +1288,8 @@ export default function AuthorAdminDashboard() {
             <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
               Please login to access your admin dashboard
             </p>
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Open Login
-            </button>
           </div>
         )}
-
         {isAuthenticated && loading && (
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
@@ -1189,7 +1300,6 @@ export default function AuthorAdminDashboard() {
             </div>
           </div>
         )}
-
         {isAuthenticated && error && !loading && (
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
@@ -1221,7 +1331,6 @@ export default function AuthorAdminDashboard() {
             </div>
           </div>
         )}
-
         {isAuthenticated && author && !loading && !error && (
           <>
             {/* MOBILE OPTIMIZED HEADER SECTION */}
@@ -1379,7 +1488,7 @@ export default function AuthorAdminDashboard() {
                 </div>
               </div>
 
-              {/* BAR CHARTS SECTION - Changed from pie to bar charts */}
+              {/* BAR CHARTS SECTION - Lazy Loaded */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1400,25 +1509,70 @@ export default function AuthorAdminDashboard() {
                   </div>
                 </div>
 
-                {/* Bar Charts Section */}
-                {chartsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
-                      <p className="mt-4 text-gray-600 dark:text-gray-400">
-                        Loading analytics...
-                      </p>
+                {/* Lazy Loading Charts */}
+                {!chartsLoaded ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Placeholder for first chart */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 text-blue-500" />
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Articles Distribution
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Loader className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-2" />
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Loading analytics...
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Placeholder for second chart */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="w-5 h-5 text-emerald-500" />
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                            Your Top Articles
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="h-64 flex items-center justify-center">
+                        <div className="text-center">
+                          <Loader className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-2" />
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Loading top articles...
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : chartsError ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                    </div>
+                    <p className="text-red-600 dark:text-red-400">
+                      {chartsError}
+                    </p>
+                    <button
+                      onClick={loadChartsData}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Retry
+                    </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Chart 1: Articles Distribution (Pie Chart) */}
                     <AuthorStatsPieChart
                       data={prepareArticlesByAuthorData()}
                       title="Articles Distribution"
                     />
-
-                    {/* Chart 2: Your Top Articles (Bar Chart) */}
                     <AuthorViewsBarChart
                       data={prepareViewsData()}
                       title="Your Top Articles"
@@ -1691,6 +1845,178 @@ export default function AuthorAdminDashboard() {
                 </>
               )}
             </motion.section>
+
+            {/* TRASH SECTION - ADDED AT THE END */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
+            >
+              <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
+                  <div>
+                    <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
+                      Trash Bin
+                    </h2>
+                    <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
+                      Articles in trash are automatically deleted after 7 days
+                    </p>
+                  </div>
+                  {trashArticles.length > 0 && (
+                    <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
+                      {trashArticles.length} articles in trash
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {trashLoading ? (
+                <div className="flex items-center justify-center py-12 md:py-20">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-6"></div>
+                    <p className="text-slate-700 dark:text-gray-300 text-lg font-medium">
+                      Loading trash articles...
+                    </p>
+                  </div>
+                </div>
+              ) : trashArticles.length === 0 ? (
+                <div className="text-center py-12 md:py-20">
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-slate-500 to-slate-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+                    <Trash2 className="w-6 h-6 md:w-10 md:h-10 text-white" />
+                  </div>
+                  <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
+                    Trash is Empty
+                  </h3>
+                  <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
+                    Articles you delete will appear here and can be restored
+                    within 7 days
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
+                  {trashArticles.map((article, index) => {
+                    const daysRemaining = article.days_remaining;
+                    const daysInTrash = article.days_in_trash;
+                    const canRestore = article.can_restore;
+
+                    return (
+                      <motion.div
+                        key={article.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+                      >
+                        <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
+                          {/* Article Info */}
+                          <div className="flex-1 min-w-0 w-full">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
+                              <span
+                                className={`inline-flex items-center gap-1.5 font-medium text-xs md:text-sm px-2 py-1 rounded-lg ${
+                                  canRestore
+                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                                }`}
+                              >
+                                {canRestore
+                                  ? `🗑️ ${daysRemaining} days remaining`
+                                  : "⏰ Expired - Cannot restore"}
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                Deleted {daysInTrash} days ago
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                                {article.read_count?.toLocaleString()} views
+                              </span>
+                            </div>
+
+                            <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2">
+                              {article.title}
+                            </h3>
+
+                            {article.excerpt && (
+                              <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                                {stripMarkdown(article.excerpt).slice(0, 120)}
+                                ...
+                              </p>
+                            )}
+
+                            {article.tags && article.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 md:gap-2">
+                                {article.tags.slice(0, 3).map((tag) => (
+                                  <span
+                                    key={tag.id}
+                                    className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
+                                  >
+                                    <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                    {tag.name}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
+                            {canRestore && (
+                              <button
+                                onClick={() =>
+                                  handleRestoreArticle(article.slug)
+                                }
+                                disabled={
+                                  restoringSlug === article.slug || !canRestore
+                                }
+                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {restoringSlug === article.slug ? (
+                                  <>
+                                    <Loader className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
+                                    Restoring...
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg
+                                      className="w-3 h-3 md:w-4 md:h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                                      />
+                                    </svg>
+                                    Restore
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            <button
+                              onClick={() =>
+                                handlePermanentDelete(article.slug)
+                              }
+                              className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                              Delete Permanently
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.section>
+
+            {/* Bottom spacing */}
+            <div className="h-8 md:h-16"></div>
           </>
         )}
       </main>

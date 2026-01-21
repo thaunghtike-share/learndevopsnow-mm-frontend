@@ -62,6 +62,7 @@ const ReactionButton = ({
   onClick,
   isAuthenticated,
   onAuthRequired,
+  reactorNames = [], // Add this prop
 }: {
   type: string;
   count: number;
@@ -70,6 +71,7 @@ const ReactionButton = ({
   onClick: () => void;
   isAuthenticated: boolean;
   onAuthRequired: () => void;
+  reactorNames?: Array<{ name: string; avatar?: string; slug?: string }>; // Add this
 }) => {
   const getReactionColor = (type: string) => {
     switch (type) {
@@ -94,19 +96,66 @@ const ReactionButton = ({
     onClick();
   };
 
+  // Tooltip content with reactor names
+  const getTooltipContent = () => {
+    if (reactorNames.length === 0) {
+      return "Be the first to react!";
+    }
+
+    return (
+      <div className="max-w-xs">
+        <div className="font-medium text-sm mb-2">
+          {reactorNames.length}{" "}
+          {reactorNames.length === 1 ? "person" : "people"} reacted
+        </div>
+        <div className="space-y-1 max-h-40 overflow-y-auto">
+          {reactorNames.map((reactor, index) => (
+            <div key={index} className="flex items-center gap-2">
+              {reactor.avatar ? (
+                <img
+                  src={reactor.avatar}
+                  alt={reactor.name}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">
+                  {reactor.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm truncate">{reactor.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <button
-      onClick={handleClick}
-      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
-        isActive
-          ? `${getReactionColor(type)} font-medium`
-          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-      }`}
-      title={!isAuthenticated ? "Sign in to react" : ""}
-    >
-      <Icon className="w-5 h-5" />
-      <span className="text-xs font-medium">{count}</span>
-    </button>
+    <div className="relative group">
+      <button
+        onClick={handleClick}
+        className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
+          isActive
+            ? `${getReactionColor(type)} font-medium`
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        }`}
+        title={!isAuthenticated ? "Sign in to react" : ""}
+      >
+        <Icon className="w-5 h-5" />
+        <span className="text-xs font-medium">{count}</span>
+      </button>
+
+      {/* Hover tooltip showing reactor names */}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
+          {getTooltipContent()}
+        </div>
+        {/* Tooltip arrow */}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+          <div className="w-3 h-3 bg-white dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-700 transform rotate-45"></div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -128,14 +177,28 @@ export function CommentsReactions({
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [reactorNames, setReactorNames] = useState<{
+    like: Array<{ name: string; avatar?: string; slug?: string }>;
+    love: Array<{ name: string; avatar?: string; slug?: string }>;
+    celebrate: Array<{ name: string; avatar?: string; slug?: string }>;
+    insightful: Array<{ name: string; avatar?: string; slug?: string }>;
+  }>({
+    like: [],
+    love: [],
+    celebrate: [],
+    insightful: [],
+  });
 
   useEffect(() => {
     fetchComments();
     fetchReactions();
   }, [articleSlug]);
 
+  // In your CommentsReactions component, update the fetchReactions function:
   const fetchReactions = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -163,6 +226,11 @@ export function CommentsReactions({
 
         if (data.user_reactions) {
           setUserReactions(data.user_reactions);
+        }
+
+        // Store reactor names
+        if (data.reactor_names) {
+          setReactorNames(data.reactor_names);
         }
       }
     } catch (error) {
@@ -411,6 +479,7 @@ export function CommentsReactions({
     const [localReplyContent, setLocalReplyContent] = useState("");
     const [isReplying, setIsReplying] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const userOwnsComment = isCommentOwner(comment);
     const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -426,6 +495,57 @@ export function CommentsReactions({
     const handleCancelReply = () => {
       setIsReplying(false);
       setLocalReplyContent("");
+    };
+
+    const handleDelete = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setShowAuthModal(true);
+          return;
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/comments/${comment.id}/`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Token ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          fetchComments();
+          toast.success("Comment deleted!");
+        } else if (response.status === 401) {
+          setShowAuthModal(true);
+        } else if (response.status === 403) {
+          toast.error("You can only delete your own comments");
+        } else {
+          toast.error("Failed to delete comment");
+        }
+      } catch (error) {
+        console.error("Failed to delete comment:", error);
+        toast.error("Failed to delete comment");
+      }
+    };
+
+    const confirmDelete = () => {
+      console.log("confirmDelete function called");
+
+      // Simple window.confirm approach that always works
+      const shouldDelete = window.confirm(
+        "Are you sure you want to delete this comment? This action cannot be undone."
+      );
+
+      if (shouldDelete) {
+        console.log("User confirmed deletion, calling handleDelete");
+        handleDelete();
+      } else {
+        console.log("User cancelled deletion");
+      }
     };
 
     const handleSubmitReply = async () => {
@@ -582,6 +702,7 @@ export function CommentsReactions({
             )}
 
             <div className="flex items-center gap-3 flex-wrap">
+              {/* Reply button */}
               {isAuthenticated ? (
                 <button
                   onClick={handleStartReply}
@@ -599,7 +720,7 @@ export function CommentsReactions({
                   Reply
                 </button>
               )}
-
+              {/* Edit button (only for comment owner) */}
               {userOwnsComment && !isEditing && (
                 <button
                   onClick={handleStartEdit}
@@ -609,7 +730,21 @@ export function CommentsReactions({
                   Edit
                 </button>
               )}
-
+              {/* Delete button (only for comment owner) */}
+              {userOwnsComment && (
+                <button
+                  onClick={() => {
+                    console.log("Setting comment to delete:", comment.id);
+                    setCommentToDelete(comment.id);
+                    setShowDeleteModal(true);
+                  }}
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-medium transition-colors flex items-center gap-1 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Delete
+                </button>
+              )}
+              {/* Show replies toggle */}
               {comment.replies && comment.replies.length > 0 && (
                 <button
                   onClick={() => setShowReplies(!showReplies)}
@@ -684,7 +819,7 @@ export function CommentsReactions({
     );
   };
 
-  const displayedComments = showAllComments ? comments : comments.slice(0, 5);
+  const displayedComments = showAllComments ? comments : comments.slice(0, 3);
 
   return (
     <div className="space-y-8">
@@ -702,7 +837,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("like")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.like} // Pass reactor names
           />
+
           <ReactionButton
             type="love"
             count={reactions.love}
@@ -711,7 +848,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("love")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.love}
           />
+
           <ReactionButton
             type="celebrate"
             count={reactions.celebrate}
@@ -720,7 +859,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("celebrate")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.celebrate}
           />
+
           <ReactionButton
             type="insightful"
             count={reactions.insightful}
@@ -729,6 +870,7 @@ export function CommentsReactions({
             onClick={() => handleReaction("insightful")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.insightful}
           />
         </div>
       </div>
@@ -747,7 +889,7 @@ export function CommentsReactions({
               </h3>
             </div>
           </div>
-          {comments.length > 5 && (
+          {comments.length > 3 && (
             <Button
               variant="outline"
               size="sm"
@@ -835,6 +977,100 @@ export function CommentsReactions({
             </>
           )}
         </div>
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Delete Comment
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setCommentToDelete(null);
+                  }}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
+                Are you sure you want to delete this comment?
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
+                This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setCommentToDelete(null);
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (commentToDelete) {
+                      console.log("Deleting comment:", commentToDelete);
+                      try {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                          setShowAuthModal(true);
+                          setShowDeleteModal(false);
+                          return;
+                        }
+
+                        const response = await fetch(
+                          `${API_BASE_URL}/comments/${commentToDelete}/`,
+                          {
+                            method: "DELETE",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Token ${token}`,
+                            },
+                          }
+                        );
+
+                        console.log("Delete response status:", response.status);
+
+                        if (response.ok) {
+                          fetchComments();
+                          toast.success("Comment deleted!");
+                        } else if (response.status === 401) {
+                          setShowAuthModal(true);
+                          toast.error("Please sign in again");
+                        } else if (response.status === 403) {
+                          toast.error("You can only delete your own comments");
+                        } else {
+                          toast.error("Failed to delete comment");
+                        }
+                      } catch (error) {
+                        console.error("Failed to delete comment:", error);
+                        toast.error("Failed to delete comment");
+                      }
+                    }
+
+                    setShowDeleteModal(false);
+                    setCommentToDelete(null);
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Auth Modal */}

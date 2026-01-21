@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Calendar,
   ArrowRight,
@@ -26,17 +26,18 @@ import {
   ThumbsUp,
   Sparkles,
   Lightbulb,
+  Tag as TagIcon,
+  Search,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Category {
   id: number;
   name: string;
   slug: string;
-  post_count?: number;
 }
 
 interface Article {
@@ -46,11 +47,24 @@ interface Article {
   content: string;
   excerpt?: string;
   published_at: string;
-  category: number | null;
-  tags: number[];
-  author: number;
-  read_count?: number;
+  read_count: number;
   cover_image?: string;
+  category: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  author: {
+    id: number;
+    slug: string;
+    name: string;
+    avatar?: string;
+  } | null;
+  tags: {
+    id: number;
+    name: string;
+    slug: string;
+  }[];
   comment_count?: number;
   reactions_summary?: {
     like?: number;
@@ -60,40 +74,115 @@ interface Article {
   };
 }
 
-interface Author {
-  id: number;
-  slug: string;
-  name: string;
-  avatar?: string;
-}
-
-interface Tag {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-interface Props {
-  slug: string;
+interface ApiResponse {
+  category: Category;
+  articles: Article[];
+  stats: {
+    total_articles: number;
+    total_views: number;
+    total_comments: number;
+    total_reactions: number;
+    total_authors: number;
+    avg_read_time: number;
+  };
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 8;
 
-export default function CategoryPageClient({ slug }: Props) {
+export default function CategoryPageClient({ slug }: { slug: string }) {
   const [category, setCategory] = useState<Category | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [authors, setAuthors] = useState<Author[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [stats, setStats] = useState({
+    total_articles: 0,
+    total_views: 0,
+    total_comments: 0,
+    total_reactions: 0,
+    total_authors: 0,
+    avg_read_time: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
   const router = useRouter();
-  const topRef = useRef<HTMLHeadingElement>(null);
-  const isFirstRender = useRef(true);
 
-  // Calculate read time function
+  useEffect(() => {
+    async function fetchCategory() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Use the optimized endpoint - single API call
+        const res = await fetch(`${API_BASE_URL}/categories/${slug}/public/`);
+
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error("Category not found");
+          }
+          throw new Error("Failed to load category");
+        }
+
+        const data: ApiResponse = await res.json();
+
+        console.log("API Response:", data); // Debug log
+
+        // Set category data
+        setCategory(data.category);
+
+        // Set articles - sort by published date
+        const sortedArticles = [...(data.articles || [])].sort(
+          (a, b) =>
+            new Date(b.published_at).getTime() -
+            new Date(a.published_at).getTime()
+        );
+        setArticles(sortedArticles);
+
+        // Set stats
+        setStats(
+          data.stats || {
+            total_articles: sortedArticles.length,
+            total_views: sortedArticles.reduce(
+              (sum, a) => sum + (a.read_count || 0),
+              0
+            ),
+            total_comments: sortedArticles.reduce(
+              (sum, a) => sum + (a.comment_count || 0),
+              0
+            ),
+            total_reactions: sortedArticles.reduce((sum, a) => {
+              const reactions = a.reactions_summary || {};
+              return (
+                sum +
+                (reactions.like || 0) +
+                (reactions.love || 0) +
+                (reactions.celebrate || 0) +
+                (reactions.insightful || 0)
+              );
+            }, 0),
+            total_authors: new Set(
+              sortedArticles.map((a) => a.author?.id).filter(Boolean)
+            ).size,
+            avg_read_time: Math.round(
+              sortedArticles.reduce((sum, a) => {
+                const words = a.content ? a.content.split(/\s+/).length : 0;
+                return sum + Math.max(1, Math.ceil(words / 200));
+              }, 0) / (sortedArticles.length || 1)
+            ),
+          }
+        );
+      } catch (err) {
+        console.error("Error fetching category:", err);
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (slug) fetchCategory();
+  }, [slug]);
+
+  // Helper functions
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
     const wordsPerMinute = 200;
@@ -101,7 +190,6 @@ export default function CategoryPageClient({ slug }: Props) {
     return Math.max(1, Math.ceil(words / wordsPerMinute));
   };
 
-  // Get category icon based on category name
   const getCategoryIcon = (categoryName: string) => {
     const name = categoryName.toLowerCase();
 
@@ -124,7 +212,6 @@ export default function CategoryPageClient({ slug }: Props) {
     }
   };
 
-  // Get category gradient colors
   const getCategoryGradient = (categoryName: string) => {
     const name = categoryName.toLowerCase();
 
@@ -147,160 +234,30 @@ export default function CategoryPageClient({ slug }: Props) {
     }
   };
 
-  // Fetch data on slug change
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
+  const stripMarkdown = (md?: string) => {
+    if (!md) return "";
+    let text = md;
+    text = text.replace(/^#{1,6}\s+/gm, "");
+    text = text.replace(/```[\s\S]*?```/g, "");
+    text = text.replace(/`([^`]*)`/g, "$1");
+    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, "");
+    text = text.replace(/!\[.*?\]\(.*?\)/g, "");
+    text = text.replace(/\[(.*?)\]\\$\$.*?\\$\$/g, "$1");
+    text = text.replace(/\[(.*?)\]\(.*?\)/g, "$1");
+    text = text.replace(/[*_~>/\\-]/g, "");
+    text = text.replace(/^\s*[-*+]\s+/gm, "");
+    text = text.replace(/^\s*\d+\.\s+/gm, "");
+    text = text.replace(/<[^>]+>/g, "");
+    text = text.replace(/^>\s+/gm, "");
+    text = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+    return text;
+  };
 
-        // Fetch category
-        const categoryRes = await fetch(`${API_BASE_URL}/categories/${slug}/`);
-        if (!categoryRes.ok)
-          throw new Error(
-            `Error ${categoryRes.status}: ${categoryRes.statusText}`
-          );
-        const categoryData = await categoryRes.json();
-        setCategory(categoryData);
-
-        // Fetch articles by category slug
-        const articlesRes = await fetch(
-          `${API_BASE_URL}/articles/?category__slug=${slug}`
-        );
-        const articlesData = await articlesRes.json();
-        const articlesList = Array.isArray(articlesData)
-          ? articlesData
-          : articlesData.results || [];
-
-        // 🔥 ENHANCED: Fetch comment counts AND reactions for each article
-        const articlesWithEngagement = await Promise.all(
-          articlesList.map(async (article: Article) => {
-            try {
-              // Fetch comments
-              const commentsRes = await fetch(
-                `${API_BASE_URL}/articles/${article.slug}/comments/`
-              );
-
-              // 🔥 NEW: Fetch reactions
-              const reactionsRes = await fetch(
-                `${API_BASE_URL}/articles/${article.slug}/reactions/`
-              );
-
-              let comment_count = 0;
-              let reactions_summary = {
-                like: 0,
-                love: 0,
-                celebrate: 0,
-                insightful: 0,
-              };
-
-              if (commentsRes.ok) {
-                const commentsData = await commentsRes.json();
-                // Count all comments (including replies)
-                comment_count = commentsData.reduce(
-                  (total: number, comment: any) => {
-                    return total + 1 + (comment.replies?.length || 0);
-                  },
-                  0
-                );
-              }
-
-              if (reactionsRes.ok) {
-                const reactionsData = await reactionsRes.json();
-                reactions_summary = {
-                  like: reactionsData.summary?.like || 0,
-                  love: reactionsData.summary?.love || 0,
-                  celebrate: reactionsData.summary?.celebrate || 0,
-                  insightful: reactionsData.summary?.insightful || 0,
-                };
-              }
-
-              return {
-                ...article,
-                comment_count,
-                reactions_summary,
-                read_time: calculateReadTime(article.content),
-              };
-            } catch (error) {
-              console.error(
-                `Failed to fetch engagement for article ${article.slug}:`,
-                error
-              );
-            }
-
-            // Fallback if fetch fails
-            return {
-              ...article,
-              comment_count: 0,
-              reactions_summary: {
-                like: 0,
-                love: 0,
-                celebrate: 0,
-                insightful: 0,
-              },
-              read_time: calculateReadTime(article.content),
-            };
-          })
-        );
-
-        setArticles(articlesWithEngagement);
-
-        // Fetch authors
-        const authorsRes = await fetch(`${API_BASE_URL}/authors/`);
-        const authorsData = await authorsRes.json();
-        const authorsList = Array.isArray(authorsData)
-          ? authorsData
-          : authorsData.results || [];
-        setAuthors(authorsList);
-
-        // Fetch tags
-        const tagsRes = await fetch(`${API_BASE_URL}/tags/`);
-        const tagsData = await tagsRes.json();
-        setTags(Array.isArray(tagsData) ? tagsData : tagsData.results || []);
-
-        setLoading(false);
-        setCurrentPage(1);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch data");
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [slug]);
-
-  // Scroll to top on page change (not on first render)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-    } else {
-      topRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [currentPage]);
-
-  // Helpers
-  const getAuthor = (id: number) => authors.find((a) => a.id === id);
-  const getTagById = (id: number) => tags.find((t) => t.id === id);
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  const stripMarkdown = (md: string) =>
-    md
-      .replace(/<[^>]+>/g, "")
-      .replace(/[#_*>[\]~`-]/g, "")
-      .trim();
-  const truncate = (str: string, max = 150) =>
-    str.length <= max ? str : str.slice(0, max) + "...";
-
-  // Get cover image URL
   const getCoverImage = (article: Article) => {
     if (article.cover_image && article.cover_image.trim() !== "") {
       return article.cover_image;
     }
 
-    // Fallback based on category
     const categoryName = category?.name?.toLowerCase() || "";
     if (categoryName.includes("kubernetes")) {
       return "/kubernetes.webp";
@@ -320,103 +277,52 @@ export default function CategoryPageClient({ slug }: Props) {
     } else if (categoryName.includes("devsecops")) {
       return "/security.webp";
     }
-
     return "/devops.webp";
   };
 
-  // Check if article has a real cover image
-  const hasRealCoverImage = (article: Article) => {
-    return !!(article.cover_image && article.cover_image.trim() !== "");
+  const getCleanExcerpt = (article: Article) => {
+    if (article.excerpt?.trim()) {
+      return stripMarkdown(article.excerpt);
+    }
+
+    if (article.content) {
+      const cleanContent = stripMarkdown(article.content);
+      return cleanContent.length > 150
+        ? cleanContent.slice(0, 150) + "..."
+        : cleanContent;
+    }
+
+    return "Read the full article to learn more...";
   };
 
-  // Calculate stats
-  const totalArticles = articles.length;
-  const totalViews = articles.reduce(
-    (sum, article) => sum + (article.read_count || 0),
-    0
-  );
-  const avgViews =
-    totalArticles > 0 ? Math.round(totalViews / totalArticles) : 0;
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-  // Calculate total comments
-  const totalComments = articles.reduce(
-    (sum, article) => sum + (article.comment_count || 0),
-    0
-  );
-
-  // 🔥 NEW: Calculate total reactions
-  const totalReactions = articles.reduce((sum, article) => {
-    const reactions = article.reactions_summary || {};
-    return (
-      sum +
-      (reactions.like || 0) +
-      (reactions.love || 0) +
-      (reactions.celebrate || 0) +
-      (reactions.insightful || 0)
-    );
-  }, 0);
-
-  // Get unique authors in this category
-  const uniqueAuthors = new Set(articles.map((article) => article.author));
-  const totalAuthors = uniqueAuthors.size;
-
-  // Calculate total read time
-  const totalReadTime = articles.reduce(
-    (sum, article) => sum + calculateReadTime(article.content),
-    0
-  );
-  const avgReadTime =
-    totalArticles > 0 ? Math.round(totalReadTime / totalArticles) : 0;
-
-  // Pagination logic
-  const totalPages = Math.ceil(totalArticles / pageSize);
+  // Pagination
+  const totalPages = Math.ceil(stats.total_articles / pageSize);
   const paginatedArticles = articles.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
-        <MinimalHeader />
-        <main className="px-6 md:px-11 py-20">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Shield className="w-12 h-12 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-              Category Not Found
-            </h1>
-            <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
-              {error}
-            </p>
-            <Link
-              href="/categories"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Browse All Categories
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-        </main>
-        <MinimalFooter />
-      </div>
-    );
-  }
+  const CategoryIcon = category ? getCategoryIcon(category.name) : Wrench;
+  const categoryGradient = category
+    ? getCategoryGradient(category.name)
+    : "from-slate-500 to-slate-600";
 
-  // Loading state
+  // Loading state (same as your author page)
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
-          {/* Simple Elegant Loading */}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            {/* Animated Logo Container */}
             <div className="relative">
-              {/* Outer Ring Animation */}
               <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
-                {/* Logo Container */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 border-t-blue-500 dark:border-t-blue-400 animate-spin">
                     <img
@@ -438,132 +344,138 @@ export default function CategoryPageClient({ slug }: Props) {
     );
   }
 
-  const CategoryIcon = category ? getCategoryIcon(category.name) : Wrench;
-  const categoryGradient = category
-    ? getCategoryGradient(category.name)
-    : "from-slate-500 to-slate-600";
+  // Error state
+  if (error || !category) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
+        <MinimalHeader />
+        <main className="max-w-6xl mx-auto px-4 py-20">
+          <div className="text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+              <Star className="w-12 h-12 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
+              Category Not Found
+            </h1>
+            <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
+              {error || "The category could not be loaded."}
+            </p>
+            <Link
+              href="/articles"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              Browse All Articles
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </main>
+        <MinimalFooter />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-8 relative z-10">
-        {/* Category Header - Premium Design */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full mb-12 md:mb-16"
-        >
-          {/* Simple Header */}
-          <div className="mb-8 md:mb-12">
-            <div className="flex items-center gap-4 mb-4 md:mb-6">
-              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+        {/* Category Header - Same design as author page */}
+        <section className="w-full mb-8 md:mb-10">
+          <div className="mb-12 md:mb-16">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-px w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
               <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                 Category
               </span>
             </div>
             <h1 className="text-3xl md:text-7xl font-light text-black dark:text-white md:mb-6 tracking-tight">
-              {category?.name}
+              Articles in the {category.name} Category
             </h1>
           </div>
 
-          {/* Category Profile */}
-          <div className="flex flex-col lg:flex-row items-start gap-8 md:gap-12 md:mb-10">
-            {/* Icon Section */}
+          <div className="flex flex-col lg:flex-row items-start gap-8 md:gap-12 md:mb-16">
             <div className="flex-shrink-0">
               <div className="relative">
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
                   <div className="w-full h-full rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <CategoryIcon className="w-8 h-8 md:w-12 md:h-12 text-white" />
+                    <CategoryIcon className="w-12 h-12 md:w-14 md:h-14 text-white" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Content Section */}
             <div className="flex-1">
-              {/* Description */}
               <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed mb-6 md:mb-8 max-w-2xl">
-                Explore all articles in the {category?.name} category. Stay
+                Explore all articles in the {category.name} category. Stay
                 updated with the latest insights, tutorials, and best practices.
               </p>
 
-              {/* Simple Badges */}
               <div className="flex flex-wrap gap-2 md:gap-3">
-                <span className="px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs md:text-sm font-medium rounded-full shadow-sm">
-                  {totalArticles} Related Articles
+                <span
+                  className={`px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${categoryGradient} text-white text-xs md:text-sm font-medium rounded-full shadow-sm`}
+                >
+                  {stats.total_articles} Related Articles
                 </span>
                 <span className="px-3 py-1.5 md:px-4 md:py-2 bg-black dark:bg-gray-700 text-white dark:text-gray-300 text-xs md:text-sm font-medium rounded-full shadow-sm">
-                  {totalAuthors} Related Authors
+                  {stats.total_authors} Related Authors
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Stats - Premium Design */}
-          {/* 🔥 UPDATED: Added comments AND reactions stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 md:gap-8 max-w-6xl mx-auto text-center py-8 md:py-12">
+          {/* Stats Grid - Matches author detail page spacing */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
             <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-4xl font-light text-black dark:text-white">
-                {totalArticles}
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {stats.total_articles}
               </div>
               <div className="text-xs md:text-sm text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">
                 Articles
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-4xl font-light text-black dark:text-white">
-                {totalViews.toLocaleString()}
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {stats.total_views.toLocaleString()}
               </div>
               <div className="text-xs md:text-sm text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">
                 Total Views
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-4xl font-light text-black dark:text-white">
-                {avgReadTime}m
-              </div>
-              <div className="text-xs md:text-sm text-orange-600 dark:text-orange-400 font-semibold uppercase tracking-wider">
-                Avg Read Time
-              </div>
-            </div>
-            {/* Comments Stat */}
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-4xl font-light text-black dark:text-white">
-                {totalComments}
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {stats.total_comments}
               </div>
               <div className="text-xs md:text-sm text-pink-600 dark:text-pink-400 font-semibold uppercase tracking-wider">
                 Total Comments
               </div>
             </div>
-            {/* 🔥 NEW: Reactions Stat */}
             <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-4xl font-light text-black dark:text-white">
-                {totalReactions}
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {stats.total_reactions}
               </div>
               <div className="text-xs md:text-sm text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider">
                 Total Reactions
               </div>
             </div>
           </div>
-        </motion.section>
+        </section>
 
-        {/* Articles Section - Premium Design */}
+        {/* Articles Section - Same design as author page */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700/60 shadow-2xl overflow-hidden mb-10"
+          className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
         >
-          <div className="px-4 py-4 md:px-8 md:py-6 border-b border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+          <div className="px-4 py-4 md:px-8 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
               <div>
                 <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
                   Latest Articles
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {totalArticles} articles • {totalViews.toLocaleString()} reads
+                  {stats.total_articles} articles •{" "}
+                  {stats.total_views.toLocaleString()} reads
                 </p>
               </div>
               <div className="flex items-center gap-2 md:gap-3">
@@ -583,21 +495,15 @@ export default function CategoryPageClient({ slug }: Props) {
                 No Articles Yet
               </h3>
               <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                Stay tuned! We're preparing amazing {category?.name} content for
+                Stay tuned! We're preparing amazing {category.name} content for
                 you.
               </p>
             </div>
           ) : (
             <>
-              <div className="divide-y divide-slate-200/50 dark:divide-gray-700/50">
+              <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
                 {paginatedArticles.map((article, index) => {
-                  // Use excerpt if available, otherwise strip markdown from content and truncate
-                  const previewText =
-                    article.excerpt?.trim() ||
-                    truncate(stripMarkdown(article.content || ""), 150) ||
-                    "Discover insights and best practices in this comprehensive article...";
-
-                  const author = getAuthor(article.author);
+                  const previewText = getCleanExcerpt(article);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};
@@ -611,46 +517,26 @@ export default function CategoryPageClient({ slug }: Props) {
                       className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                        {/* Article Cover - Mobile Optimized */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600/50 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        {/* Cover Image with Category Badge */}
+                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={article.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            onError={(e) => {
-                              console.log(
-                                `Image failed to load: ${coverImage}`
-                              );
-                              // Fallback to category-based image
-                              const categoryName =
-                                category?.name?.toLowerCase() || "";
-                              let fallbackImage = "/devops.webp";
-                              if (categoryName.includes("kubernetes"))
-                                fallbackImage = "/kubernetes.webp";
-                              if (
-                                categoryName.includes("cicd") ||
-                                categoryName.includes("ci/cd")
-                              )
-                                fallbackImage = "/cicd.webp";
-                              if (categoryName.includes("python"))
-                                fallbackImage = "/python.webp";
-                              if (categoryName.includes("terraform"))
-                                fallbackImage = "/terraform.webp";
-                              if (categoryName.includes("cloud"))
-                                fallbackImage = "/cloud.webp";
-                              if (categoryName.includes("devops"))
-                                fallbackImage = "/devops.webp";
-                              if (categoryName.includes("devsecops"))
-                                fallbackImage = "/security.webp";
-                              (e.target as HTMLImageElement).src =
-                                fallbackImage;
-                            }}
                           />
+                          <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                            {article.category && (
+                              <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                                <Folder className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                                {article.category.name}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Article Info - Mobile Optimized */}
+                        {/* Article Info */}
                         <div className="flex-1 min-w-0 w-full">
-                          {/* Article Metadata - Stacked on Mobile */}
+                          {/* Metadata */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -661,11 +547,9 @@ export default function CategoryPageClient({ slug }: Props) {
                               {readTime} min read
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-sky-600 dark:text-sky-400" />
-                              {article.read_count?.toLocaleString() || "0"}{" "}
-                              views
+                              <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600 dark:text-sky-400" />
+                              {article.read_count?.toLocaleString()} views
                             </span>
-                            {/* Comment count for each article */}
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
                               {article.comment_count || 0}
@@ -679,7 +563,31 @@ export default function CategoryPageClient({ slug }: Props) {
                             </Link>
                           </h3>
 
-                          {/* 🔥 NEW: Reactions for each article - Mobile Optimized */}
+                          {/* Author */}
+                          {article.author && (
+                            <div className="flex items-center gap-2 mb-2 md:mb-3">
+                              <div className="flex items-center gap-2 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 p-0.5">
+                                  <img
+                                    src={
+                                      article.author.avatar ||
+                                      "/placeholder.svg"
+                                    }
+                                    alt={article.author.name}
+                                    className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
+                                  />
+                                </div>
+                                <Link
+                                  href={`/authors/${article.author.slug}`}
+                                  className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                                >
+                                  {article.author.name}
+                                </Link>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Reactions */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
                             {(reactions.like ?? 0) > 0 && (
                               <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
@@ -707,57 +615,33 @@ export default function CategoryPageClient({ slug }: Props) {
                             )}
                           </div>
 
-                          {/* Article Excerpt/Content Preview */}
-                          <div className="mb-3 md:mb-4">
-                            <p className="text-slate-600 dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
-                              {previewText}
-                            </p>
+                          {/* Excerpt */}
+                          <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                            {previewText}
+                          </p>
 
-                            {/* Show content length indicator */}
-                            {article.content && (
-                              <div className="mt-2 flex items-center gap-2 text-xs md:text-sm text-slate-500 dark:text-gray-500">
-                                <BookOpen className="w-3 h-3 md:w-4 md:h-4" />
-                                <span>
-                                  {article.content
-                                    .split(/\s+/)
-                                    .length.toLocaleString()}{" "}
-                                  words
-                                  {article.content.length > 5000 &&
-                                    " • Comprehensive guide"}
-                                  {article.content.length > 10000 &&
-                                    " • In-depth tutorial"}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Author Info */}
-                          {author && (
-                            <div className="flex items-center gap-3 mb-3 md:mb-4">
-                              <div className="flex items-center gap-2 text-slate-700 dark:text-gray-300 font-medium">
-                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 p-0.5">
-                                  <img
-                                    src={author.avatar || "/placeholder.svg"}
-                                    alt={author.name}
-                                    className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src =
-                                        "/placeholder.svg";
-                                    }}
-                                  />
-                                </div>
-                                <Link
-                                  href={`/authors/${author.slug}`}
-                                  className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors text-xs md:text-sm"
+                          {/* Tags */}
+                          {article.tags && article.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                              {article.tags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag.id}
+                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
                                 >
-                                  {author.name}
-                                </Link>
-                              </div>
+                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                  {tag.name}
+                                </span>
+                              ))}
+                              {article.tags.length > 3 && (
+                                <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                  +{article.tags.length - 3} more
+                                </span>
+                              )}
                             </div>
                           )}
                         </div>
 
-                        {/* Read More Button - Mobile Optimized */}
+                        {/* Read More Button */}
                         <div className="flex items-center w-full md:w-auto justify-end md:justify-start">
                           <Link
                             href={`/articles/${article.slug}`}
@@ -773,16 +657,15 @@ export default function CategoryPageClient({ slug }: Props) {
                 })}
               </div>
 
-              {/* Pagination Controls - Mobile Optimized */}
+              {/* Pagination - Same as author page */}
               {totalPages > 1 && (
-                <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                      Showing {paginatedArticles.length} of {totalArticles}{" "}
-                      articles
+                      Showing {paginatedArticles.length} of{" "}
+                      {stats.total_articles} articles
                     </div>
 
-                    {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
                         onClick={() =>
@@ -795,21 +678,18 @@ export default function CategoryPageClient({ slug }: Props) {
                         <span className="hidden xs:inline">Previous</span>
                       </button>
 
-                      {/* Page Numbers - Hidden on very small screens */}
+                      {/* Page Numbers */}
                       <div className="hidden xs:flex items-center gap-1">
                         {Array.from(
                           { length: Math.min(3, totalPages) },
                           (_, i) => {
                             let pageNum;
-                            if (totalPages <= 3) {
-                              pageNum = i + 1;
-                            } else if (currentPage <= 2) {
-                              pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 1) {
+                            if (totalPages <= 3) pageNum = i + 1;
+                            else if (currentPage <= 2) pageNum = i + 1;
+                            else if (currentPage >= totalPages - 1)
                               pageNum = totalPages - 2 + i;
-                            } else {
-                              pageNum = currentPage - 1 + i;
-                            }
+                            else pageNum = currentPage - 1 + i;
+
                             return (
                               <button
                                 key={pageNum}
@@ -841,7 +721,6 @@ export default function CategoryPageClient({ slug }: Props) {
                       </button>
                     </div>
 
-                    {/* Mobile Page Indicator - Only show on very small screens */}
                     <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
                       Page {currentPage} of {totalPages}
                     </div>

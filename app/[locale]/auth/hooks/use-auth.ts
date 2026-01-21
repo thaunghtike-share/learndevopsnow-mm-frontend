@@ -12,6 +12,19 @@ interface User {
   is_super_user?: boolean;
 }
 
+export const useAuthCheck = () => {
+  const [isChecking, setIsChecking] = useState(true);
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setHasToken(!!token);
+    setIsChecking(false);
+  }, []);
+
+  return { isChecking, hasToken };
+};
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

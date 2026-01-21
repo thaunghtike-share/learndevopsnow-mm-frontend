@@ -10,17 +10,32 @@ import {
   Database,
   Eye,
   Mail,
-  FileText,
   CheckCircle,
-  XCircle,
   Server,
   Key,
   Users,
   BookOpen,
+  ShieldCheck,
+  Globe,
+  MessageSquare,
+  Sparkles,
+  Zap,
+  Cpu,
+  Cloud,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function PrivacyPolicy() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const privacyPrinciples = [
     {
       icon: Shield,
@@ -78,86 +93,102 @@ export default function PrivacyPolicy() {
       description: "Passwords hashed with bcrypt",
     },
     {
-      icon: Shield,
+      icon: ShieldCheck,
       title: "No Third Parties",
       description: "Your data stays with us",
     },
     {
-      icon: Lock,
+      icon: Globe,
       title: "Regular Updates",
       description: "Security patches applied automatically",
     },
   ];
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white/95 dark:bg-[#000000] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white/95 dark:bg-[#000000] relative transition-colors duration-300">
+      {/* Messenger Button */}
+      <a
+        href="https://m.me/learndevopsnowbytho"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Messenger Support"
+        className="hidden md:flex fixed top-[70%] right-4 z-50 group"
+      >
+        <div className="flex items-center gap-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-lg rounded-full px-4 py-3 cursor-pointer transition-all duration-400 hover:scale-105 hover:shadow-xl">
+          <div className="relative w-8 h-8">
+            <div className="absolute inset-0 bg-purple-500 rounded-full animate-ping opacity-20"></div>
+            <div className="relative w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-white" />
+            </div>
+          </div>
+          <span className="text-sm font-medium text-black dark:text-white">
+            Chat Now
+          </span>
+        </div>
+      </a>
+
       <MinimalHeader />
 
-      <main className="px-6 md:px-11 md:py-8">
-        {/* Hero Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative mb-16 md:mb-20"
-        >
-          {/* Background Elements */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute top-0 left-0 w-48 h-48 md:w-72 md:h-72 bg-sky-100 dark:bg-sky-900/20 rounded-full blur-3xl opacity-30"></div>
-            <div className="absolute bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-blue-100 dark:bg-blue-900/20 rounded-full blur-3xl opacity-20"></div>
-          </div>
-
-          <div className="max-w-4xl">
-            {/* Header */}
-            <div className="max-w-3xl mb-12 md:mb-16">
-              {/* Blue/Purple gradient line with "Our Mission" style */}
-              <div className="flex items-center gap-4 mb-4 md:mb-6">
-                <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-                <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                  Our Privacy
-                </span>
-              </div>
-              <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight">
-                Privacy & Data Protection
-              </h1>
-              <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                We believe in keeping things simple. No tracking, no cookies, no
-                newsletters - just a clean DevOps learning community built on
-                trust and transparency.
-              </p>
-            </div>
-
-            {/* Last Updated */}
-            <div className="inline-flex items-center gap-3 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 shadow-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-slate-700 dark:text-gray-300 font-medium text-sm md:text-base">
-                Last updated:{" "}
-                {new Date().toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+      <main className="px-4 md:px-11 md:py-8">
+        {/* Hero Section - Matching About Page */}
+        <section className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl"
+          >
+            {/* Blue/Purple gradient line with "Our Mission" style */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Our Privacy Commitment
               </span>
             </div>
-          </div>
-        </motion.section>
 
-        {/* Privacy Principles */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-16 md:mb-20"
-        >
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3 md:mb-4">
+            <h1 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              Privacy & Data Protection
+            </h1>
+
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-8 md:mb-12 leading-relaxed max-w-3xl text-left">
+              We believe in keeping things simple. No tracking, no cookies, no
+              newsletters — just a clean DevOps learning community built on
+              trust and transparency.
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Privacy Principles - Matching Services Page Grid */}
+        <section className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mb-8"
+          >
+            {/* Blue/Purple gradient line */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Core Principles
+              </span>
+            </div>
+
+            <h2 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
               Our Privacy Principles
             </h2>
-            <p className="text-base md:text-lg text-slate-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
               Four simple principles that guide how we handle your data
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {privacyPrinciples.map((principle, index) => (
               <motion.div
                 key={index}
@@ -166,166 +197,208 @@ export default function PrivacyPolicy() {
                 transition={{ delay: index * 0.1 }}
                 className="group"
               >
-                <div className="bg-gradient-to-br from-white to-slate-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-gray-700 p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 h-full">
-                  <div
-                    className={`w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br ${principle.gradient} rounded-xl md:rounded-2xl flex items-center justify-center mb-4 md:mb-6 shadow-lg group-hover:scale-105 md:group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <principle.icon className="w-6 h-6 md:w-7 md:h-7 text-white" />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-2 md:mb-3">
-                    {principle.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
-                    {principle.description}
-                  </p>
-                </div>
+                <Card className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white dark:bg-gray-800">
+                  <CardContent className="p-6">
+                    <div
+                      className={`w-12 h-12 bg-gradient-to-r ${principle.gradient} rounded-xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <principle.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="font-bold text-black dark:text-white mb-2 text-lg">
+                      {principle.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {principle.description}
+                    </p>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
-        {/* Data Collection */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-16 md:mb-20"
-        >
-          <div className="bg-gradient-to-br from-slate-900 to-blue-900 dark:from-slate-800 dark:to-blue-800 rounded-2xl md:rounded-3xl p-6 md:p-12 text-white relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0 bg-gradient-to-br from-white to-transparent"></div>
+        {/* Data Collection - Matching About Page Layout */}
+        <section className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mb-8"
+          >
+            {/* Blue/Purple gradient line */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Data Collection
+              </span>
             </div>
 
-            <div className="relative z-10">
-              <div className="max-w-4xl">
-                <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
-                  What We Collect
-                </h2>
-                <p className="text-blue-100 dark:text-blue-200 text-base md:text-lg mb-8 md:mb-12 max-w-2xl">
-                  Only the bare minimum needed for author accounts. Regular
-                  readers can access all content completely anonymously.
-                </p>
+            <h2 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              What We Collect
+            </h2>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              Only the bare minimum needed for author accounts. Regular readers
+              can access all content completely anonymously.
+            </p>
+          </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-                  {dataCollection.map((section, index) => (
-                    <div
-                      key={index}
-                      className="bg-white/10 dark:bg-white/5 backdrop-blur-sm rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/20"
-                    >
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-lg md:rounded-xl flex items-center justify-center mb-3 md:mb-4">
-                        <section.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                      </div>
-                      <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">
-                        {section.title}
-                      </h3>
-                      <ul className="space-y-1 md:space-y-2">
-                        {section.items.map((item, itemIndex) => (
-                          <li
-                            key={itemIndex}
-                            className="flex items-center gap-2 md:gap-3 text-blue-100 dark:text-blue-200 text-sm md:text-base"
-                          >
-                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full flex-shrink-0"></div>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {dataCollection.map((section, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="group"
+              >
+                <Card className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800 overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white mb-4">
+                      <section.icon className="h-6 w-6" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                    <h3 className="font-bold text-black dark:text-white mb-3 text-lg">
+                      {section.title}
+                    </h3>
+                    <ul className="space-y-3">
+                      {section.items.map((item, itemIndex) => (
+                        <li
+                          key={itemIndex}
+                          className="flex items-center text-sm text-gray-600 dark:text-gray-300"
+                        >
+                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1 mr-3 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
-        </motion.section>
+        </section>
 
-        {/* Security & Infrastructure */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-16 md:mb-20"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+        {/* Security & Infrastructure - Improved Design */}
+        <section className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mb-8"
+          >
+            {/* Blue/Purple gradient line */}
+            <div className="flex items-center gap-4 mb-4 md:mb-6">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Enterprise Security
+              </span>
+            </div>
+
+            <h2 className="text-2xl md:text-6xl text-black dark:text-white mb-4 tracking-tight text-left">
+              Security & Infrastructure
+            </h2>
+            <p className="text-lg md:text-xl text-black dark:text-gray-300 mb-4 text-left">
+              We use the same infrastructure trusted by Fortune 500 companies,
+              ensuring your data is protected with industry-leading security
+              practices.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column - Features */}
             <div>
-              <h2 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 md:mb-6">
-                Enterprise-Grade Security
-              </h2>
-              <p className="text-base md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 leading-relaxed">
-                We use the same infrastructure trusted by Fortune 500 companies,
-                ensuring your data is protected with industry-leading security
-                practices.
-              </p>
-
-              <div className="space-y-3 md:space-y-4">
+              <div className="space-y-6">
                 {securityFeatures.map((feature, index) => (
-                  <div
+                  <motion.div
                     key={index}
-                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl bg-slate-50 dark:bg-gray-800 border border-slate-200 dark:border-gray-700"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-gray-700 rounded-lg md:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-                      <feature.icon className="w-5 h-5 md:w-6 md:h-6 text-sky-600 dark:text-sky-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-slate-900 dark:text-white text-sm md:text-base">
-                        {feature.title}
-                      </h3>
-                      <p className="text-slate-600 dark:text-gray-400 text-xs md:text-sm">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </div>
+                    <Card className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800 overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                            <feature.icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-black dark:text-white mb-2 text-lg">
+                              {feature.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                              {feature.description}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-gray-700">
-              <div className="text-center">
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg">
-                  <Server className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-3 md:mb-4">
-                  Azure AKS Infrastructure
-                </h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-4 md:mb-6 text-sm md:text-base">
-                  Built on Microsoft Azure Kubernetes Service with automated
-                  security updates and enterprise-grade reliability.
-                </p>
-                <div className="inline-flex items-center gap-2 bg-white dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded-full px-3 md:px-4 py-1 md:py-2 text-slate-700 dark:text-gray-300 text-xs md:text-sm font-medium">
-                  <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
-                  SOC 2 Compliant Infrastructure
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.section>
+            {/* Right Column - Improved Infrastructure Card */}
+            <div>
+              <Card className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 h-full">
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white mx-auto mb-6">
+                      <Server className="h-8 w-8" />
+                    </div>
 
-        {/* Final CTA */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-center"
-        >
-          <div className="bg-gradient-to-br from-sky-500 to-blue-600 dark:from-sky-600 dark:to-blue-700 rounded-2xl md:rounded-3xl p-6 md:p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative z-10">
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6">
-                Questions About Your Data?
-              </h2>
-              <p className="text-blue-100 dark:text-blue-200 text-base md:text-lg mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed">
-                We're developers building for developers. We believe in complete
-                transparency and are always happy to answer questions about how
-                we handle your data.
-              </p>
-              <div className="inline-flex items-center gap-2 md:gap-3 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3 border border-white/30">
-                <Eye className="w-4 h-4 md:w-5 md:h-5" />
-                <span className="font-semibold text-sm md:text-base">
-                  100% Transparent
-                </span>
-              </div>
+                    <h3 className="font-bold text-black dark:text-white text-xl mb-4">
+                      Azure AKS Infrastructure
+                    </h3>
+
+                    <div className="space-y-4 mb-6 text-left">
+                      <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                        Built on Microsoft Azure Kubernetes Service with
+                        automated security updates, zero-trust architecture, and
+                        enterprise-grade reliability. Our infrastructure
+                        includes:
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-xs text-gray-600 dark:text-gray-300">
+                            Auto Security Updates
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-xs text-gray-600 dark:text-gray-300">
+                            Zero Trust Network
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-xs text-gray-600 dark:text-gray-300">
+                            99.9% Uptime SLA
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-xs text-gray-600 dark:text-gray-300">
+                            Daily Backups
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Badge className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-0 px-4 py-2 text-sm">
+                        <ShieldCheck className="w-4 h-4 mr-2" />
+                        SOC 2 Compliant
+                      </Badge>
+                      <Badge className="bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-0 px-4 py-2 text-sm">
+                        <Cloud className="w-4 h-4 mr-2" />
+                        Azure Certified
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </motion.section>
+        </section>
       </main>
 
       <MinimalFooter />
