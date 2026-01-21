@@ -380,7 +380,7 @@ export default function AuthorDetailPage() {
                     href={author.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute -bottom-2 -right-2 bg-blue-600 p-1.5 md:p-2 rounded-full hover:scale-110 transition-transform border-2 border-white dark:border-gray-800"
+                    className="hidden md:block absolute -bottom-2 -right-2 bg-blue-600 p-1.5 md:p-2 md:rounded-full hover:scale-110 transition-transform border-2 border-white dark:border-gray-800"
                   >
                     <Linkedin className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </a>
