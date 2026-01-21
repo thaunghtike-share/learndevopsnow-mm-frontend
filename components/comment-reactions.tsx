@@ -62,6 +62,7 @@ const ReactionButton = ({
   onClick,
   isAuthenticated,
   onAuthRequired,
+  reactorNames = [], // Add this prop
 }: {
   type: string;
   count: number;
@@ -70,6 +71,7 @@ const ReactionButton = ({
   onClick: () => void;
   isAuthenticated: boolean;
   onAuthRequired: () => void;
+  reactorNames?: Array<{ name: string; avatar?: string; slug?: string }>; // Add this
 }) => {
   const getReactionColor = (type: string) => {
     switch (type) {
@@ -94,19 +96,66 @@ const ReactionButton = ({
     onClick();
   };
 
+  // Tooltip content with reactor names
+  const getTooltipContent = () => {
+    if (reactorNames.length === 0) {
+      return "Be the first to react!";
+    }
+
+    return (
+      <div className="max-w-xs">
+        <div className="font-medium text-sm mb-2">
+          {reactorNames.length}{" "}
+          {reactorNames.length === 1 ? "person" : "people"} reacted
+        </div>
+        <div className="space-y-1 max-h-40 overflow-y-auto">
+          {reactorNames.map((reactor, index) => (
+            <div key={index} className="flex items-center gap-2">
+              {reactor.avatar ? (
+                <img
+                  src={reactor.avatar}
+                  alt={reactor.name}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">
+                  {reactor.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm truncate">{reactor.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <button
-      onClick={handleClick}
-      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
-        isActive
-          ? `${getReactionColor(type)} font-medium`
-          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-      }`}
-      title={!isAuthenticated ? "Sign in to react" : ""}
-    >
-      <Icon className="w-5 h-5" />
-      <span className="text-xs font-medium">{count}</span>
-    </button>
+    <div className="relative group">
+      <button
+        onClick={handleClick}
+        className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
+          isActive
+            ? `${getReactionColor(type)} font-medium`
+            : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+        }`}
+        title={!isAuthenticated ? "Sign in to react" : ""}
+      >
+        <Icon className="w-5 h-5" />
+        <span className="text-xs font-medium">{count}</span>
+      </button>
+
+      {/* Hover tooltip showing reactor names */}
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-50">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
+          {getTooltipContent()}
+        </div>
+        {/* Tooltip arrow */}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+          <div className="w-3 h-3 bg-white dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-700 transform rotate-45"></div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -132,12 +181,24 @@ export function CommentsReactions({
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const [reactorNames, setReactorNames] = useState<{
+    like: Array<{ name: string; avatar?: string; slug?: string }>;
+    love: Array<{ name: string; avatar?: string; slug?: string }>;
+    celebrate: Array<{ name: string; avatar?: string; slug?: string }>;
+    insightful: Array<{ name: string; avatar?: string; slug?: string }>;
+  }>({
+    like: [],
+    love: [],
+    celebrate: [],
+    insightful: [],
+  });
 
   useEffect(() => {
     fetchComments();
     fetchReactions();
   }, [articleSlug]);
 
+  // In your CommentsReactions component, update the fetchReactions function:
   const fetchReactions = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -165,6 +226,11 @@ export function CommentsReactions({
 
         if (data.user_reactions) {
           setUserReactions(data.user_reactions);
+        }
+
+        // Store reactor names
+        if (data.reactor_names) {
+          setReactorNames(data.reactor_names);
         }
       }
     } catch (error) {
@@ -771,7 +837,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("like")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.like} // Pass reactor names
           />
+
           <ReactionButton
             type="love"
             count={reactions.love}
@@ -780,7 +848,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("love")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.love}
           />
+
           <ReactionButton
             type="celebrate"
             count={reactions.celebrate}
@@ -789,7 +859,9 @@ export function CommentsReactions({
             onClick={() => handleReaction("celebrate")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.celebrate}
           />
+
           <ReactionButton
             type="insightful"
             count={reactions.insightful}
@@ -798,6 +870,7 @@ export function CommentsReactions({
             onClick={() => handleReaction("insightful")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
+            reactorNames={reactorNames.insightful}
           />
         </div>
       </div>
