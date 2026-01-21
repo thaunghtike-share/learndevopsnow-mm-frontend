@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Calendar,
   ArrowRight,
-  Eye,
+  TrendingUp,
   MessageSquare,
   ThumbsUp,
   Heart,
@@ -13,17 +13,10 @@ import {
   Lightbulb,
   ChevronLeft,
   ChevronRight,
-  Users,
   Clock,
   FileText,
   Terminal,
-  Server,
-  Cpu,
-  HardDrive,
-  Database,
-  Network,
-  ShieldCheck,
-  Wrench,
+  Tag as TagIcon,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
@@ -247,17 +240,35 @@ export default function LinuxEssentialsSeries() {
 
   // Helper functions
   const getAuthor = (id: number) => authors.find((a) => a.id === id);
+  const getTagById = (id: number) => tags.find((t) => t.id === id);
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  const stripMarkdown = (md: string) =>
-    md
-      .replace(/<[^>]+>/g, "")
-      .replace(/[#_*>[\]~`-]/g, "")
-      .trim();
+
+  const stripMarkdown = (md: string) => {
+    if (!md) return "";
+    let text = md;
+
+    text = text.replace(/^#{1,6}\s+/gm, "");
+    text = text.replace(/```[\s\S]*?```/g, "");
+    text = text.replace(/`([^`]*)`/g, "$1");
+    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, "");
+    text = text.replace(/!\[.*?\]\(.*?\)/g, "");
+    text = text.replace(/\[(.*?)\]\\$\$.*?\\$\$/g, "$1");
+    text = text.replace(/\[(.*?)\]\(.*?\)/g, "$1");
+    text = text.replace(/[*_~>/\\-]/g, "");
+    text = text.replace(/^\s*[-*+]\s+/gm, "");
+    text = text.replace(/^\s*\d+\.\s+/gm, "");
+    text = text.replace(/<[^>]+>/g, "");
+    text = text.replace(/^>\s+/gm, "");
+    text = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+
+    return text;
+  };
+
   const truncate = (str: string, max = 150) =>
     str.length <= max ? str : str.slice(0, max) + "...";
 
@@ -270,7 +281,7 @@ export default function LinuxEssentialsSeries() {
     return "/linux-logo.png";
   };
 
-  // Calculate series stats - EXACTLY LIKE KODEKLOUD
+  // Calculate series stats
   const totalArticles = articles.length;
   const totalViews = articles.reduce(
     (sum, article) => sum + (article.read_count || 0),
@@ -291,6 +302,37 @@ export default function LinuxEssentialsSeries() {
     );
   }, 0);
 
+  // Get clean excerpt for article
+  const getCleanExcerpt = (article: Article) => {
+    if (article.excerpt?.trim()) {
+      return stripMarkdown(article.excerpt);
+    }
+
+    if (article.content) {
+      const content = article.content;
+      const lines = content.split("\n");
+
+      let startIndex = 0;
+      const firstLine = lines[0].trim();
+      if (
+        lines.length > 1 &&
+        firstLine.startsWith("#") &&
+        stripMarkdown(firstLine).includes(stripMarkdown(article.title))
+      ) {
+        startIndex = 1;
+      }
+
+      const contentWithoutFirstHeading = lines.slice(startIndex).join("\n");
+      const cleanContent = stripMarkdown(contentWithoutFirstHeading);
+      return (
+        truncate(cleanContent, 120) ||
+        "Explore this Linux essentials article to master new skills..."
+      );
+    }
+
+    return "Explore this Linux essentials article to master new skills...";
+  };
+
   // Pagination logic
   const totalPages = Math.ceil(totalArticles / pageSize);
   const paginatedArticles = articles.slice(
@@ -304,7 +346,7 @@ export default function LinuxEssentialsSeries() {
         <MinimalHeader />
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+            <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <Terminal className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
@@ -315,7 +357,7 @@ export default function LinuxEssentialsSeries() {
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
             >
               Return Home
               <ArrowRight className="w-5 h-5" />
@@ -332,16 +374,12 @@ export default function LinuxEssentialsSeries() {
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
-          {/* Simple Elegant Loading */}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
-            {/* Animated Logo Container */}
             <div className="relative">
-              {/* Outer Ring Animation */}
-              <div className="w-32 h-32 rounded-full border-4 border-green-200/50 dark:border-green-800/30 animate-spin">
-                {/* Logo Container */}
+              <div className="w-32 h-32 rounded-full border-4 border-sky-200/50 dark:border-sky-800/30 animate-spin">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
-                    <Terminal className="w-16 h-16 text-green-600 dark:text-green-400 animate-pulse" />
+                    <Terminal className="w-16 h-16 text-sky-600 dark:text-sky-400 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -354,33 +392,32 @@ export default function LinuxEssentialsSeries() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#000000] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-10 pb-8 relative z-10">
-        {/* Series Header - Premium Design */}
+        {/* Series Header - Sky Blue Theme */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="w-full mb-12 md:mb-16"
         >
-          {/* Simple Header */}
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-4 mb-4 md:mb-6">
-              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-green-500 to-emerald-600"></div>
-              <span className="text-xs md:text-sm font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide">
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-sky-500 to-blue-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
                 Linux Essentials Series
               </span>
             </div>
 
             <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-8 mb-6 md:mb-8">
-              {/* Linux Logo */}
+              {/* Linux Logo with Sky Blue Theme */}
               <div className="flex-shrink-0">
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl border-4 border-white dark:border-gray-800 shadow-2xl overflow-hidden bg-white p-1">
                   <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                     <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
-                      <Terminal className="w-12 h-12 md:w-16 md:h-16 text-green-600 dark:text-green-400" />
+                      <Terminal className="w-12 h-12 md:w-16 md:h-16 text-sky-600 dark:text-sky-400" />
                     </div>
                   </div>
                 </div>
@@ -401,14 +438,14 @@ export default function LinuxEssentialsSeries() {
             </div>
           </div>
 
-          {/* Stats Cards - EXACTLY LIKE KODEKLOUD */}
+          {/* Stats Cards - Sky Blue Theme */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-4xl mx-auto md:py-10">
             {/* Article Count */}
             <div className="flex flex-col items-center">
               <div className="text-2xl md:text-4xl font-light text-black dark:text-white mb-1">
                 {totalArticles}
               </div>
-              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-green-600 dark:text-green-400">
+              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-400">
                 Articles
               </div>
             </div>
@@ -445,7 +482,7 @@ export default function LinuxEssentialsSeries() {
           </div>
         </motion.section>
 
-        {/* Series Articles Section */}
+        {/* Series Articles Section - Admin Dashboard Style */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -459,8 +496,8 @@ export default function LinuxEssentialsSeries() {
                   Linux Series Articles
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {totalArticles} articles published • {totalViews.toLocaleString()}{" "}
-                  total reads
+                  {totalArticles} articles published •{" "}
+                  {totalViews.toLocaleString()} total reads
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -473,7 +510,7 @@ export default function LinuxEssentialsSeries() {
 
           {articles.length === 0 ? (
             <div className="text-center py-12 md:py-20">
-              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
                 <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
               </div>
               <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
@@ -489,17 +526,14 @@ export default function LinuxEssentialsSeries() {
               <div className="divide-y divide-slate-200/50 dark:divide-gray-700/50">
                 {paginatedArticles.map((article, index) => {
                   const partNumber = (article as any).part_number;
-
-                  // Use excerpt if available, otherwise strip markdown from content and truncate
-                  const previewText =
-                    article.excerpt?.trim() ||
-                    truncate(stripMarkdown(article.content || ""), 150) ||
-                    "Explore this Linux essentials article to master new skills...";
-
+                  const previewText = getCleanExcerpt(article);
                   const author = getAuthor(article.author);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};
+                  const articleTags = article.tags
+                    .map((tagId) => getTagById(tagId))
+                    .filter((tag) => tag !== undefined);
 
                   return (
                     <motion.div
@@ -510,18 +544,24 @@ export default function LinuxEssentialsSeries() {
                       className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                        {/* Article Cover - Mobile Optimized */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600/50 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        <div className="flex-shrink-0 w-full md:w-32 h-35 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={`Part ${partNumber}`}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
+                          {/* Part number badge */}
+                          <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                            <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                              <FileText className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                              Part {partNumber}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Article Info - Mobile Optimized */}
+                        {/* Article Info - Admin Style */}
                         <div className="flex-1 min-w-0 w-full">
-                          {/* Article Metadata - Stacked on Mobile */}
+                          {/* Article Metadata - Exactly like admin dashboard */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -532,7 +572,7 @@ export default function LinuxEssentialsSeries() {
                               {readTime} min read
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-green-600 dark:text-green-400" />
+                              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
                               {article.read_count?.toLocaleString() || "0"}{" "}
                               views
                             </span>
@@ -542,14 +582,14 @@ export default function LinuxEssentialsSeries() {
                             </span>
                           </div>
 
-                          {/* Article Title */}
-                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-green-700 dark:group-hover:text-green-400 transition-colors">
+                          {/* Article Title - Same style as admin */}
+                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                             <Link href={`/articles/${article.slug}`}>
                               {article.title}
                             </Link>
                           </h3>
 
-                          {/* Reactions - Mobile Optimized */}
+                          {/* Reactions - Same style as admin */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
                             {(reactions.like ?? 0) > 0 && (
                               <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
@@ -577,18 +617,38 @@ export default function LinuxEssentialsSeries() {
                             )}
                           </div>
 
-                          {/* Article Excerpt/Content Preview */}
+                          {/* Article Excerpt/Content Preview - Same as admin */}
                           <div className="mb-3 md:mb-4">
-                            <p className="text-slate-600 dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
+                            <p className="text-black dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
                               {previewText}
                             </p>
                           </div>
 
-                          {/* Author Info */}
+                          {/* Tags - Same style as admin */}
+                          {articleTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                              {articleTags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag!.id}
+                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
+                                >
+                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                  {tag!.name}
+                                </span>
+                              ))}
+                              {articleTags.length > 3 && (
+                                <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                  +{articleTags.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Author Info - Same style as admin */}
                           {author && (
-                            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                            <div className="flex items-center gap-2 md:gap-3 mt-4">
                               <div className="flex items-center gap-1 md:gap-2 text-slate-700 dark:text-gray-300 font-medium">
-                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 p-0.5">
+                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 p-0.5">
                                   <img
                                     src={author.avatar || "/placeholder.svg"}
                                     alt={author.name}
@@ -601,7 +661,7 @@ export default function LinuxEssentialsSeries() {
                                 </div>
                                 <Link
                                   href={`/authors/${author.slug}`}
-                                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors text-xs md:text-sm"
+                                  className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors text-xs md:text-sm"
                                 >
                                   {author.name}
                                 </Link>
@@ -610,11 +670,11 @@ export default function LinuxEssentialsSeries() {
                           )}
                         </div>
 
-                        {/* Read More Button - Mobile Optimized */}
+                        {/* Read More Button - Same as admin's View/Edit buttons */}
                         <div className="flex items-center w-full md:w-auto justify-end md:justify-start">
                           <Link
                             href={`/articles/${article.slug}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
+                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
                           >
                             Read More
                             <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -626,15 +686,15 @@ export default function LinuxEssentialsSeries() {
                 })}
               </div>
 
-              {/* Pagination Controls - Mobile Optimized */}
+              {/* Pagination Controls - Same as admin dashboard */}
               {totalPages > 1 && (
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                      Showing {paginatedArticles.length} of {totalArticles} articles
+                      Showing {paginatedArticles.length} of {totalArticles}{" "}
+                      articles
                     </div>
 
-                    {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
                         onClick={() =>
@@ -647,7 +707,6 @@ export default function LinuxEssentialsSeries() {
                         <span className="hidden xs:inline">Previous</span>
                       </button>
 
-                      {/* Page Numbers - Hidden on very small screens */}
                       <div className="hidden xs:flex items-center gap-1">
                         {Array.from(
                           { length: Math.min(3, totalPages) },
@@ -668,7 +727,7 @@ export default function LinuxEssentialsSeries() {
                                 onClick={() => setCurrentPage(pageNum)}
                                 className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
                                   currentPage === pageNum
-                                    ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md"
+                                    ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
                                     : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
                                 }`}
                               >
@@ -693,7 +752,6 @@ export default function LinuxEssentialsSeries() {
                       </button>
                     </div>
 
-                    {/* Mobile Page Indicator - Only show on very small screens */}
                     <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
                       Page {currentPage} of {totalPages}
                     </div>
@@ -702,98 +760,6 @@ export default function LinuxEssentialsSeries() {
               )}
             </>
           )}
-        </motion.section>
-
-        {/* Topics Covered Section */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-12 md:mt-16"
-        >
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-              Topics Covered
-            </h2>
-            <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 max-w-3xl font-medium">
-              A comprehensive journey through Linux system administration,
-              covering essential concepts and practical skills.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {[
-              {
-                icon: Terminal,
-                title: "Command Line Basics",
-                description: "Essential commands, navigation, and text editing",
-                color: "from-green-500 to-emerald-600",
-              },
-              {
-                icon: Server,
-                title: "System Administration",
-                description: "User management, services, and process control",
-                color: "from-blue-500 to-cyan-600",
-              },
-              {
-                icon: HardDrive,
-                title: "File Systems",
-                description: "Permissions, storage, and disk management",
-                color: "from-amber-500 to-orange-600",
-              },
-              {
-                icon: Network,
-                title: "Networking",
-                description: "Network config, SSH, firewall, and services",
-                color: "from-purple-500 to-pink-600",
-              },
-              {
-                icon: Database,
-                title: "Package Management",
-                description: "APT, YUM, DNF, and software installation",
-                color: "from-red-500 to-rose-600",
-              },
-              {
-                icon: ShieldCheck,
-                title: "Security",
-                description: "Permissions, sudo, firewalls, and hardening",
-                color: "from-indigo-500 to-violet-600",
-              },
-              {
-                icon: Cpu,
-                title: "Monitoring",
-                description: "System monitoring and performance tuning",
-                color: "from-cyan-500 to-blue-600",
-              },
-              {
-                icon: Wrench,
-                title: "Scripting",
-                description: "Bash scripting and automation",
-                color: "from-emerald-500 to-teal-600",
-              },
-            ].map((topic, index) => (
-              <div
-                key={index}
-                className="group bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl md:rounded-2xl border border-slate-200/50 dark:border-gray-700/50 p-4 md:p-6 hover:border-green-400/50 dark:hover:border-green-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              >
-                <div className="flex items-start gap-3 md:gap-4">
-                  <div
-                    className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${topic.color} flex items-center justify-center flex-shrink-0 shadow-lg`}
-                  >
-                    <topic.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm md:text-lg font-bold text-slate-800 dark:text-white mb-1 md:mb-2">
-                      {topic.title}
-                    </h3>
-                    <p className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium">
-                      {topic.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </motion.section>
       </main>
 

@@ -1,6 +1,5 @@
 "use client";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import type React from "react";
 import { useState } from "react";
 
 interface ProgrammingLanguage {
@@ -121,9 +120,7 @@ export function ProgrammingLanguagesRoadmap({
 
   const currentLanguage = programmingLanguages[currentIndex];
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.currentTarget;
     target.src = "/new.png";
   };

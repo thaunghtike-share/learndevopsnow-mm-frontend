@@ -1,7 +1,5 @@
 "use client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type React from "react";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -24,196 +22,6 @@ interface RoadmapStage {
   descriptionMy: string[];
   items: RoadmapItem[];
 }
-
-interface ProgrammingLanguage {
-  name: string;
-  nameMy: string;
-  icon: string;
-  description: string;
-  descriptionMy: string;
-  fullDescription: string;
-  fullDescriptionMy: string;
-  officialLink: string;
-  frameworks: string[];
-  frameworksMy: string[];
-}
-
-const programmingLanguages: Record<string, ProgrammingLanguage[]> = {
-  beginner: [
-    {
-      name: "Python",
-      nameMy: "Python",
-      icon: "python.png",
-      description: "Scripting & Automation",
-      descriptionMy: "Scripting & Automation",
-      fullDescription:
-        "Python is a high-level, interpreted programming language known for its simplicity and readability. In DevOps, Python is extensively used for automation scripts, infrastructure management, and building CI/CD tools. Its rich ecosystem of libraries makes it perfect for system administration tasks.",
-      fullDescriptionMy:
-        "Python သည် အဆင့်မြင့်၊ လွယ်ကူပြီး ဖတ်ရလွယ်ကူသော Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Python ကို Automation Scripts များ၊ Infrastructure Management နှင့် CI/CD Tools များတည်ဆောက်ရာတွင် ကျယ်ပြန့်စွာအသုံးပြုပါသည်။ ၎င်း၏ ကြွယ်ဝသော Libraries Ecosystem သည် System Administration လုပ်ငန်းများအတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://www.python.org",
-      frameworks: ["Django", "Flask", "Ansible", "Fabric"],
-      frameworksMy: ["Django", "Flask", "Ansible", "Fabric"],
-    },
-    {
-      name: "JavaScript",
-      nameMy: "JavaScript",
-      icon: "javascript.png",
-      description: "Web & Node.js",
-      descriptionMy: "Web & Node.js",
-      fullDescription:
-        "JavaScript is a versatile programming language that powers both frontend and backend development. In DevOps, JavaScript (via Node.js) is used for building automation tools, serverless functions, and real-time monitoring dashboards. Its event-driven architecture makes it ideal for handling asynchronous operations.",
-      fullDescriptionMy:
-        "JavaScript သည် Frontend နှင့် Backend Development နှစ်ခုလုံးအတွက် အသုံးပြုသော Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် JavaScript (Node.js မှတစ်ဆင့်) ကို Automation Tools များ၊ Serverless Functions များနှင့် Real-time Monitoring Dashboards များတည်ဆောက်ရာတွင် အသုံးပြုပါသည်။ ၎င်း၏ Event-driven Architecture သည် Asynchronous Operations များကို ကိုင်တွယ်ရန်အတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-      frameworks: ["Node.js", "Express.js", "React", "Next.js"],
-      frameworksMy: ["Node.js", "Express.js", "React", "Next.js"],
-    },
-    {
-      name: "Go",
-      nameMy: "Go",
-      icon: "go.png",
-      description: "Cloud Native Tools",
-      descriptionMy: "Cloud Native Tools",
-      fullDescription:
-        "Go (Golang) is a statically typed, compiled language designed by Google for building efficient and reliable software. In DevOps, Go is the language of choice for cloud-native tools like Docker, Kubernetes, and Terraform. Its fast compilation, built-in concurrency, and small binary sizes make it perfect for microservices and CLI tools.",
-      fullDescriptionMy:
-        "Go (Golang) သည် Google မှဒီဇိုင်းထုတ်ထားသော Statically Typed, Compiled Language တစ်ခုဖြစ်ပြီး ထိရောက်ပြီးယုံကြည်စိတ်ချရသော Software များတည်ဆောက်ရန်အတွက်ဖြစ်ပါသည်။ DevOps တွင် Go သည် Docker, Kubernetes, နှင့် Terraform ကဲ့သို့သော Cloud-native Tools များအတွက် ရွေးချယ်မှုအဓိကပြုသော Language ဖြစ်ပါသည်။ ၎င်း၏ မြန်ဆန်သော Compilation, Built-in Concurrency နှင့် Binary Sizes ငယ်မားခြင်းတို့သည် Microservices နှင့် CLI Tools များအတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://go.dev",
-      frameworks: ["Gin", "Echo", "Cobra", "Viper"],
-      frameworksMy: ["Gin", "Echo", "Cobra", "Viper"],
-    },
-  ],
-  intermediate: [
-    {
-      name: "Python",
-      nameMy: "Python",
-      icon: "python.png",
-      description: "Advanced Automation",
-      descriptionMy: "Advanced Automation",
-      fullDescription:
-        "At the intermediate level, Python is used for complex automation workflows, infrastructure orchestration, and building custom DevOps tools. You'll leverage advanced libraries for API integrations, data processing, and creating sophisticated deployment pipelines.",
-      fullDescriptionMy:
-        "Intermediate အဆင့်တွင် Python ကို Complex Automation Workflows, Infrastructure Orchestration နှင့် Custom DevOps Tools များတည်ဆောက်ရာတွင် အသုံးပြုပါသည်။ API Integrations, Data Processing နှင့် Sophisticated Deployment Pipelines များဖန်တီးရန်အတွက် Advanced Libraries များကို အသုံးပြုပါမည်။",
-      officialLink: "https://www.python.org",
-      frameworks: ["Ansible", "SaltStack", "Fabric", "Boto3"],
-      frameworksMy: ["Ansible", "SaltStack", "Fabric", "Boto3"],
-    },
-    {
-      name: "Node.js",
-      nameMy: "Node.js",
-      icon: "nodejs.png",
-      description: "Backend Services",
-      descriptionMy: "Backend Services",
-      fullDescription:
-        "Node.js is a JavaScript runtime built on Chrome's V8 engine that enables server-side JavaScript execution. In DevOps, Node.js powers backend services, API gateways, and real-time monitoring systems. Its non-blocking I/O model makes it excellent for building scalable network applications.",
-      fullDescriptionMy:
-        "Node.js သည် Chrome ၏ V8 Engine အပေါ်တွင်တည်ဆောက်ထားသော JavaScript Runtime တစ်ခုဖြစ်ပြီး Server-side JavaScript Execution ကိုခွင့်ပြုပါသည်။ DevOps တွင် Node.js သည် Backend Services, API Gateways နှင့် Real-time Monitoring Systems များအတွက် အဓိကအသုံးပြုပါသည်။ ၎င်း၏ Non-blocking I/O Model သည် Scalable Network Applications များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://nodejs.org",
-      frameworks: ["Express.js", "NestJS", "Fastify", "Koa"],
-      frameworksMy: ["Express.js", "NestJS", "Fastify", "Koa"],
-    },
-    {
-      name: "Go",
-      nameMy: "Go",
-      icon: "go.png",
-      description: "Microservices",
-      descriptionMy: "Microservices",
-      fullDescription:
-        "Go excels at building microservices due to its lightweight nature and excellent concurrency support. At this level, you'll use Go to create scalable, distributed systems with efficient resource utilization and fast response times.",
-      fullDescriptionMy:
-        "Go သည် ၎င်း၏ Lightweight Nature နှင့် Excellent Concurrency Support တို့ကြောင့် Microservices များတည်ဆောက်ရာတွင် ထူးချွန်ပါသည်။ ဤအဆင့်တွင် Go ကို အသုံးပြု၍ Efficient Resource Utilization နှင့် Fast Response Times ရှိသော Scalable, Distributed Systems များဖန်တီးပါမည်။",
-      officialLink: "https://go.dev",
-      frameworks: ["Gin", "Echo", "gRPC", "Fiber"],
-      frameworksMy: ["Gin", "Echo", "gRPC", "Fiber"],
-    },
-    {
-      name: "Java",
-      nameMy: "Java",
-      icon: "java.png",
-      description: "Enterprise Apps",
-      descriptionMy: "Enterprise Apps",
-      fullDescription:
-        "Java is a robust, object-oriented programming language widely used in enterprise environments. In DevOps, Java is essential for managing and deploying large-scale enterprise applications. Its platform independence and mature ecosystem make it ideal for building reliable, high-performance systems.",
-      fullDescriptionMy:
-        "Java သည် Enterprise Environments များတွင်ကျယ်ပြန့်စွာအသုံးပြုသော Robust, Object-oriented Programming Language တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Java သည် Large-scale Enterprise Applications များကို စီမံခန့်ခွဲရန်နှင့် Deploy လုပ်ရန်အတွက် အဓိကလိုအပ်ပါသည်။ ၎င်း၏ Platform Independence နှင့် Mature Ecosystem တို့သည် Reliable, High-performance Systems များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://www.java.com",
-      frameworks: ["Spring Boot", "Maven", "Gradle", "Jenkins"],
-      frameworksMy: ["Spring Boot", "Maven", "Gradle", "Jenkins"],
-    },
-  ],
-  advanced: [
-    {
-      name: "Go",
-      nameMy: "Go",
-      icon: "go.png",
-      description: "K8s Operators",
-      descriptionMy: "K8s Operators",
-      fullDescription:
-        "At the advanced level, Go is used to build Kubernetes operators and custom controllers. These extend Kubernetes functionality to automate complex application management tasks. Go's performance and the official Kubernetes client libraries make it the standard for cloud-native infrastructure development.",
-      fullDescriptionMy:
-        "Advanced အဆင့်တွင် Go ကို Kubernetes Operators နှင့် Custom Controllers များတည်ဆောက်ရာတွင်အသုံးပြုပါသည်။ ၎င်းတို့သည် Complex Application Management Tasks များကို အလိုအလျောက်လုပ်ဆောင်ရန် Kubernetes Functionality ကိုတိုးချဲ့ပေးပါသည်။ Go ၏ Performance နှင့် Official Kubernetes Client Libraries တို့သည် Cloud-native Infrastructure Development အတွက် Standard ဖြစ်စေပါသည်။",
-      officialLink: "https://go.dev",
-      frameworks: ["Operator SDK", "Kubebuilder", "client-go", "Helm"],
-      frameworksMy: ["Operator SDK", "Kubebuilder", "client-go", "Helm"],
-    },
-    {
-      name: "Python",
-      nameMy: "Python",
-      icon: "python.png",
-      description: "ML Ops & Automation",
-      descriptionMy: "ML Ops & Automation",
-      fullDescription:
-        "Python dominates the MLOps space, bridging machine learning and DevOps practices. You'll use Python to build ML pipelines, automate model deployment, and create sophisticated monitoring systems for AI applications.",
-      fullDescriptionMy:
-        "Python သည် MLOps Space တွင်ထင်ရှားပြီး Machine Learning နှင့် DevOps Practices ကိုဆက်သွယ်ပေးပါသည်။ ML Pipelines များတည်ဆောက်ရန်၊ Model Deployment ကိုအလိုအလျောက်လုပ်ဆောင်ရန်နှင့် AI Applications များအတွက် Sophisticated Monitoring Systems များဖန်တီးရန် Python ကိုအသုံးပြုပါမည်။",
-      officialLink: "https://www.python.org",
-      frameworks: ["Kubeflow", "MLflow", "Airflow", "TensorFlow"],
-      frameworksMy: ["Kubeflow", "MLflow", "Airflow", "TensorFlow"],
-    },
-    {
-      name: "Java",
-      nameMy: "Java",
-      icon: "java.png",
-      description: "Distributed Systems",
-      descriptionMy: "Distributed Systems",
-      fullDescription:
-        "Java's maturity and robustness make it ideal for building distributed systems at scale. In advanced DevOps, Java is used for creating resilient microservices architectures, message queuing systems, and high-throughput data processing pipelines.",
-      fullDescriptionMy:
-        "Java ၏ Maturity နှင့် Robustness တို့သည် Scale ကြီးမားသော Distributed Systems များတည်ဆောက်ရန်အတွက် ကောင်းမွန်ပါသည်။ Advanced DevOps တွင် Java ကို Resilient Microservices Architectures, Message Queuing Systems နှင့် High-throughput Data Processing Pipelines များဖန်တီးရာတွင်အသုံးပြုပါသည်။",
-      officialLink: "https://www.java.com",
-      frameworks: ["Spring Cloud", "Apache Kafka", "Apache Camel", "Quarkus"],
-      frameworksMy: ["Spring Cloud", "Apache Kafka", "Apache Camel", "Quarkus"],
-    },
-    {
-      name: "Node.js",
-      nameMy: "Node.js",
-      icon: "nodejs.png",
-      description: "Real-time Services",
-      descriptionMy: "Real-time Services",
-      fullDescription:
-        "Node.js excels at building real-time services like monitoring dashboards, log streaming, and event-driven architectures. Its event loop and WebSocket support make it perfect for applications requiring instant data updates and high concurrency.",
-      fullDescriptionMy:
-        "Node.js သည် Real-time Services များဖြစ်သော Monitoring Dashboards, Log Streaming နှင့် Event-driven Architectures များတည်ဆောက်ရာတွင်ထူးချွန်ပါသည်။ ၎င်း၏ Event Loop နှင့် WebSocket Support တို့သည် Instant Data Updates နှင့် High Concurrency လိုအပ်သော Applications များအတွက် ကောင်းမွန်ပါသည်။",
-      officialLink: "https://nodejs.org",
-      frameworks: ["Socket.io", "NestJS", "Express.js", "PM2"],
-      frameworksMy: ["Socket.io", "NestJS", "Express.js", "PM2"],
-    },
-    {
-      name: "Laravel",
-      nameMy: "Laravel",
-      icon: "laravel.png",
-      description: "PHP Deployments",
-      descriptionMy: "PHP Deployments",
-      fullDescription:
-        "Laravel is a modern PHP framework that simplifies web application development. In DevOps, understanding Laravel is crucial for deploying and managing PHP applications at scale. It includes built-in tools for queue management, caching, and database migrations.",
-      fullDescriptionMy:
-        "Laravel သည် Web Application Development ကိုလွယ်ကူစေသော Modern PHP Framework တစ်ခုဖြစ်ပါသည်။ DevOps တွင် Laravel ကိုနားလည်ခြင်းသည် Scale ကြီးမားသော PHP Applications များကို Deploy လုပ်ရန်နှင့် စီမံခန့်ခွဲရန်အတွက် အရေးကြီးပါသည်။ ၎င်းတွင် Queue Management, Caching နှင့် Database Migrations များအတွက် Built-in Tools များပါဝင်ပါသည်။",
-      officialLink: "https://laravel.com",
-      frameworks: ["Laravel", "Symfony", "Composer", "PHPUnit"],
-      frameworksMy: ["Laravel", "Symfony", "Composer", "PHPUnit"],
-    },
-  ],
-};
 
 const roadmap: RoadmapStage[] = [
   {
@@ -543,19 +351,14 @@ export function MinimalDevopsRoadmap({
   };
 
   const prevStage = () => {
-    setCurrentStageIndex(
-      (prev) => (prev - 1 + roadmap.length) % roadmap.length
-    );
+    setCurrentStageIndex((prev) => (prev - 1 + roadmap.length) % roadmap.length);
   };
 
   const currentStage = roadmap[currentStageIndex];
-  const currentConfig =
-    stageConfig[currentStage.key as keyof typeof stageConfig];
+  const currentConfig = stageConfig[currentStage.key as keyof typeof stageConfig];
   const visibleItems = currentStage.items;
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.currentTarget;
     target.src = "/new.png";
   };
@@ -625,24 +428,17 @@ export function MinimalDevopsRoadmap({
                   >
                     <div>
                       <span className="text-xs font-mono text-black-500 dark:text-gray-400 tracking-wider uppercase hidden md:block">
-                        {locale === "en" ? "Stage" : "အဆင့်"}{" "}
-                        {currentStageIndex + 1} {locale === "en" ? "of" : "/"}{" "}
-                        {roadmap.length}
+                        {locale === "en" ? "Stage" : "အဆင့်"} {currentStageIndex + 1} {locale === "en" ? "of" : "/"} {roadmap.length}
                       </span>
                       <h3
                         className={`text-2xl md:text-4xl font-bold mt-1 md:mt-2 tracking-tight bg-gradient-to-r ${currentConfig.gradient} bg-clip-text text-transparent`}
                       >
-                        {locale === "en"
-                          ? currentStage.label
-                          : currentStage.labelMy}
+                        {locale === "en" ? currentStage.label : currentStage.labelMy}
                       </h3>
                     </div>
 
                     <div className="space-y-3 md:space-y-4">
-                      {(locale === "en"
-                        ? currentStage.description
-                        : currentStage.descriptionMy
-                      ).map((desc, index) => (
+                      {(locale === "en" ? currentStage.description : currentStage.descriptionMy).map((desc, index) => (
                         <p
                           key={index}
                           className="text-base text-black dark:text-gray-300 leading-relaxed"
@@ -693,9 +489,7 @@ export function MinimalDevopsRoadmap({
                   <button
                     onClick={prevStage}
                     className="p-2 md:p-3 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
-                    aria-label={
-                      locale === "en" ? "Previous stage" : "ယခင်အဆင့်"
-                    }
+                    aria-label={locale === "en" ? "Previous stage" : "ယခင်အဆင့်"}
                   >
                     <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -708,20 +502,12 @@ export function MinimalDevopsRoadmap({
                           setCurrentStageIndex(index);
                         }}
                         className="group"
-                        aria-label={
-                          locale === "en"
-                            ? `Go to stage ${index + 1}`
-                            : `အဆင့် ${index + 1} သို့သွားရန်`
-                        }
+                        aria-label={locale === "en" ? `Go to stage ${index + 1}` : `အဆင့် ${index + 1} သို့သွားရန်`}
                       >
                         <div
                           className={`h-1.5 md:h-2 rounded-full transition-all duration-300 ${
                             index === currentStageIndex
-                              ? `w-5 md:w-10 bg-gradient-to-r ${
-                                  stageConfig[
-                                    stage.key as keyof typeof stageConfig
-                                  ].gradient
-                                }`
+                              ? `w-5 md:w-10 bg-gradient-to-r ${stageConfig[stage.key as keyof typeof stageConfig].gradient}`
                               : "w-1.5 md:w-2 bg-gray-300 dark:bg-gray-600 group-hover:bg-gray-400 dark:group-hover:bg-gray-500"
                           }`}
                         />
@@ -797,17 +583,12 @@ export function MinimalDevopsRoadmap({
                               </a>
 
                               <p className="text-sm text-black-700 dark:text-gray-300 leading-relaxed mb-2 md:mb-3">
-                                {locale === "en"
-                                  ? item.description
-                                  : item.descriptionMy}
+                                {locale === "en" ? item.description : item.descriptionMy}
                               </p>
 
                               {/* Compact Tags */}
                               <div className="flex flex-wrap gap-1 md:gap-1.5">
-                                {(locale === "en"
-                                  ? item.tags
-                                  : item.tagsMy
-                                ).map((tag, tagIndex) => (
+                                {(locale === "en" ? item.tags : item.tagsMy).map((tag, tagIndex) => (
                                   <span
                                     key={tagIndex}
                                     className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-xs font-medium ${currentConfig.tagBg} dark:bg-gray-700 border ${currentConfig.tagBorder} dark:border-gray-600 text-orange-600 dark:text-orange-400 transition-all duration-200 hover:scale-105 ${currentConfig.tagHover} dark:hover:bg-gray-600`}

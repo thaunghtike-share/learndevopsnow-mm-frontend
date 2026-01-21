@@ -276,17 +276,14 @@ const difficultyConfig = {
   Beginner: {
     labelColor: "bg-gradient-to-r from-sky-500 to-blue-600",
     glowColor: "hover:shadow-blue-500/20",
-    borderColor: "border-blue-300",
   },
   Intermediate: {
     labelColor: "bg-gradient-to-r from-yellow-500 to-orange-600",
     glowColor: "hover:shadow-orange-500/20",
-    borderColor: "border-orange-300",
   },
   Advanced: {
     labelColor: "bg-gradient-to-r from-green-500 to-emerald-600",
     glowColor: "hover:shadow-emerald-500/20",
-    borderColor: "border-emerald-300",
   },
 };
 

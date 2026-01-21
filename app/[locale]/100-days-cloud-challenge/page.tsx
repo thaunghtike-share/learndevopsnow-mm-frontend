@@ -6,30 +6,20 @@ import {
   Calendar,
   ArrowRight,
   Eye,
-  Star,
   TrendingUp,
-  Code,
-  Cloud,
-  Shield,
-  Container,
-  Wrench,
-  ToolCase,
-  Folder,
-  ChevronLeft,
-  ChevronRight,
-  Users,
   Clock,
-  BookOpen,
-  FileText,
   MessageSquare,
   Heart,
   ThumbsUp,
   Sparkles,
   Lightbulb,
-  CheckCircle,
-  Target,
-  Award,
-  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Tag as TagIcon,
+  Folder,
+  FileText,
+  Code,
+  Cloud,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
@@ -73,14 +63,6 @@ interface Tag {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 10;
 
-// Progress tracking interface
-interface ProgressData {
-  completedDays: number[];
-  lastRead: { [day: number]: number }; // timestamp
-  streak: number;
-  totalTimeSpent: number;
-}
-
 export default function HundredDaysCloudChallenge() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
@@ -89,88 +71,10 @@ export default function HundredDaysCloudChallenge() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [progress, setProgress] = useState<ProgressData>({
-    completedDays: [],
-    lastRead: {},
-    streak: 0,
-    totalTimeSpent: 0,
-  });
 
   const router = useRouter();
   const topRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
-
-  // Load progress from localStorage
-  useEffect(() => {
-    const savedProgress = localStorage.getItem("cloud-challenge-progress");
-    if (savedProgress) {
-      setProgress(JSON.parse(savedProgress));
-    }
-  }, []);
-
-  // Save progress to localStorage
-  const saveProgress = (newProgress: ProgressData) => {
-    setProgress(newProgress);
-    localStorage.setItem(
-      "cloud-challenge-progress",
-      JSON.stringify(newProgress)
-    );
-  };
-
-  // Mark day as completed
-  const markDayCompleted = (dayNumber: number) => {
-    const newCompletedDays = [
-      ...new Set([...progress.completedDays, dayNumber]),
-    ].sort((a, b) => a - b);
-
-    // Calculate streak (consecutive days from current day backward)
-    let currentStreak = 0;
-    for (let i = dayNumber; i > 0; i--) {
-      if (newCompletedDays.includes(i)) {
-        currentStreak++;
-      } else {
-        break;
-      }
-    }
-
-    const newProgress: ProgressData = {
-      ...progress,
-      completedDays: newCompletedDays,
-      lastRead: {
-        ...progress.lastRead,
-        [dayNumber]: Date.now(),
-      },
-      streak: currentStreak,
-    };
-
-    saveProgress(newProgress);
-  };
-
-  // Unmark day as completed
-  const unmarkDayCompleted = (dayNumber: number) => {
-    const newCompletedDays = progress.completedDays.filter(
-      (day) => day !== dayNumber
-    );
-
-    // Recalculate streak
-    let currentStreak = 0;
-    const maxDay = Math.max(...newCompletedDays);
-    for (let i = maxDay; i > 0; i--) {
-      if (newCompletedDays.includes(i)) {
-        currentStreak++;
-      } else {
-        break;
-      }
-    }
-
-    const newProgress: ProgressData = {
-      ...progress,
-      completedDays: newCompletedDays,
-      streak: currentStreak,
-    };
-
-    saveProgress(newProgress);
-  };
 
   // Calculate read time function
   const calculateReadTime = (content?: string) => {
@@ -346,11 +250,28 @@ export default function HundredDaysCloudChallenge() {
       month: "long",
       day: "numeric",
     });
-  const stripMarkdown = (md: string) =>
-    md
-      .replace(/<[^>]+>/g, "")
-      .replace(/[#_*>[\]~`-]/g, "")
-      .trim();
+  
+  const stripMarkdown = (md: string) => {
+    if (!md) return "";
+    let text = md;
+
+    text = text.replace(/^#{1,6}\s+/gm, "");
+    text = text.replace(/```[\s\S]*?```/g, "");
+    text = text.replace(/`([^`]*)`/g, "$1");
+    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, "");
+    text = text.replace(/!\[.*?\]\(.*?\)/g, "");
+    text = text.replace(/\[(.*?)\]\\$\$.*?\\$\$/g, "$1");
+    text = text.replace(/\[(.*?)\]\(.*?\)/g, "$1");
+    text = text.replace(/[*_~>/\\-]/g, "");
+    text = text.replace(/^\s*[-*+]\s+/gm, "");
+    text = text.replace(/^\s*\d+\.\s+/gm, "");
+    text = text.replace(/<[^>]+>/g, "");
+    text = text.replace(/^>\s+/gm, "");
+    text = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+
+    return text;
+  };
+  
   const truncate = (str: string, max = 150) =>
     str.length <= max ? str : str.slice(0, max) + "...";
 
@@ -384,11 +305,35 @@ export default function HundredDaysCloudChallenge() {
     );
   }, 0);
 
-  // Progress calculations
-  const completedCount = progress.completedDays.length;
-  const completionPercentage =
-    totalArticles > 0 ? Math.round((completedCount / 100) * 100) : 0;
-  const currentDay = Math.max(...progress.completedDays, 0) + 1;
+  // Get clean excerpt for article
+  const getCleanExcerpt = (article: Article) => {
+    if (article.excerpt?.trim()) {
+      return stripMarkdown(article.excerpt);
+    }
+
+    if (article.content) {
+      const content = article.content;
+      const lines = content.split("\n");
+
+      let startIndex = 0;
+      const firstLine = lines[0].trim();
+      if (
+        lines.length > 1 &&
+        firstLine.startsWith("#") &&
+        stripMarkdown(firstLine).includes(stripMarkdown(article.title))
+      ) {
+        startIndex = 1;
+      }
+
+      const contentWithoutFirstHeading = lines.slice(startIndex).join("\n");
+      const cleanContent = stripMarkdown(contentWithoutFirstHeading);
+      return (
+        truncate(cleanContent, 120) || "Join this day of the cloud challenge to learn new skills..."
+      );
+    }
+
+    return "Join this day of the cloud challenge to learn new skills...";
+  };
 
   // Pagination logic
   const totalPages = Math.ceil(totalArticles / pageSize);
@@ -404,7 +349,7 @@ export default function HundredDaysCloudChallenge() {
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Cloud className="w-12 h-12 text-white" />
+              <FileText className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
               Challenge Not Found
@@ -436,18 +381,11 @@ export default function HundredDaysCloudChallenge() {
             {/* Animated Logo Container */}
             <div className="relative">
               {/* Outer Ring Animation */}
-              <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+              <div className="w-32 h-32 rounded-full border-4 border-sky-200/50 dark:border-sky-800/30 animate-spin">
                 {/* Logo Container */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
-                    <img
-                      src="/kodekloud.webp"
-                      alt="KodeKloud"
-                      className="w-16 h-16 object-contain animate-pulse"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
+                    <Cloud className="w-16 h-16 text-sky-600 dark:text-sky-400 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -464,14 +402,13 @@ export default function HundredDaysCloudChallenge() {
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-10 pb-8 relative z-10">
-        {/* Challenge Header - Premium Design */}
+        {/* Challenge Header */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="w-full mb-12 md:mb-16"
         >
-          {/* Simple Header */}
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-4 mb-4 md:mb-6">
               <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
@@ -481,18 +418,13 @@ export default function HundredDaysCloudChallenge() {
             </div>
 
             <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-8 mb-6 md:mb-8">
-              {/* KodeKloud Logo */}
+              {/* Linux Logo */}
               <div className="flex-shrink-0">
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl border-4 border-white dark:border-gray-800 shadow-2xl overflow-hidden bg-white p-1">
                   <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <img
-                      src="/kodekloud.webp"
-                      alt="KodeKloud"
-                      className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
+                    <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                      <Cloud className="w-12 h-12 md:w-16 md:h-16 text-sky-600 dark:text-sky-400" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -500,12 +432,12 @@ export default function HundredDaysCloudChallenge() {
               {/* Title and Description */}
               <div className="flex-1">
                 <h1 className="text-3xl md:text-6xl font-light text-black dark:text-white mb-4 md:mb-6 tracking-tight">
-                  100 Days of Cloud Challenge
+                  50 Days of Cloud Challenge
                 </h1>
                 <p className="text-base md:text-xl text-black dark:text-gray-300 leading-relaxed max-w-3xl">
                   Master cloud technologies with KodeKloud's structured learning
                   path. One concept per day, hands-on labs, and real-world
-                  projects to transform your cloud skills in 100 days.
+                  projects to transform your cloud skills in 50 days.
                 </p>
               </div>
             </div>
@@ -554,7 +486,7 @@ export default function HundredDaysCloudChallenge() {
           </div>
         </motion.section>
 
-        {/* Challenge Days Section */}
+        {/* Challenge Days Section - UPDATED TO MATCH ADMIN DASHBOARD STYLE */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -598,19 +530,12 @@ export default function HundredDaysCloudChallenge() {
               <div className="divide-y divide-slate-200/50 dark:divide-gray-700/50">
                 {paginatedArticles.map((article, index) => {
                   const dayNumber = (article as any).day_number;
-                  const isCompleted =
-                    progress.completedDays.includes(dayNumber);
-
-                  // Use excerpt if available, otherwise strip markdown from content and truncate
-                  const previewText =
-                    article.excerpt?.trim() ||
-                    truncate(stripMarkdown(article.content || ""), 150) ||
-                    "Join this day of the cloud challenge to learn new skills...";
-
+                  const previewText = getCleanExcerpt(article);
                   const author = getAuthor(article.author);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};
+                  const articleTags = article.tags.map(tagId => getTagById(tagId)).filter(tag => tag !== undefined);
 
                   return (
                     <motion.div
@@ -621,18 +546,25 @@ export default function HundredDaysCloudChallenge() {
                       className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                        {/* Article Cover - Mobile Optimized */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600/50 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        {/* Article Cover - Updated to match admin style */}
+                        <div className="flex-shrink-0 w-full md:w-32 h-35 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={`Day ${dayNumber}`}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
+                          {/* Day number badge - similar to category badge in admin */}
+                          <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                            <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                              <FileText className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                              Day {dayNumber}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Article Info - Mobile Optimized */}
+                        {/* Article Info - Updated to match admin dashboard */}
                         <div className="flex-1 min-w-0 w-full">
-                          {/* Article Metadata - Stacked on Mobile */}
+                          {/* Article Metadata - Exactly like admin dashboard */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -643,9 +575,8 @@ export default function HundredDaysCloudChallenge() {
                               {readTime} min read
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" />
-                              {article.read_count?.toLocaleString() || "0"}{" "}
-                              views
+                              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                              {article.read_count?.toLocaleString() || "0"} views
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
@@ -653,14 +584,14 @@ export default function HundredDaysCloudChallenge() {
                             </span>
                           </div>
 
-                          {/* Article Title */}
-                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                          {/* Article Title - Same style as admin */}
+                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                             <Link href={`/articles/${article.slug}`}>
                               {article.title}
                             </Link>
                           </h3>
 
-                          {/* Reactions - Mobile Optimized */}
+                          {/* Reactions - Same style as admin */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
                             {(reactions.like ?? 0) > 0 && (
                               <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
@@ -688,44 +619,39 @@ export default function HundredDaysCloudChallenge() {
                             )}
                           </div>
 
-                          {/* Article Excerpt/Content Preview */}
+                          {/* Article Excerpt/Content Preview - Same as admin */}
                           <div className="mb-3 md:mb-4">
-                            <p className="text-slate-600 dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
+                            <p className="text-black dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
                               {previewText}
                             </p>
                           </div>
 
-                          {/* Author Info */}
-                          {author && (
-                            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                              <div className="flex items-center gap-1 md:gap-2 text-slate-700 dark:text-gray-300 font-medium">
-                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
-                                  <img
-                                    src={author.avatar || "/placeholder.svg"}
-                                    alt={author.name}
-                                    className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src =
-                                        "/placeholder.svg";
-                                    }}
-                                  />
-                                </div>
-                                <Link
-                                  href={`/authors/${author.slug}`}
-                                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-xs md:text-sm"
+                          {/* Tags - Same style as admin */}
+                          {articleTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                              {articleTags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag!.id}
+                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
                                 >
-                                  {author.name}
-                                </Link>
-                              </div>
+                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                  {tag!.name}
+                                </span>
+                              ))}
+                              {articleTags.length > 3 && (
+                                <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                  +{articleTags.length - 3} more
+                                </span>
+                              )}
                             </div>
                           )}
                         </div>
 
-                        {/* Read More Button - Mobile Optimized */}
+                        {/* Read More Button - Same as admin's View/Edit buttons */}
                         <div className="flex items-center w-full md:w-auto justify-end md:justify-start">
                           <Link
                             href={`/articles/${article.slug}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
+                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
                           >
                             Read More
                             <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -737,7 +663,7 @@ export default function HundredDaysCloudChallenge() {
                 })}
               </div>
 
-              {/* Pagination Controls - Mobile Optimized */}
+              {/* Pagination Controls - Same as admin dashboard */}
               {totalPages > 1 && (
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -745,7 +671,6 @@ export default function HundredDaysCloudChallenge() {
                       Showing {paginatedArticles.length} of {totalArticles} days
                     </div>
 
-                    {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
                         onClick={() =>
@@ -758,7 +683,6 @@ export default function HundredDaysCloudChallenge() {
                         <span className="hidden xs:inline">Previous</span>
                       </button>
 
-                      {/* Page Numbers - Hidden on very small screens */}
                       <div className="hidden xs:flex items-center gap-1">
                         {Array.from(
                           { length: Math.min(3, totalPages) },
@@ -804,7 +728,6 @@ export default function HundredDaysCloudChallenge() {
                       </button>
                     </div>
 
-                    {/* Mobile Page Indicator - Only show on very small screens */}
                     <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
                       Page {currentPage} of {totalPages}
                     </div>

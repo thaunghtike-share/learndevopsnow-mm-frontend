@@ -21,18 +21,14 @@ import {
   Home,
   FileText,
   Server,
-  HelpCircle,
   PenSquare,
-  Zap,
   Moon,
   Sun,
   Globe,
   ChevronRight,
-  LogIn,
-  BookOpen,
-  Briefcase,
   MoreHorizontal,
   Book,
+  Briefcase,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,7 +43,6 @@ export function MinimalHeader() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -76,7 +71,6 @@ export function MinimalHeader() {
   const languageTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Language options
   const languageOptions = [
@@ -133,9 +127,12 @@ export function MinimalHeader() {
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const mobileMenuElement = document.querySelector(
+        ".fixed.top-0.right-0.z-50.h-full.w-\\[320px\\].bg-white.dark\\:bg-gray-900.transform"
+      );
       if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target as Node)
+        mobileMenuElement &&
+        !mobileMenuElement.contains(event.target as Node)
       ) {
         setIsMobileMenuOpen(false);
         setActiveMobileDropdown(null);
@@ -165,11 +162,9 @@ export function MinimalHeader() {
     const fetchResults = async () => {
       if (searchQuery.trim().length < 2) {
         setSearchResults([]);
-        setError(null);
         return;
       }
       setLoading(true);
-      setError(null);
       try {
         const res = await fetch(
           `${API_BASE_URL}/articles/?search=${encodeURIComponent(searchQuery)}`
@@ -180,7 +175,6 @@ export function MinimalHeader() {
         setSearchResults(Array.isArray(data.results) ? data.results : data);
       } catch {
         setSearchResults([]);
-        setError("Failed to fetch results. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -195,7 +189,6 @@ export function MinimalHeader() {
   const handleClear = () => {
     setSearchQuery("");
     setSearchResults([]);
-    setError(null);
   };
 
   const handleSignInClick = (e: React.MouseEvent) => {
@@ -307,8 +300,11 @@ export function MinimalHeader() {
       ),
     },
     {
-      href: `/${currentLocale}/categories`,
-      label: getNavText("Explore All Categories", "အမျိုးအစားများ"),
+      href: `/${currentLocale}/learn-linux-basic`,
+      label: getNavText(
+        "Learn Linux Basics",
+        "Linux အခြေခံများသင်ယူရန်"
+      ),
     },
   ];
 
@@ -327,6 +323,10 @@ export function MinimalHeader() {
         "DevOps Playgrounds များ"
       ),
     },
+    {
+      href: `/${currentLocale}/categories`,
+      label: getNavText("Explore All Categories", "အမျိုးအစားများ"),
+    },
   ];
 
   const mobileServicesItems = [
@@ -337,6 +337,10 @@ export function MinimalHeader() {
     {
       href: `/${currentLocale}/services/part-time-devops-support`,
       label: getNavText("DevOps Support", "DevOps အကူအညီ"),
+    },
+    {
+      href: `/${currentLocale}/services/web-development`,
+      label: getNavText("Web Development", "ဝက်ဘ်ဆိုက် ဖန်တီးခြင်း"),
     },
   ];
 
@@ -840,19 +844,13 @@ export function MinimalHeader() {
                     href={`/${currentLocale}/100-days-cloud-challenge`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText("Learn 100 Days of Azure", "Azure လေ့လာရန်")}
+                    {getNavText("Learn 50 Days of Azure", "Azure လေ့လာရန်")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/learn-linux-basic`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Learn Linux Essentials", "Linux အခြေခံများ")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/categories`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
-                  >
-                    {getNavText("Explore All Categories", "အမျိုးအစားများ")}
                   </Link>
                 </div>
               )}
@@ -872,7 +870,7 @@ export function MinimalHeader() {
                 className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/learn-devops-on-youtube") ||
                   pathname.includes("/free-courses") ||
-                  pathname.includes("/devops-playgrounds")
+                  pathname.includes("/categories")
                     ? "text-blue-600 dark:text-blue-400 font-semibold"
                     : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
@@ -909,6 +907,12 @@ export function MinimalHeader() {
                       "Explore DevOps Playgrounds",
                       "DevOps Playgrounds များ"
                     )}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/categories`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Explore All Categories", "အမျိုးအစားများ")}
                   </Link>
                 </div>
               )}
@@ -960,6 +964,12 @@ export function MinimalHeader() {
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
                   >
                     {getNavText("DevOps Support", "အချိန်ပိုင်း DevOps အကူအညီ")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/services/web-development`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Web Development", "ဝက်ဘ်ဆိုက် ဖန်တီးခြင်း")}
                   </Link>
                 </div>
               )}
@@ -1192,7 +1202,6 @@ export function MinimalHeader() {
       )}
 
       <div
-        ref={mobileMenuRef}
         className={`fixed top-0 right-0 z-50 h-full w-[320px] bg-white dark:bg-gray-900 transform transition-all duration-300 ease-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}

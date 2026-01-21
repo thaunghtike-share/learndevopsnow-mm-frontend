@@ -1,10 +1,9 @@
 "use client";
 
-import type React from "react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
-import { ChevronLeft, ChevronRight, ArrowRight, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 const DevOpsCyclingHero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -22,18 +21,8 @@ const DevOpsCyclingHero = () => {
         "DevOps is a set of practices that combines software development (Dev) and IT operations (Ops) to shorten the development lifecycle and provide continuous delivery with high software quality.",
       descriptionMy:
         "DevOps ဆိုသည်မှာ Software Development နှင့် IT Operations တို့ကို ပေါင်းစည်းထားခြင်းဖြစ်ပြီး၊ Software Development Lifecycle တစ်ခုလုံး ပိုမိုမြန်ဆန်၊ ထိရောက်စေရန် Automation နှင့် Security တို့ကို အဓိကထား လုပ်ဆောင်ပေးသည့် နည်းပညာဖြစ်ပါသည်။",
-      tags: [
-        "Automation",
-        "Collaboration",
-        "Monitoring",
-        "Continuous Delivery",
-      ],
-      tagsMy: [
-        "Automation",
-        "Collaboration",
-        "Monitoring",
-        "Continuous Delivery",
-      ],
+      tags: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
+      tagsMy: ["Automation", "Collaboration", "Monitoring", "Continuous Delivery"],
     },
     {
       id: "linux",
@@ -142,9 +131,7 @@ const DevOpsCyclingHero = () => {
 
   const currentSlideData = slides[currentSlide];
 
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.currentTarget;
     target.src = "/devops.png";
   };
@@ -247,22 +234,17 @@ const DevOpsCyclingHero = () => {
                   {/* Topic indicator - Sky Blue */}
                   <div className="inline-block mb-1 md:mb-4">
                     <span className="text-xs font-mono text-sky-600 dark:text-sky-400 tracking-wider uppercase">
-                      {locale === "en" ? "Topic" : "အကြောင်းအရာ"}{" "}
-                      {currentSlide + 1} of {slides.length}
+                      {locale === "en" ? "Topic" : "အကြောင်းအရာ"} {currentSlide + 1} of {slides.length}
                     </span>
                   </div>
 
                   {/* Consistent Question Color - Dark Blue for better readability */}
                   <h1 className="md:mb-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl tracking-tight text-gray-900 dark:text-white">
-                    {locale === "en"
-                      ? currentSlideData.title
-                      : currentSlideData.titleMy}
+                    {locale === "en" ? currentSlideData.title : currentSlideData.titleMy}
                   </h1>
 
                   <p className="text-sm sm:text-base md:text-lg text-black dark:text-gray-300 leading-relaxed">
-                    {locale === "en"
-                      ? currentSlideData.description
-                      : currentSlideData.descriptionMy}
+                    {locale === "en" ? currentSlideData.description : currentSlideData.descriptionMy}
                   </p>
 
                   {/* Two Action Buttons */}
