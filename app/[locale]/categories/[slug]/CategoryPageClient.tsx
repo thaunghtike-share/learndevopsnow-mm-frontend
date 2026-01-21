@@ -314,25 +314,21 @@ export default function CategoryPageClient({ slug }: { slug: string }) {
     ? getCategoryGradient(category.name)
     : "from-slate-500 to-slate-600";
 
-  // Loading state (same as your author page)
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
+          {/* Simple Elegant Loading */}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            {/* Animated Logo Container */}
             <div className="relative">
-              <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+              {/* Outer Ring Animation */}
+              <div className="w-32 h-32 rounded-full border-4 border-sky-200/50 dark:border-sky-800/30 animate-spin">
+                {/* Logo Container */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 border-t-blue-500 dark:border-t-blue-400 animate-spin">
-                    <img
-                      src="/logo.png"
-                      alt="KodeKloud"
-                      className="w-16 h-16 object-contain animate-pulse"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
+                  <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
+                    <Cloud className="w-16 h-16 text-sky-600 dark:text-sky-400 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -396,9 +392,9 @@ export default function CategoryPageClient({ slug }: { slug: string }) {
           <div className="flex flex-col lg:flex-row items-start gap-8 md:gap-12 md:mb-16">
             <div className="flex-shrink-0">
               <div className="relative">
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border-4 border-white/70 dark:border-gray-800 shadow-lg overflow-hidden bg-white/95 p-1">
                   <div className="w-full h-full rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <CategoryIcon className="w-12 h-12 md:w-14 md:h-14 text-white" />
+                    <CategoryIcon className="w-12 h-12 md:w-14 md:h-14 text-sky-500" />
                   </div>
                 </div>
               </div>
@@ -518,7 +514,7 @@ export default function CategoryPageClient({ slug }: { slug: string }) {
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
                         {/* Cover Image with Category Badge */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        <div className="flex-shrink-0 w-full md:w-32 h-38 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={article.title}
