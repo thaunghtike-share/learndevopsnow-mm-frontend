@@ -51,12 +51,20 @@ interface Notification {
   time_ago: string;
 }
 
+interface NotificationResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Notification[];
+}
+
 export default function DashboardNotificationSection() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [locallyRead, setLocallyRead] = useState<Set<number>>(new Set());
   const [locallyRemoved, setLocallyRemoved] = useState<Set<number>>(new Set());
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
@@ -82,8 +90,9 @@ export default function DashboardNotificationSection() {
 
       if (!response.ok) throw new Error("Failed to fetch notifications");
       
-      const data = await response.json();
+      const data: NotificationResponse = await response.json();
       setNotifications(data.results || []);
+      setTotalCount(data.count || 0);
       setTotalPages(Math.ceil((data.count || 0) / notificationsPerPage));
     } catch (err) {
       console.error("Error fetching notifications:", err);
@@ -132,6 +141,9 @@ export default function DashboardNotificationSection() {
           Authorization: `Token ${token}`,
         },
       });
+      
+      // Refresh the current page after deletion
+      fetchNotifications(currentPage);
     } catch (error) {
       console.error("Error removing notification:", error);
     }
@@ -170,22 +182,41 @@ export default function DashboardNotificationSection() {
     return '#';
   };
 
-  const getNotificationColor = (notification: Notification) => {
-    const isRead = notification.is_read || locallyRead.has(notification.id);
-    if (!isRead) {
-      switch (notification.notification_type) {
-        case 'comment':
-          return 'bg-blue-50/50 dark:bg-blue-900/20';
-        case 'reply':
-          return 'bg-green-50/50 dark:bg-green-900/20';
-        case 'reaction':
-          return 'bg-purple-50/50 dark:bg-purple-900/20';
-        default:
-          return 'bg-gray-50 dark:bg-gray-800';
+  // Filter out locally removed notifications BEFORE displaying
+  const filteredNotifications = notifications.filter(
+    n => !locallyRemoved.has(n.id)
+  );
+
+  // Calculate unread count from ALL notifications (not just current page)
+  const [overallUnreadCount, setOverallUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        
+        const response = await fetch(`${API_BASE_URL}/notifications/count/`, {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setOverallUnreadCount(data.unread_count || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching unread count:", error);
       }
-    }
-    return 'bg-gray-50/30 dark:bg-gray-800/30';
-  };
+    };
+    
+    fetchUnreadCount();
+  }, [notifications]); // Refresh when notifications change
+
+  const unreadCountOnPage = filteredNotifications.filter(
+    n => !(n.is_read || locallyRead.has(n.id))
+  ).length;
 
   // Setup polling for new notifications
   useEffect(() => {
@@ -236,27 +267,12 @@ export default function DashboardNotificationSection() {
     }
   }, []);
 
-  // Filter out locally removed notifications
-  const visibleNotifications = notifications.filter(
-    n => !locallyRemoved.has(n.id)
-  );
-
-  const unreadCount = visibleNotifications.filter(
-    n => !(n.is_read || locallyRead.has(n.id))
-  ).length;
-  const totalNotifications = visibleNotifications.length;
-
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-
-  const paginatedNotifications = visibleNotifications.slice(
-    (currentPage - 1) * notificationsPerPage,
-    currentPage * notificationsPerPage
-  );
 
   return (
     <motion.section
@@ -273,10 +289,10 @@ export default function DashboardNotificationSection() {
               Notifications
             </h2>
             <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-              {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"} • {totalNotifications} total
+              {overallUnreadCount > 0 ? `${overallUnreadCount} unread` : "All caught up"} • {totalCount} total
             </p>
           </div>
-          {visibleNotifications.length > 0 && (
+          {totalCount > 0 && (
             <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
               Page {currentPage} of {totalPages}
             </div>
@@ -312,7 +328,7 @@ export default function DashboardNotificationSection() {
             Try Again
           </button>
         </div>
-      ) : visibleNotifications.length === 0 ? (
+      ) : filteredNotifications.length === 0 && totalCount === 0 ? (
         <div className="text-center py-12 md:py-20">
           <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-slate-500 to-slate-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
             <Bell className="w-6 h-6 md:w-10 md:h-10 text-white" />
@@ -324,10 +340,28 @@ export default function DashboardNotificationSection() {
             Comments, replies, and reactions will appear here
           </p>
         </div>
+      ) : filteredNotifications.length === 0 && totalCount > 0 ? (
+        <div className="text-center py-12 md:py-20">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+            <Bell className="w-6 h-6 md:w-8 md:h-8 text-white" />
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
+            All Notifications Removed
+          </h3>
+          <p className="text-sm md:text-base text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
+            You've removed all notifications on this page
+          </p>
+          <button
+            onClick={() => fetchNotifications(currentPage)}
+            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 text-sm md:text-base font-medium"
+          >
+            Refresh Page
+          </button>
+        </div>
       ) : (
         <>
           <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
-            {paginatedNotifications.map((notification, index) => {
+            {filteredNotifications.map((notification, index) => {
               const isRead = notification.is_read || locallyRead.has(notification.id);
               
               return (
@@ -430,7 +464,7 @@ export default function DashboardNotificationSection() {
             <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                  Showing {paginatedNotifications.length} of {totalNotifications} notifications
+                  Showing {filteredNotifications.length} of {totalCount} notifications
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
