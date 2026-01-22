@@ -294,14 +294,15 @@ export function MinimalHeader() {
     },
     {
       href: `/${currentLocale}/50-days-cloud-challenge`,
-      label: getNavText(
-        "Explore 100 Days of Cloud",
-        "Cloud 100 ရက်စိန်ခေါ်မှု"
-      ),
+      label: getNavText("Explore 50 Days of Azure", "Azure ရက် 50 လေ့လာမယ်"),
     },
     {
       href: `/${currentLocale}/learn-linux-basic`,
       label: getNavText("Learn Linux Basics", "Linux အခြေခံများသင်ယူရန်"),
+    },
+    {
+      href: `/${currentLocale}/terraform-series`,
+      label: getNavText("Learn Terraform", "Terraform သင်ယူရန်"),
     },
   ];
 
@@ -822,7 +823,8 @@ export function MinimalHeader() {
                 className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/articles") ||
                   pathname.includes("/50-days-cloud-challenge") ||
-                  pathname.includes("/learn-linux-basic")
+                  pathname.includes("/learn-linux-basic") ||
+                  pathname.includes("/terraform-series")
                     ? "text-blue-600 dark:text-blue-400 font-semibold"
                     : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
@@ -859,6 +861,12 @@ export function MinimalHeader() {
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Learn Linux Essentials", "Linux အခြေခံများ")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/terraform-series`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                  >
+                    {getNavText("Learn Terraform", "Terraform လေ့လာရန်")}
                   </Link>
                 </div>
               )}
