@@ -54,6 +54,7 @@ import {
   BarElement,
   ArcElement,
 } from "chart.js";
+import DashboardNotificationSection from "@/components/DashboardNotificationSection";
 
 ChartJS.register(
   ArcElement,
@@ -2014,6 +2015,8 @@ export default function AuthorAdminDashboard() {
                 </div>
               )}
             </motion.section>
+
+            <DashboardNotificationSection />
 
             {/* Bottom spacing */}
             <div className="h-8 md:h-16"></div>
