@@ -11,7 +11,6 @@ import { YouTubePlaylists } from "@/components/YouTubePlaylists";
 import { FreeLabs } from "@/components/FreeLabs";
 import { MinimalDevopsRoadmap } from "@/components/devops-roadmap";
 import { ProgrammingLanguagesRoadmap } from "@/components/programming-languages-roadmap";
-import { TopBannerWithModal } from "@/components/TopBannerWithModal";
 
 export default function HomeClient() {
   const router = useRouter();
@@ -22,16 +21,6 @@ export default function HomeClient() {
   const initialTag = searchParams.get("tag") || null;
   const [selectedTag, setSelectedTag] = useState<string | null>(initialTag);
   const [mounted, setMounted] = useState(false);
-  // REMOVE the isMobile state and useEffect for checking screen size
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -51,13 +40,8 @@ export default function HomeClient() {
     router.replace(newUrl);
   }, [selectedTag, router, mounted]);
 
-  const updateTagFilter = (tagSlug: string | null) => {
-    setSelectedTag(tagSlug);
-  };
-
   return (
     <div className="min-h-screen bg-white dark:bg-[#000000] relative transition-colors duration-300">
-
       <div className="relative z-10">
         <MinimalHeader />
 

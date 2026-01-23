@@ -54,6 +54,7 @@ import {
   BarElement,
   ArcElement,
 } from "chart.js";
+import DashboardNotificationSection from "@/components/DashboardNotificationSection";
 
 ChartJS.register(
   ArcElement,
@@ -1649,7 +1650,7 @@ export default function AuthorAdminDashboard() {
                         >
                           <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
                             {/* MOBILE OPTIMIZED COVER */}
-                            <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                            <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                               <img
                                 src={coverImage}
                                 alt={article.title}
@@ -2014,6 +2015,8 @@ export default function AuthorAdminDashboard() {
                 </div>
               )}
             </motion.section>
+
+            <DashboardNotificationSection />
 
             {/* Bottom spacing */}
             <div className="h-8 md:h-16"></div>

@@ -6,16 +6,12 @@ import {
   Play,
   Clock,
   Users,
-  Star,
-  TrendingUp,
-  BookOpen,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ArrowRight,
-  Youtube,
-  CheckCircle2,
-  Circle,
-  ExternalLink,
+  Star,
+  TrendingUp,
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -25,7 +21,7 @@ const youtubePlaylists = [
   {
     id: 5,
     title: "Linux Essentials",
-    titleMy: "Linux Essentials", // Keep English title
+    titleMy: "Linux Essentials",
     videoId: "Wgi-OfbP2Gw",
     playlistUrl:
       "https://www.youtube.com/watch?v=Wgi-OfbP2Gw&list=PL9ooVrP1hQOH3SvcgkC4Qv2cyCebvs0Ik",
@@ -44,7 +40,7 @@ const youtubePlaylists = [
   {
     id: 6,
     title: "Linux Server Administration",
-    titleMy: "Linux Server Administration", // Keep English title
+    titleMy: "Linux Server Administration",
     videoId: "acv0fUTDK3g",
     playlistUrl:
       "https://www.youtube.com/watch?v=acv0fUTDK3g&list=PLS0spxc8nUsDro6iDvLzeC8iDv5y1gDXa",
@@ -63,7 +59,7 @@ const youtubePlaylists = [
   {
     id: 35,
     title: "Bash Scripting",
-    titleMy: "Bash Scripting", // Keep English title
+    titleMy: "Bash Scripting",
     videoId: "e7BufAVwDiM",
     playlistUrl: "https://www.youtube.com/watch?v=e7BufAVwDiM",
     channel: "LinuxHint",
@@ -83,7 +79,7 @@ const youtubePlaylists = [
   {
     id: 28,
     title: "CCNA Free Course",
-    titleMy: "CCNA Free Course", // Keep English title
+    titleMy: "CCNA Free Course",
     videoId: "H8W9oMNSuwo",
     playlistUrl:
       "https://www.youtube.com/watch?v=H8W9oMNSuwo&list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ",
@@ -102,7 +98,7 @@ const youtubePlaylists = [
   {
     id: 30,
     title: "CCNA (Burmese)",
-    titleMy: "CCNA (Burmese)", // Keep English title
+    titleMy: "CCNA (Burmese)",
     videoId: "iutsJfATykg",
     playlistUrl:
       "https://www.youtube.com/watch?v=iutsJfATykg&list=PLOFIpcUzu6dWs4DjtrVUA2SRwiWOPSCeJ",
@@ -123,7 +119,7 @@ const youtubePlaylists = [
   {
     id: 1,
     title: "Cloud Fundamentals",
-    titleMy: "Cloud Fundamentals", // Keep English title
+    titleMy: "Cloud Fundamentals",
     videoId: "3XFODda6YXo",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLEiEAq2VkUULlNtIFhEQHo8gacvme35rz",
@@ -145,7 +141,7 @@ const youtubePlaylists = [
   {
     id: 2,
     title: "AWS Course Certification",
-    titleMy: "AWS Course Certification", // Keep English title
+    titleMy: "AWS Course Certification",
     videoId: "YqWuL3an-5o",
     playlistUrl: "https://www.youtube.com/watch?v=YqWuL3an-5o",
     channel: "Intellipaat",
@@ -163,7 +159,7 @@ const youtubePlaylists = [
   {
     id: 34,
     title: "AWS Basic (Burmese)",
-    titleMy: "AWS Basic (Burmese)", // Keep English title
+    titleMy: "AWS Basic (Burmese)",
     videoId: "Dn5B-qliqyk",
     playlistUrl:
       "https://www.youtube.com/watch?v=Dn5B-qliqyk&list=PLfFA9b_Mlfz4H8wn2KnPI-u5a3F9UNNVz",
@@ -184,7 +180,7 @@ const youtubePlaylists = [
   {
     id: 3,
     title: "Azure (AZ-900) Full Course",
-    titleMy: "Azure (AZ-900) Full Course", // Keep English title
+    titleMy: "Azure (AZ-900) Full Course",
     videoId: "NPEsD6n9A_I",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLGjZwEtPN7j-Q59JYso3L4_yoCjj2syrM",
@@ -206,7 +202,7 @@ const youtubePlaylists = [
   {
     id: 7,
     title: "Docker Crash Course Tutorial",
-    titleMy: "Docker Crash Course Tutorial", // Keep English title
+    titleMy: "Docker Crash Course Tutorial",
     videoId: "31ieHmcTUOk",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PL4cUxeGkcC9hxjeEtdHFNYMtCpjNBm3h7",
@@ -225,7 +221,7 @@ const youtubePlaylists = [
   {
     id: 8,
     title: "Docker Tutorial",
-    titleMy: "Docker Tutorial", // Keep English title
+    titleMy: "Docker Tutorial",
     videoId: "zJ6WbK9zFpI",
     playlistUrl: "https://www.youtube.com/watch?v=zJ6WbK9zFpI&t=11s",
     channel: "Kode Kloud",
@@ -245,7 +241,7 @@ const youtubePlaylists = [
   {
     id: 12,
     title: "Git – Full Course for Beginners",
-    titleMy: "Git – Full Course for Beginners", // Keep English title
+    titleMy: "Git – Full Course for Beginners",
     videoId: "zTjRZNkhiEU",
     playlistUrl: "https://www.youtube.com/watch?v=zTjRZNkhiEU",
     channel: "freeCodeCamp.org",
@@ -263,7 +259,7 @@ const youtubePlaylists = [
   {
     id: 36,
     title: "Git Basic (Burmese)",
-    titleMy: "Git Basic (Burmese)", // Keep English title
+    titleMy: "Git Basic (Burmese)",
     videoId: "DB_MEZZdiIs",
     playlistUrl:
       "https://www.youtube.com/watch?v=DB_MEZZdiIs&list=PLD_eiqVVLZDge73nM5J-LyPgbfVL6vnDc",
@@ -284,7 +280,7 @@ const youtubePlaylists = [
   {
     id: 10,
     title: "CICD Tutorials",
-    titleMy: "CICD Tutorials", // Keep English title
+    titleMy: "CICD Tutorials",
     videoId: "R8_veQiYBjI",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLy7NrYWoggjzSIlwxeBbcgfAdYoxCIrM2",
@@ -304,7 +300,7 @@ const youtubePlaylists = [
   {
     id: 11,
     title: "CICD (Github Action)",
-    titleMy: "CICD (Github Action)", // Keep English title
+    titleMy: "CICD (Github Action)",
     videoId: "-hVG9z0fCac",
     playlistUrl:
       "https://www.youtube.com/watch?v=-hVG9z0fCac&list=PLArH6NjfKsUhvGHrpag7SuPumMzQRhUKY",
@@ -325,7 +321,7 @@ const youtubePlaylists = [
   {
     id: 14,
     title: "Ansible Tutorials",
-    titleMy: "Ansible Tutorials", // Keep English title
+    titleMy: "Ansible Tutorials",
     videoId: "3RiVKs8GHYQ",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLT98CRl2KxKEUHlbhuq9V02n9AMLPySoEQ",
@@ -344,7 +340,7 @@ const youtubePlaylists = [
   {
     id: 15,
     title: "Ansible Zero to Hero",
-    titleMy: "Ansible Zero to Hero", // Keep English title
+    titleMy: "Ansible Zero to Hero",
     videoId: "aT69WlNi8EA",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PL0lvsZ5ieQicXHPMNNg7qXJJoO2AnE8ej",
@@ -365,7 +361,7 @@ const youtubePlaylists = [
   {
     id: 39,
     title: "AWS Security Full Course",
-    titleMy: "AWS Security Full Course", // Keep English title
+    titleMy: "AWS Security Full Course",
     videoId: "oGS9FhCT91g",
     playlistUrl: "https://www.youtube.com/watch?v=oGS9FhCT91g",
     channel: "Maruchin tech",
@@ -384,7 +380,7 @@ const youtubePlaylists = [
   {
     id: 40,
     title: "AWS Security",
-    titleMy: "AWS Security", // Keep English title
+    titleMy: "AWS Security",
     videoId: "2pEp1mcf3jU",
     playlistUrl:
       "https://www.youtube.com/watch?v=2pEp1mcf3jU&list=PLTCuRW0ikUdP5OrEUckFdQPHeE05ZeS5z",
@@ -405,7 +401,7 @@ const youtubePlaylists = [
   {
     id: 38,
     title: "Hashicorp Packer",
-    titleMy: "Hashicorp Packer", // Keep English title
+    titleMy: "Hashicorp Packer",
     videoId: "tbv1lTF1wFU",
     playlistUrl:
       "https://www.youtube.com/watch?v=tbv1lTF1wFU&list=PL8VzFQ8k4UdP5OrEUckFdQPHeE05ZeS5z",
@@ -426,7 +422,7 @@ const youtubePlaylists = [
   {
     id: 9,
     title: "Kubernetes Administrator Course",
-    titleMy: "Kubernetes Administrator Course", // Keep English title
+    titleMy: "Kubernetes Administrator Course",
     videoId: "6_gMoe7Ik8k",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLl4APkPHzsUUOkOv3i62UidrLmSB8DcGC",
@@ -445,7 +441,7 @@ const youtubePlaylists = [
   {
     id: 31,
     title: "Kubernetes Fundamentals",
-    titleMy: "Kubernetes Fundamentals", // Keep English title
+    titleMy: "Kubernetes Fundamentals",
     videoId: "2T86xAtR6Fo",
     playlistUrl:
       "https://www.youtube.com/watch?v=dfxrdoEQe00&list=PLdpzxOOAlwvJdsW6A0jCz_3VaANuFMLpc",
@@ -466,7 +462,7 @@ const youtubePlaylists = [
   {
     id: 13,
     title: "Terraform Full Course For Beginners",
-    titleMy: "Terraform Full Course For Beginners", // Keep English title
+    titleMy: "Terraform Full Course For Beginners",
     videoId: "j0mfH_7sR7k",
     playlistUrl:
       "https://www.youtube.com/playlist?list=PLl4APkPHzsUUHlbhuq9V02n9AMLPySoEQ",
@@ -485,7 +481,7 @@ const youtubePlaylists = [
   {
     id: 37,
     title: "Terraform (Burmese)",
-    titleMy: "Terraform (Burmese)", // Keep English title
+    titleMy: "Terraform (Burmese)",
     videoId: "v4X3D4YlyHc",
     playlistUrl:
       "https://www.youtube.com/watch?v=v4X3D4YlyHc&list=PLvzWOIc1IOtdufeA0ab5mKycSJgq5Bi57",
@@ -506,7 +502,7 @@ const youtubePlaylists = [
   {
     id: 21,
     title: "DevOps Zero To Hero Course",
-    titleMy: "DevOps Zero To Hero Course", // Keep English title
+    titleMy: "DevOps Zero To Hero Course",
     videoId: "Xrgk023l4lI",
     playlistUrl:
       "https://www.youtube.com/watch?v=Ou9j73aWgyE&list=PLdpzxOOAlwvIKMhk8WhzN1pYoJ1YU8Csa",
@@ -527,7 +523,7 @@ const youtubePlaylists = [
   {
     id: 22,
     title: "GitOps with ArgoCD",
-    titleMy: "GitOps with ArgoCD", // Keep English title
+    titleMy: "GitOps with ArgoCD",
     videoId: "eTR-gbIeXPw",
     playlistUrl:
       "https://www.youtube.com/watch?v=eTR-gbIeXPw&list=PLdsu0umqbb8P8dNoox7ECgOo_fJ9FBfZl",
@@ -548,7 +544,7 @@ const youtubePlaylists = [
   {
     id: 29,
     title: "DevSecOps Fundamentals",
-    titleMy: "DevSecOps Fundamentals", // Keep English title
+    titleMy: "DevSecOps Fundamentals",
     videoId: "7tcX_ndqD68",
     playlistUrl: "https://www.youtube.com/watch?v=7tcX_ndqD68",
     channel: "MartinY Tech",
@@ -568,7 +564,7 @@ const youtubePlaylists = [
   {
     id: 41,
     title: "Kubernetes Logging & Monitoring",
-    titleMy: "Kubernetes Logging & Monitoring", // Keep English title
+    titleMy: "Kubernetes Logging & Monitoring",
     videoId: "0POI5E7Uzjo",
     playlistUrl: "https://www.youtube.com/watch?v=0POI5E7Uzjo",
     channel: "Rayan Slim",
@@ -586,7 +582,7 @@ const youtubePlaylists = [
   {
     id: 42,
     title: "Filebeat + Elk Stack Tutorial With Kubernetes",
-    titleMy: "Filebeat + Elk Stack Tutorial With Kubernetes", // Keep English title
+    titleMy: "Filebeat + Elk Stack Tutorial With Kubernetes",
     videoId: "SU--XMhbWoY",
     playlistUrl: "https://www.youtube.com/watch?v=SU--XMhbWoY",
     channel: "Michael Guay",
@@ -606,7 +602,7 @@ const youtubePlaylists = [
   {
     id: 43,
     title: "Hashicorp Vault",
-    titleMy: "Hashicorp Vault", // Keep English title
+    titleMy: "Hashicorp Vault",
     videoId: "-sU0O82fdZs",
     playlistUrl:
       "https://www.youtube.com/watch?v=-sU0O82fdZs&list=PL7iMyoQPMtAP7XeXabzWuPumMzQRhUKC",
@@ -627,7 +623,7 @@ const youtubePlaylists = [
   {
     id: 44,
     title: "Kubernetes Security Course",
-    titleMy: "Kubernetes Security Course", // Keep English title
+    titleMy: "Kubernetes Security Course",
     videoId: "d9xfB5qaOfg",
     playlistUrl: "https://www.youtube.com/watch?v=d9xfB5qaOfg",
     channel: "Killer Shell",
@@ -661,7 +657,7 @@ const difficultyConfig = {
     textColor: "text-sky-700 dark:text-sky-300",
     borderColor: "border-sky-200 dark:border-sky-800",
     icon: TrendingUp,
-    position: "left", // Changed from "right" to "left"
+    position: "left",
   },
   Advanced: {
     gradient: "from-pink-500 to-purple-600",
@@ -676,8 +672,8 @@ const difficultyConfig = {
 
 const learningPaths = {
   Beginner: {
-    title: "Start Your DevOps Journey", // Keep English title
-    titleMy: "Start Your DevOps Journey", // Keep English
+    title: "Start Your DevOps Journey",
+    titleMy: "Start Your DevOps Journey",
     description:
       "Begin with foundational concepts and essential tools. Master Linux, networking, and cloud basics to build a solid foundation for your DevOps career.",
     descriptionMy:
@@ -700,8 +696,8 @@ const learningPaths = {
     skillsMy: ["Linux CLI", "Network", "Cloud အခြေခံ", "Container အခြေခံ"],
   },
   Intermediate: {
-    title: "Build DevOps Workflows", // Keep English title
-    titleMy: "Build DevOps Workflows", // Keep English
+    title: "Build DevOps Workflows",
+    titleMy: "Build DevOps Workflows",
     description:
       "Learn to automate infrastructure and implement CI/CD pipelines. Focus on container orchestration, infrastructure as code, and deployment automation.",
     descriptionMy:
@@ -719,8 +715,8 @@ const learningPaths = {
     skillsMy: ["Docker", "CI/CD", "Git", "Ansible", "AWS Security"],
   },
   Advanced: {
-    title: "Master Production DevOps", // Keep English title
-    titleMy: "Master Production DevOps", // Keep English
+    title: "Master Production DevOps",
+    titleMy: "Master Production DevOps",
     description:
       "Advanced topics including Kubernetes, Terraform, GitOps, and security. Learn to manage complex infrastructure and implement enterprise-grade DevOps practices.",
     descriptionMy:
@@ -749,8 +745,6 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
     new Set()
   );
   const [isClient, setIsClient] = useState(false);
-  const [selectedDifficulty, setSelectedDifficulty] = useState("Beginner");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -920,7 +914,6 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                 const config = difficultyConfig[difficulty];
                 const path = learningPaths[difficulty];
                 const DifficultyIcon = config.icon;
-                const isLeft = config.position === "left";
 
                 return (
                   <motion.section
@@ -931,21 +924,9 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                     transition={{ duration: 0.6 }}
                     className="scroll-mt-20 mb-5"
                   >
-                    <div
-                      className={`flex flex-col ${
-                        isLeft ? "items-start" : "items-start"
-                      } mb-6 md:mb-8`}
-                    >
-                      <div
-                        className={`max-w-full lg:max-w-3xl w-full ${
-                          isLeft ? "text-left" : "text-left"
-                        }`}
-                      >
-                        <div
-                          className={`flex items-center gap-3 mb-3 ${
-                            isLeft ? "" : "flex-row"
-                          }`}
-                        >
+                    <div className="flex flex-col items-start mb-6 md:mb-8">
+                      <div className="max-w-full lg:max-w-3xl w-full text-left">
+                        <div className="flex items-center gap-3 mb-3">
                           <div
                             className={`p-2 rounded-xl ${config.bgColor} text-white shadow-lg`}
                           >
@@ -953,7 +934,7 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                           </div>
                           <div className="flex-1 min-w-0 mb-5">
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                              {path.title} {/* Always show English title */}
+                              {path.title}
                             </h2>
                             <span className="text-sm font-medium text-sky-600 dark:text-sky-400 mt-1 block">
                               {locale === "en"
@@ -976,11 +957,7 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                         </p>
 
                         {/* Learning Path - Made scrollable on mobile - REMOVED BOXES */}
-                        <div
-                          className={`inline-flex flex-col gap-2 w-full ${
-                            isLeft ? "" : "items-start"
-                          }`}
-                        >
+                        <div className="inline-flex flex-col gap-2 w-full items-start">
                           <span className="text-sm md:mb-4 font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
                             {locale === "en"
                               ? "Recommended Learning Path"
@@ -1001,8 +978,7 @@ export function YouTubePlaylists({ locale = "en" }: YouTubePlaylistsProps) {
                                   <div className="flex items-center gap-2">
                                     <span className="text-lg">{step.icon}</span>
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                      {step.title}{" "}
-                                      {/* Always show English title */}
+                                      {step.title}
                                     </span>
                                   </div>
                                   {index < path.learningPath.length - 1 && (
@@ -1274,7 +1250,7 @@ function PlaylistCard({
                 : "text-gray-900 dark:text-gray-100"
             }`}
           >
-            {index}. {playlist.title} {/* Always show English title */}
+            {index}. {playlist.title}
           </h3>
         </a>
 
@@ -1282,7 +1258,7 @@ function PlaylistCard({
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <Users className="w-4 h-4 text-gray-700 dark:text-gray-500" />
             <span className="text-sm text-gray-700 font-medium">
-              {playlist.channel} {/* Always show English channel name */}
+              {playlist.channel}
             </span>
           </div>
 

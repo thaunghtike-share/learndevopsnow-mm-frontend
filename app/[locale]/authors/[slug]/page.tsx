@@ -380,7 +380,7 @@ export default function AuthorDetailPage() {
                     href={author.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute -bottom-2 -right-2 bg-blue-600 p-1.5 md:p-2 rounded-full hover:scale-110 transition-transform border-2 border-white dark:border-gray-800"
+                    className="hidden md:block absolute -bottom-2 -right-2 bg-blue-600 p-1.5 md:p-2 md:rounded-full hover:scale-110 transition-transform border-2 border-white dark:border-gray-800"
                   >
                     <Linkedin className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </a>
@@ -506,7 +506,7 @@ export default function AuthorDetailPage() {
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
                         {/* Cover Image with Category Badge */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={article.title}

@@ -30,6 +30,28 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getFullAvatarUrl = (avatarUrl: string | undefined | null) => {
+    if (!avatarUrl) return "";
+    
+    // If avatar already has http/https, return as is
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+      return avatarUrl;
+    }
+    
+    // If it's a relative path, prepend the base URL
+    if (avatarUrl.startsWith('/')) {
+      return `${process.env.NEXT_PUBLIC_API_BASE_URL}${avatarUrl}`;
+    }
+    
+    // For Azure blob paths or other formats, try to construct URL
+    if (avatarUrl.includes('blob.core.windows.net')) {
+      return avatarUrl;
+    }
+    
+    // Default: return empty string
+    return "";
+  };
+
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -55,6 +77,7 @@ export function useAuth() {
       if (profileRes.ok) {
         const profileData = await profileRes.json();
         console.log("✅ Profile loaded:", profileData.name);
+        console.log("📸 Avatar URL from API:", profileData.avatar);
 
         // ✅ DEBUG SUPER USER CHECK
         console.log("🔍 Checking super user status...");
@@ -84,17 +107,26 @@ export function useAuth() {
           isSuperUser = false;
         }
 
+        // Get full avatar URL
+        const fullAvatarUrl = getFullAvatarUrl(profileData.avatar);
+        console.log("🖼️ Full avatar URL:", fullAvatarUrl);
+
         setUser({
           id: profileData.id,
           username: profileData.name || "Author",
           email: profileData.email || "",
-          avatar: profileData.avatar,
+          avatar: fullAvatarUrl,
           profileComplete: profileData.profile_complete || false,
           slug: profileData.slug || "",
           is_super_user: isSuperUser,
         });
         setIsAuthenticated(true);
         console.log("✅ Auth complete - Super user:", isSuperUser);
+        console.log("👤 Final user object:", {
+          username: profileData.name,
+          avatar: fullAvatarUrl,
+          hasAvatar: !!fullAvatarUrl
+        });
       } else {
         console.log("❌ Profile check failed:", profileRes.status);
         localStorage.removeItem("token");

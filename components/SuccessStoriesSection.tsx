@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { Star, Quote, ChevronRight, ChevronLeft } from "lucide-react";
+import { Quote, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Testimonial = {
@@ -8,7 +8,6 @@ type Testimonial = {
   name: string;
   role: string;
   feedback: string;
-  rating: number;
   image?: string;
 };
 

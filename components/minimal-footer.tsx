@@ -18,12 +18,10 @@ import {
   BellOff,
   X,
   Star,
-  Contact,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -134,11 +132,6 @@ export function MinimalFooter() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSignIn = () => {
-    setShowAuthModal(false);
-    router.push("/auth");
   };
 
   return (
@@ -405,7 +398,6 @@ export function MinimalFooter() {
 
               <div>
                 <h3 className="text-base md:text-lg font-bold text-black dark:text-gray-100 mb-4 md:mb-6 flex items-center">
-                  <Contact className="h-4 w-4 md:h-5 md:w-5 mr-2 text-purple-500" />
                   <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Contact
                   </span>
@@ -500,13 +492,18 @@ export function MinimalFooter() {
             </p>
 
             <div className="flex gap-3">
-              <Button
+              <button
                 onClick={() => setShowAuthModal(false)}
-                variant="outline"
-                className="flex-1 border-gray-300 dark:border-gray-600"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-black dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 Cancel
-              </Button>
+              </button>
+              <button
+                onClick={() => router.push("/auth")}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Sign In
+              </button>
             </div>
           </div>
         </div>

@@ -1,40 +1,30 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calendar,
   ArrowRight,
-  Eye,
-  Star,
   TrendingUp,
-  Code,
-  Cloud,
-  Shield,
-  Container,
-  Wrench,
-  ToolCase,
-  Folder,
-  ChevronLeft,
-  ChevronRight,
-  Users,
   Clock,
-  BookOpen,
-  FileText,
   MessageSquare,
   Heart,
   ThumbsUp,
   Sparkles,
   Lightbulb,
-  CheckCircle,
-  Target,
-  Award,
-  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Tag as TagIcon,
+  FileText,
+  Cloud,
+  Terminal,
+  Layers,
+  GitBranch,
+  Server,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Article {
   id: number;
@@ -73,104 +63,17 @@ interface Tag {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 10;
 
-// Progress tracking interface
-interface ProgressData {
-  completedDays: number[];
-  lastRead: { [day: number]: number }; // timestamp
-  streak: number;
-  totalTimeSpent: number;
-}
-
-export default function HundredDaysCloudChallenge() {
+export default function TerraformBeginnerGuide() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [progress, setProgress] = useState<ProgressData>({
-    completedDays: [],
-    lastRead: {},
-    streak: 0,
-    totalTimeSpent: 0,
-  });
+  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
 
-  const router = useRouter();
   const topRef = useRef<HTMLHeadingElement>(null);
   const isFirstRender = useRef(true);
-
-  // Load progress from localStorage
-  useEffect(() => {
-    const savedProgress = localStorage.getItem("cloud-challenge-progress");
-    if (savedProgress) {
-      setProgress(JSON.parse(savedProgress));
-    }
-  }, []);
-
-  // Save progress to localStorage
-  const saveProgress = (newProgress: ProgressData) => {
-    setProgress(newProgress);
-    localStorage.setItem(
-      "cloud-challenge-progress",
-      JSON.stringify(newProgress)
-    );
-  };
-
-  // Mark day as completed
-  const markDayCompleted = (dayNumber: number) => {
-    const newCompletedDays = [
-      ...new Set([...progress.completedDays, dayNumber]),
-    ].sort((a, b) => a - b);
-
-    // Calculate streak (consecutive days from current day backward)
-    let currentStreak = 0;
-    for (let i = dayNumber; i > 0; i--) {
-      if (newCompletedDays.includes(i)) {
-        currentStreak++;
-      } else {
-        break;
-      }
-    }
-
-    const newProgress: ProgressData = {
-      ...progress,
-      completedDays: newCompletedDays,
-      lastRead: {
-        ...progress.lastRead,
-        [dayNumber]: Date.now(),
-      },
-      streak: currentStreak,
-    };
-
-    saveProgress(newProgress);
-  };
-
-  // Unmark day as completed
-  const unmarkDayCompleted = (dayNumber: number) => {
-    const newCompletedDays = progress.completedDays.filter(
-      (day) => day !== dayNumber
-    );
-
-    // Recalculate streak
-    let currentStreak = 0;
-    const maxDay = Math.max(...newCompletedDays);
-    for (let i = maxDay; i > 0; i--) {
-      if (newCompletedDays.includes(i)) {
-        currentStreak++;
-      } else {
-        break;
-      }
-    }
-
-    const newProgress: ProgressData = {
-      ...progress,
-      completedDays: newCompletedDays,
-      streak: currentStreak,
-    };
-
-    saveProgress(newProgress);
-  };
 
   // Calculate read time function
   const calculateReadTime = (content?: string) => {
@@ -182,12 +85,12 @@ export default function HundredDaysCloudChallenge() {
 
   // Extract day number from title or slug
   const extractDayNumber = (article: Article): number => {
-    // Try to extract from title first (e.g., "Day 1: Introduction")
-    const titleMatch = article.title.match(/Day\s+(\d+)/i);
+    // Try to extract from title first (e.g., "Terraform Day 1: Introduction")
+    const titleMatch = article.title.match(/Terraform\s+Day\s+(\d+)/i);
     if (titleMatch) return parseInt(titleMatch[1]);
 
-    // Try to extract from slug (e.g., "day-1-introduction")
-    const slugMatch = article.slug.match(/day-?(\d+)/i);
+    // Try to extract from slug (e.g., "terraform-day-1-introduction")
+    const slugMatch = article.slug.match(/terraform-?day-?(\d+)/i);
     if (slugMatch) return parseInt(slugMatch[1]);
 
     // Fallback: use article ID or return 0
@@ -201,9 +104,9 @@ export default function HundredDaysCloudChallenge() {
         setLoading(true);
         setError(null);
 
-        // Fetch articles with kodekloud-cloud-challenge tag
+        // Fetch articles with terraform-series tag
         const articlesRes = await fetch(
-          `${API_BASE_URL}/articles/?tags__slug=kodekloud-cloud-challenge&ordering=published_at`
+          `${API_BASE_URL}/articles/?tags__slug=terraform-series&ordering=published_at`
         );
 
         if (!articlesRes.ok) {
@@ -287,16 +190,16 @@ export default function HundredDaysCloudChallenge() {
           })
         );
 
-        // Sort articles by day number in DESCENDING order (Day 19, Day 18, Day 17, ...)
+        // Sort articles by day number in DESCENDING order
         const sortedArticles = articlesWithEngagement.sort((a, b) => {
           const dayA = extractDayNumber(a);
           const dayB = extractDayNumber(b);
 
-          // Sort by day number DESCENDING (Day 19, Day 18, Day 17, ...)
+          // Sort by day number DESCENDING
           if (dayA > dayB) return -1;
           if (dayA < dayB) return 1;
 
-          // If day numbers are equal (shouldn't happen), sort by published date
+          // If day numbers are equal, sort by published date
           return (
             new Date(b.published_at).getTime() -
             new Date(a.published_at).getTime()
@@ -321,7 +224,7 @@ export default function HundredDaysCloudChallenge() {
         setLoading(false);
         setCurrentPage(1);
       } catch (err: any) {
-        setError(err.message || "Failed to fetch challenge data");
+        setError(err.message || "Failed to fetch Terraform series data");
         setLoading(false);
       }
     }
@@ -338,7 +241,6 @@ export default function HundredDaysCloudChallenge() {
   }, [currentPage]);
 
   // Helper functions
-  const getAuthor = (id: number) => authors.find((a) => a.id === id);
   const getTagById = (id: number) => tags.find((t) => t.id === id);
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -346,11 +248,28 @@ export default function HundredDaysCloudChallenge() {
       month: "long",
       day: "numeric",
     });
-  const stripMarkdown = (md: string) =>
-    md
-      .replace(/<[^>]+>/g, "")
-      .replace(/[#_*>[\]~`-]/g, "")
-      .trim();
+  
+  const stripMarkdown = (md: string) => {
+    if (!md) return "";
+    let text = md;
+
+    text = text.replace(/^#{1,6}\s+/gm, "");
+    text = text.replace(/```[\s\S]*?```/g, "");
+    text = text.replace(/`([^`]*)`/g, "$1");
+    text = text.replace(/!\[.*?\]\$\$.*?\$\$/g, "");
+    text = text.replace(/!\[.*?\]\(.*?\)/g, "");
+    text = text.replace(/\[(.*?)\]\\$\$.*?\\$\$/g, "$1");
+    text = text.replace(/\[(.*?)\]\(.*?\)/g, "$1");
+    text = text.replace(/[*_~>/\\-]/g, "");
+    text = text.replace(/^\s*[-*+]\s+/gm, "");
+    text = text.replace(/^\s*\d+\.\s+/gm, "");
+    text = text.replace(/<[^>]+>/g, "");
+    text = text.replace(/^>\s+/gm, "");
+    text = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+
+    return text;
+  };
+  
   const truncate = (str: string, max = 150) =>
     str.length <= max ? str : str.slice(0, max) + "...";
 
@@ -359,11 +278,11 @@ export default function HundredDaysCloudChallenge() {
     if (article.cover_image && article.cover_image.trim() !== "") {
       return article.cover_image;
     }
-    // Fallback to kodekloud.png only if no cover image
-    return "/kodekloud.png";
+    // Fallback to terraform.png
+    return "/terraform.png";
   };
 
-  // Calculate challenge stats
+  // Calculate series stats
   const totalArticles = articles.length;
   const totalViews = articles.reduce(
     (sum, article) => sum + (article.read_count || 0),
@@ -384,11 +303,35 @@ export default function HundredDaysCloudChallenge() {
     );
   }, 0);
 
-  // Progress calculations
-  const completedCount = progress.completedDays.length;
-  const completionPercentage =
-    totalArticles > 0 ? Math.round((completedCount / 100) * 100) : 0;
-  const currentDay = Math.max(...progress.completedDays, 0) + 1;
+  // Get clean excerpt for article
+  const getCleanExcerpt = (article: Article) => {
+    if (article.excerpt?.trim()) {
+      return stripMarkdown(article.excerpt);
+    }
+
+    if (article.content) {
+      const content = article.content;
+      const lines = content.split("\n");
+
+      let startIndex = 0;
+      const firstLine = lines[0].trim();
+      if (
+        lines.length > 1 &&
+        firstLine.startsWith("#") &&
+        stripMarkdown(firstLine).includes(stripMarkdown(article.title))
+      ) {
+        startIndex = 1;
+      }
+
+      const contentWithoutFirstHeading = lines.slice(startIndex).join("\n");
+      const cleanContent = stripMarkdown(contentWithoutFirstHeading);
+      return (
+        truncate(cleanContent, 120) || "Join this Terraform series to master Infrastructure as Code..."
+      );
+    }
+
+    return "Join this Terraform series to master Infrastructure as Code...";
+  };
 
   // Pagination logic
   const totalPages = Math.ceil(totalArticles / pageSize);
@@ -403,18 +346,18 @@ export default function HundredDaysCloudChallenge() {
         <MinimalHeader />
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Cloud className="w-12 h-12 text-white" />
+            <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+              <FileText className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-              Challenge Not Found
+              Series Not Found
             </h1>
             <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
               {error}
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
             >
               Return Home
               <ArrowRight className="w-5 h-5" />
@@ -436,18 +379,11 @@ export default function HundredDaysCloudChallenge() {
             {/* Animated Logo Container */}
             <div className="relative">
               {/* Outer Ring Animation */}
-              <div className="w-32 h-32 rounded-full border-4 border-blue-200/50 dark:border-blue-800/30 animate-spin">
+              <div className="w-32 h-32 rounded-full border-4 border-emerald-200/50 dark:border-emerald-800/30 animate-spin">
                 {/* Logo Container */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
-                    <img
-                      src="/kodekloud.webp"
-                      alt="KodeKloud"
-                      className="w-16 h-16 object-contain animate-pulse"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
+                    <Layers className="w-16 h-16 text-emerald-600 dark:text-emerald-400 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -464,35 +400,29 @@ export default function HundredDaysCloudChallenge() {
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-10 pb-8 relative z-10">
-        {/* Challenge Header - Premium Design */}
+        {/* Series Header */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="w-full mb-12 md:mb-16"
         >
-          {/* Simple Header */}
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-4 mb-4 md:mb-6">
-              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                Kodekloud's Cloud Challenge
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-emerald-500 to-green-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                Terraform Learning Series
               </span>
             </div>
 
             <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-8 mb-6 md:mb-8">
-              {/* KodeKloud Logo */}
+              {/* Terraform Logo */}
               <div className="flex-shrink-0">
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl border-4 border-white dark:border-gray-800 shadow-2xl overflow-hidden bg-white p-1">
                   <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <img
-                      src="/kodekloud.webp"
-                      alt="KodeKloud"
-                      className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/placeholder.svg";
-                      }}
-                    />
+                    <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                      <Layers className="w-12 h-12 md:w-16 md:h-16 text-emerald-600 dark:text-emerald-400" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -500,12 +430,11 @@ export default function HundredDaysCloudChallenge() {
               {/* Title and Description */}
               <div className="flex-1">
                 <h1 className="text-3xl md:text-6xl font-light text-black dark:text-white mb-4 md:mb-6 tracking-tight">
-                  100 Days of Cloud Challenge
+                  Terraform Beginner's Guide
                 </h1>
                 <p className="text-base md:text-xl text-black dark:text-gray-300 leading-relaxed max-w-3xl">
-                  Master cloud technologies with KodeKloud's structured learning
-                  path. One concept per day, hands-on labs, and real-world
-                  projects to transform your cloud skills in 100 days.
+                  Master Infrastructure as Code with Terraform. One concept per day, hands-on labs, 
+                  and real-world projects to transform your DevOps skills.
                 </p>
               </div>
             </div>
@@ -517,7 +446,7 @@ export default function HundredDaysCloudChallenge() {
               <div className="text-2xl md:text-4xl font-light text-black dark:text-white mb-1">
                 {totalArticles}
               </div>
-              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                 Articles
               </div>
             </div>
@@ -554,7 +483,7 @@ export default function HundredDaysCloudChallenge() {
           </div>
         </motion.section>
 
-        {/* Challenge Days Section */}
+        {/* Series Days Section - EXACT SAME STYLE AS AZURE CHALLENGE */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -565,7 +494,7 @@ export default function HundredDaysCloudChallenge() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
               <div>
                 <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
-                  Challenge Days
+                  Series Days
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
                   {totalArticles} days published • {totalViews.toLocaleString()}{" "}
@@ -582,14 +511,14 @@ export default function HundredDaysCloudChallenge() {
 
           {articles.length === 0 ? (
             <div className="text-center py-12 md:py-20">
-              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
                 <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
               </div>
               <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-                Challenge Starting Soon!
+                Series Starting Soon!
               </h3>
               <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                The 100 Days of Cloud Challenge is being prepared. Check back
+                The Terraform Beginner's Guide is being prepared. Check back
                 soon for the first day!
               </p>
             </div>
@@ -598,19 +527,11 @@ export default function HundredDaysCloudChallenge() {
               <div className="divide-y divide-slate-200/50 dark:divide-gray-700/50">
                 {paginatedArticles.map((article, index) => {
                   const dayNumber = (article as any).day_number;
-                  const isCompleted =
-                    progress.completedDays.includes(dayNumber);
-
-                  // Use excerpt if available, otherwise strip markdown from content and truncate
-                  const previewText =
-                    article.excerpt?.trim() ||
-                    truncate(stripMarkdown(article.content || ""), 150) ||
-                    "Join this day of the cloud challenge to learn new skills...";
-
-                  const author = getAuthor(article.author);
+                  const previewText = getCleanExcerpt(article);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};
+                  const articleTags = article.tags.map(tagId => getTagById(tagId)).filter(tag => tag !== undefined);
 
                   return (
                     <motion.div
@@ -621,18 +542,25 @@ export default function HundredDaysCloudChallenge() {
                       className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                        {/* Article Cover - Mobile Optimized */}
-                        <div className="flex-shrink-0 w-full md:w-32 h-24 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600/50 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                        {/* Article Cover */}
+                        <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
                             alt={`Day ${dayNumber}`}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
+                          {/* Day number badge */}
+                          <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                            <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                              <Terminal className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                              Day {dayNumber}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Article Info - Mobile Optimized */}
+                        {/* Article Info */}
                         <div className="flex-1 min-w-0 w-full">
-                          {/* Article Metadata - Stacked on Mobile */}
+                          {/* Article Metadata */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -643,9 +571,8 @@ export default function HundredDaysCloudChallenge() {
                               {readTime} min read
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                              <Eye className="w-3 h-3 md:w-4 md:h-4 text-blue-600 dark:text-blue-400" />
-                              {article.read_count?.toLocaleString() || "0"}{" "}
-                              views
+                              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-emerald-600" />
+                              {article.read_count?.toLocaleString() || "0"} views
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
@@ -654,16 +581,16 @@ export default function HundredDaysCloudChallenge() {
                           </div>
 
                           {/* Article Title */}
-                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                          <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                             <Link href={`/articles/${article.slug}`}>
                               {article.title}
                             </Link>
                           </h3>
 
-                          {/* Reactions - Mobile Optimized */}
+                          {/* Reactions */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
                             {(reactions.like ?? 0) > 0 && (
-                              <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
+                              <span className="inline-flex items-center gap-1 text-xs md:text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                                 <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
                                 {reactions.like}
                               </span>
@@ -690,42 +617,37 @@ export default function HundredDaysCloudChallenge() {
 
                           {/* Article Excerpt/Content Preview */}
                           <div className="mb-3 md:mb-4">
-                            <p className="text-slate-600 dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
+                            <p className="text-black dark:text-gray-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-3 font-medium">
                               {previewText}
                             </p>
                           </div>
 
-                          {/* Author Info */}
-                          {author && (
-                            <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                              <div className="flex items-center gap-1 md:gap-2 text-slate-700 dark:text-gray-300 font-medium">
-                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
-                                  <img
-                                    src={author.avatar || "/placeholder.svg"}
-                                    alt={author.name}
-                                    className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src =
-                                        "/placeholder.svg";
-                                    }}
-                                  />
-                                </div>
-                                <Link
-                                  href={`/authors/${author.slug}`}
-                                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-xs md:text-sm"
+                          {/* Tags */}
+                          {articleTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                              {articleTags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag!.id}
+                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
                                 >
-                                  {author.name}
-                                </Link>
-                              </div>
+                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                  {tag!.name}
+                                </span>
+                              ))}
+                              {articleTags.length > 3 && (
+                                <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                  +{articleTags.length - 3} more
+                                </span>
+                              )}
                             </div>
                           )}
                         </div>
 
-                        {/* Read More Button - Mobile Optimized */}
+                        {/* Read More Button */}
                         <div className="flex items-center w-full md:w-auto justify-end md:justify-start">
                           <Link
                             href={`/articles/${article.slug}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
+                            className="inline-flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 group/btn text-sm md:text-base w-full md:w-auto justify-center"
                           >
                             Read More
                             <ArrowRight className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -737,7 +659,7 @@ export default function HundredDaysCloudChallenge() {
                 })}
               </div>
 
-              {/* Pagination Controls - Mobile Optimized */}
+              {/* Pagination Controls */}
               {totalPages > 1 && (
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -745,7 +667,6 @@ export default function HundredDaysCloudChallenge() {
                       Showing {paginatedArticles.length} of {totalArticles} days
                     </div>
 
-                    {/* Mobile: Simple Previous/Next */}
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
                         onClick={() =>
@@ -758,7 +679,6 @@ export default function HundredDaysCloudChallenge() {
                         <span className="hidden xs:inline">Previous</span>
                       </button>
 
-                      {/* Page Numbers - Hidden on very small screens */}
                       <div className="hidden xs:flex items-center gap-1">
                         {Array.from(
                           { length: Math.min(3, totalPages) },
@@ -779,7 +699,7 @@ export default function HundredDaysCloudChallenge() {
                                 onClick={() => setCurrentPage(pageNum)}
                                 className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
                                   currentPage === pageNum
-                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                                    ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow-md"
                                     : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
                                 }`}
                               >
@@ -804,7 +724,6 @@ export default function HundredDaysCloudChallenge() {
                       </button>
                     </div>
 
-                    {/* Mobile Page Indicator - Only show on very small screens */}
                     <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
                       Page {currentPage} of {totalPages}
                     </div>

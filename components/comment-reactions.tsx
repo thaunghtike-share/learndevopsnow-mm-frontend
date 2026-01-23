@@ -62,7 +62,8 @@ const ReactionButton = ({
   onClick,
   isAuthenticated,
   onAuthRequired,
-  reactorNames = [], // Add this prop
+  reactorNames = [],
+  isLoading = false,
 }: {
   type: string;
   count: number;
@@ -71,7 +72,8 @@ const ReactionButton = ({
   onClick: () => void;
   isAuthenticated: boolean;
   onAuthRequired: () => void;
-  reactorNames?: Array<{ name: string; avatar?: string; slug?: string }>; // Add this
+  reactorNames?: Array<{ name: string; avatar?: string; slug?: string }>;
+  isLoading?: boolean;
 }) => {
   const getReactionColor = (type: string) => {
     switch (type) {
@@ -89,7 +91,7 @@ const ReactionButton = ({
   };
 
   const handleClick = () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || isLoading) {
       onAuthRequired();
       return;
     }
@@ -134,15 +136,33 @@ const ReactionButton = ({
     <div className="relative group">
       <button
         onClick={handleClick}
-        className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 ${
-          isActive
+        disabled={isLoading}
+        className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all duration-200 relative ${
+          isLoading
+            ? "opacity-70 cursor-not-allowed"
+            : isActive
             ? `${getReactionColor(type)} font-medium`
             : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
         }`}
-        title={!isAuthenticated ? "Sign in to react" : ""}
+        title={
+          !isAuthenticated 
+            ? "Sign in to react" 
+            : isLoading 
+            ? "Processing..." 
+            : ""
+        }
       >
-        <Icon className="w-5 h-5" />
-        <span className="text-xs font-medium">{count}</span>
+        {/* Loading spinner overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 rounded-xl">
+            <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin"></div>
+          </div>
+        )}
+        
+        <Icon className={`w-5 h-5 ${isLoading ? "opacity-50" : ""}`} />
+        <span className={`text-xs font-medium ${isLoading ? "opacity-50" : ""}`}>
+          {count}
+        </span>
       </button>
 
       {/* Hover tooltip showing reactor names */}
@@ -180,6 +200,9 @@ export function CommentsReactions({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
 
+  // Add loading state for reactions
+  const [loadingReaction, setLoadingReaction] = useState<string | null>(null);
+
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [reactorNames, setReactorNames] = useState<{
     like: Array<{ name: string; avatar?: string; slug?: string }>;
@@ -198,7 +221,6 @@ export function CommentsReactions({
     fetchReactions();
   }, [articleSlug]);
 
-  // In your CommentsReactions component, update the fetchReactions function:
   const fetchReactions = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -258,11 +280,46 @@ export function CommentsReactions({
       return;
     }
 
+    // Show immediate feedback toast
+    const toastId = toast.loading(
+      userReactions.includes(reactionType) 
+        ? "Removing reaction..." 
+        : "Adding reaction..."
+    );
+
+    setLoadingReaction(reactionType);
+    
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setShowAuthModal(true);
+        setLoadingReaction(null);
+        toast.dismiss(toastId);
         return;
+      }
+
+      // Show immediate optimistic update
+      const currentCount = reactions[reactionType as keyof ReactionsSummary] || 0;
+      const currentActive = userReactions.includes(reactionType);
+      
+      // Optimistically update UI
+      if (currentActive) {
+        // Removing reaction
+        setReactions(prev => ({
+          ...prev,
+          [reactionType]: Math.max(0, currentCount - 1)
+        }));
+        setUserReactions(prev => prev.filter(r => r !== reactionType));
+      } else {
+        // Adding reaction - remove other reactions first
+        setUserReactions(prev => {
+          const filtered = prev.filter(r => r !== reactionType);
+          return [...filtered, reactionType];
+        });
+        setReactions(prev => ({
+          ...prev,
+          [reactionType]: currentCount + 1
+        }));
       }
 
       const response = await fetch(
@@ -277,14 +334,31 @@ export function CommentsReactions({
       );
 
       if (response.ok) {
-        fetchReactions();
-        toast.success("Reaction updated!");
+        // Fetch updated data from server
+        await fetchReactions();
+        toast.success(
+          currentActive 
+            ? `Removed ${reactionType} reaction` 
+            : `Added ${reactionType} reaction`,
+          { id: toastId }
+        );
       } else if (response.status === 401) {
         setShowAuthModal(true);
+        // Revert optimistic update on error
+        await fetchReactions();
+        toast.error("Please sign in again", { id: toastId });
+      } else {
+        // Revert optimistic update on error
+        await fetchReactions();
+        toast.error("Failed to update reaction", { id: toastId });
       }
     } catch (error) {
       console.error("Failed to toggle reaction:", error);
-      toast.error("Failed to add reaction");
+      // Revert optimistic update on error
+      await fetchReactions();
+      toast.error("Failed to add reaction", { id: toastId });
+    } finally {
+      setLoadingReaction(null);
     }
   };
 
@@ -837,7 +911,8 @@ export function CommentsReactions({
             onClick={() => handleReaction("like")}
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
-            reactorNames={reactorNames.like} // Pass reactor names
+            reactorNames={reactorNames.like}
+            isLoading={loadingReaction === "like"}
           />
 
           <ReactionButton
@@ -849,6 +924,7 @@ export function CommentsReactions({
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
             reactorNames={reactorNames.love}
+            isLoading={loadingReaction === "love"}
           />
 
           <ReactionButton
@@ -860,6 +936,7 @@ export function CommentsReactions({
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
             reactorNames={reactorNames.celebrate}
+            isLoading={loadingReaction === "celebrate"}
           />
 
           <ReactionButton
@@ -871,6 +948,7 @@ export function CommentsReactions({
             isAuthenticated={isAuthenticated}
             onAuthRequired={handleAuthRequired}
             reactorNames={reactorNames.insightful}
+            isLoading={loadingReaction === "insightful"}
           />
         </div>
       </div>

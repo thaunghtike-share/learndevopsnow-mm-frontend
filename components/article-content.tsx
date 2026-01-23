@@ -744,43 +744,50 @@ export function ArticleContent({
                   return (
                     <h1
                       id={id}
-                      className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-6"
+                      className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-12 mb-8 pb-4 border-b border-gray-100 dark:border-gray-800"
                       {...props}
                     >
-                      {children}
+                      <span className="relative">
+                        {children}
+                        <span className="absolute -bottom-4 left-0 w-20 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"></span>
+                      </span>
                     </h1>
                   );
                 },
+
                 h2: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
                     <h2
                       id={id}
-                      className="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-8 mb-6 pb-2 border-l-4 border-sky-500 dark:border-sky-400 pl-4 bg-gradient-to-r from-sky-50 dark:from-sky-900/20 to-transparent rounded-r-lg"
+                      className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mt-10 mb-6 pl-4 border-l-4 border-blue-500 dark:border-blue-400"
                       {...props}
                     >
                       {children}
                     </h2>
                   );
                 },
+
                 h3: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
                     <h3
                       id={id}
-                      className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 mt-8 mb-4 pl-4 border-l-4 border-sky-400 dark:border-sky-500 bg-gradient-to-r from-sky-50 dark:from-sky-900/10 to-transparent rounded-r-lg py-2"
+                      className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-8 mb-4 flex items-center gap-2"
                       {...props}
                     >
+                      <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>
                       {children}
                     </h3>
                   );
                 },
+
                 h4: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
                     <h4
                       id={id}
-                      className="text-base md:text-lg font-medium text-gray-800 dark:text-gray-200 mt-6 mb-3 pl-4 border-l-2 border-sky-300 dark:border-sky-600 bg-gradient-to-r from-sky-50/50 dark:from-sky-900/5 to-transparent rounded-r-lg py-1"
+                      className="text-lg md:text-xl font-semibold text-gray-600 dark:text-gray-400 mt-6 mb-3 pl-2 border-l-2 border-blue-300 dark:border-blue-500"
                       {...props}
                     >
                       {children}

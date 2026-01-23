@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Search,
   Plus,
   Minus,
   MessageCircleQuestion,
@@ -25,7 +24,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 type FAQ = {
   id: number;
@@ -238,7 +237,6 @@ export default function FAQPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
-  const sectionRef = useRef<HTMLElement>(null);
 
   const filteredFaqs = faqsData.filter((faq) => {
     const matchesCategory =

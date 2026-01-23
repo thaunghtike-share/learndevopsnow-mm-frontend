@@ -5,17 +5,17 @@ import {
   Calendar,
   ArrowRight,
   TrendingUp,
+  Clock,
   MessageSquare,
-  ThumbsUp,
   Heart,
+  ThumbsUp,
   Sparkles,
   Lightbulb,
   ChevronLeft,
   ChevronRight,
-  Clock,
-  FileText,
-  Terminal,
   Tag as TagIcon,
+  FileText,
+  Cloud,
 } from "lucide-react";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
@@ -59,7 +59,7 @@ interface Tag {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 10;
 
-export default function LinuxEssentialsSeries() {
+export default function HundredDaysCloudChallenge() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -79,14 +79,14 @@ export default function LinuxEssentialsSeries() {
     return Math.max(1, Math.ceil(words / wordsPerMinute));
   };
 
-  // Extract day/part number from title or slug
-  const extractPartNumber = (article: Article): number => {
-    // Try to extract from title first (e.g., "Part 1: Introduction")
-    const titleMatch = article.title.match(/(?:Part|Day)\s+(\d+)/i);
+  // Extract day number from title or slug
+  const extractDayNumber = (article: Article): number => {
+    // Try to extract from title first (e.g., "Day 1: Introduction")
+    const titleMatch = article.title.match(/Day\s+(\d+)/i);
     if (titleMatch) return parseInt(titleMatch[1]);
 
-    // Try to extract from slug (e.g., "part-1-introduction" or "day-1-introduction")
-    const slugMatch = article.slug.match(/(?:part|day)-?(\d+)/i);
+    // Try to extract from slug (e.g., "day-1-introduction")
+    const slugMatch = article.slug.match(/day-?(\d+)/i);
     if (slugMatch) return parseInt(slugMatch[1]);
 
     // Fallback: use article ID or return 0
@@ -100,9 +100,9 @@ export default function LinuxEssentialsSeries() {
         setLoading(true);
         setError(null);
 
-        // Fetch articles with linux-series tag
+        // Fetch articles with 50-days-azure-challenge tag
         const articlesRes = await fetch(
-          `${API_BASE_URL}/articles/?tags__slug=linux-series&ordering=published_at`
+          `${API_BASE_URL}/articles/?tags__slug=50-days-azure-challenge&ordering=published_at`
         );
 
         if (!articlesRes.ok) {
@@ -163,7 +163,7 @@ export default function LinuxEssentialsSeries() {
                 comment_count,
                 reactions_summary,
                 read_time: calculateReadTime(article.content),
-                part_number: extractPartNumber(article),
+                day_number: extractDayNumber(article),
               };
             } catch (error) {
               console.error(
@@ -180,22 +180,22 @@ export default function LinuxEssentialsSeries() {
                   insightful: 0,
                 },
                 read_time: calculateReadTime(article.content),
-                part_number: extractPartNumber(article),
+                day_number: extractDayNumber(article),
               };
             }
           })
         );
 
-        // Sort articles by part number in DESCENDING order (Part 19, Part 18, Part 17, ...)
+        // Sort articles by day number in DESCENDING order (Day 19, Day 18, Day 17, ...)
         const sortedArticles = articlesWithEngagement.sort((a, b) => {
-          const partA = extractPartNumber(a);
-          const partB = extractPartNumber(b);
+          const dayA = extractDayNumber(a);
+          const dayB = extractDayNumber(b);
 
-          // Sort by part number DESCENDING (Part 19, Part 18, Part 17, ...)
-          if (partA > partB) return -1;
-          if (partA < partB) return 1;
+          // Sort by day number DESCENDING (Day 19, Day 18, Day 17, ...)
+          if (dayA > dayB) return -1;
+          if (dayA < dayB) return 1;
 
-          // If part numbers are equal (shouldn't happen), sort by published date
+          // If day numbers are equal (shouldn't happen), sort by published date
           return (
             new Date(b.published_at).getTime() -
             new Date(a.published_at).getTime()
@@ -220,7 +220,7 @@ export default function LinuxEssentialsSeries() {
         setLoading(false);
         setCurrentPage(1);
       } catch (err: any) {
-        setError(err.message || "Failed to fetch Linux Series data");
+        setError(err.message || "Failed to fetch challenge data");
         setLoading(false);
       }
     }
@@ -237,7 +237,6 @@ export default function LinuxEssentialsSeries() {
   }, [currentPage]);
 
   // Helper functions
-  const getAuthor = (id: number) => authors.find((a) => a.id === id);
   const getTagById = (id: number) => tags.find((t) => t.id === id);
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -245,7 +244,7 @@ export default function LinuxEssentialsSeries() {
       month: "long",
       day: "numeric",
     });
-
+  
   const stripMarkdown = (md: string) => {
     if (!md) return "";
     let text = md;
@@ -266,7 +265,7 @@ export default function LinuxEssentialsSeries() {
 
     return text;
   };
-
+  
   const truncate = (str: string, max = 150) =>
     str.length <= max ? str : str.slice(0, max) + "...";
 
@@ -275,11 +274,11 @@ export default function LinuxEssentialsSeries() {
     if (article.cover_image && article.cover_image.trim() !== "") {
       return article.cover_image;
     }
-    // Fallback to linux logo if no cover image
-    return "/linux-logo.png";
+    // Fallback to kodekloud.png only if no cover image
+    return "/kodekloud.png";
   };
 
-  // Calculate series stats
+  // Calculate challenge stats
   const totalArticles = articles.length;
   const totalViews = articles.reduce(
     (sum, article) => sum + (article.read_count || 0),
@@ -323,12 +322,11 @@ export default function LinuxEssentialsSeries() {
       const contentWithoutFirstHeading = lines.slice(startIndex).join("\n");
       const cleanContent = stripMarkdown(contentWithoutFirstHeading);
       return (
-        truncate(cleanContent, 120) ||
-        "Explore this Linux essentials article to master new skills..."
+        truncate(cleanContent, 120) || "Join this day of the cloud challenge to learn new skills..."
       );
     }
 
-    return "Explore this Linux essentials article to master new skills...";
+    return "Join this day of the cloud challenge to learn new skills...";
   };
 
   // Pagination logic
@@ -344,18 +342,18 @@ export default function LinuxEssentialsSeries() {
         <MinimalHeader />
         <main className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Terminal className="w-12 h-12 text-white" />
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+              <FileText className="w-12 h-12 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-              Series Not Found
+              Challenge Not Found
             </h1>
             <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
               {error}
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
             >
               Return Home
               <ArrowRight className="w-5 h-5" />
@@ -372,12 +370,16 @@ export default function LinuxEssentialsSeries() {
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300 relative">
         <MinimalHeader />
         <main className="max-w-7xl mx-auto px-4 py-20">
+          {/* Simple Elegant Loading */}
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            {/* Animated Logo Container */}
             <div className="relative">
+              {/* Outer Ring Animation */}
               <div className="w-32 h-32 rounded-full border-4 border-sky-200/50 dark:border-sky-800/30 animate-spin">
+                {/* Logo Container */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center p-2">
-                    <Terminal className="w-16 h-16 text-sky-600 dark:text-sky-400 animate-pulse" />
+                    <Cloud className="w-16 h-16 text-sky-600 dark:text-sky-400 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -394,7 +396,7 @@ export default function LinuxEssentialsSeries() {
       <MinimalHeader />
 
       <main className="px-4 sm:px-6 md:px-11 md:py-10 pb-8 relative z-10">
-        {/* Series Header - Sky Blue Theme */}
+        {/* Challenge Header */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -403,19 +405,19 @@ export default function LinuxEssentialsSeries() {
         >
           <div className="mb-8 md:mb-12">
             <div className="flex items-center gap-4 mb-4 md:mb-6">
-              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-sky-500 to-blue-600"></div>
-              <span className="text-xs md:text-sm font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">
-                Linux Essentials Series
+              <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+              <span className="text-xs md:text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                Kodekloud's Cloud Challenge
               </span>
             </div>
 
             <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-8 mb-6 md:mb-8">
-              {/* Linux Logo with Sky Blue Theme */}
+              {/* Linux Logo */}
               <div className="flex-shrink-0">
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-2xl border-4 border-white dark:border-gray-800 shadow-2xl overflow-hidden bg-white p-1">
                   <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
                     <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
-                      <Terminal className="w-12 h-12 md:w-16 md:h-16 text-sky-600 dark:text-sky-400" />
+                      <Cloud className="w-12 h-12 md:w-16 md:h-16 text-sky-600 dark:text-sky-400" />
                     </div>
                   </div>
                 </div>
@@ -424,26 +426,24 @@ export default function LinuxEssentialsSeries() {
               {/* Title and Description */}
               <div className="flex-1">
                 <h1 className="text-3xl md:text-6xl font-light text-black dark:text-white mb-4 md:mb-6 tracking-tight">
-                  Linux Essentials Series
+                  50 Days of Cloud Challenge
                 </h1>
                 <p className="text-base md:text-xl text-black dark:text-gray-300 leading-relaxed max-w-3xl">
-                  Master Linux administration from the ground up. A structured
-                  series covering essential commands, system administration,
-                  security, and advanced topics through practical examples and
-                  real-world scenarios.
+                  Master cloud technologies with KodeKloud's structured learning
+                  path. One concept per day, hands-on labs, and real-world
+                  projects to transform your cloud skills in 50 days.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Stats Cards - Sky Blue Theme */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-4xl mx-auto md:py-10">
             {/* Article Count */}
             <div className="flex flex-col items-center">
               <div className="text-2xl md:text-4xl font-light text-black dark:text-white mb-1">
                 {totalArticles}
               </div>
-              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-400">
+              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
                 Articles
               </div>
             </div>
@@ -453,7 +453,7 @@ export default function LinuxEssentialsSeries() {
               <div className="text-2xl md:text-4xl font-light text-black dark:text-white mb-1">
                 {totalViews.toLocaleString()}
               </div>
-              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+              <div className="text-xs md:text-sm font-semibold uppercase tracking-wide text-green-600 dark:text-green-400">
                 Total Views
               </div>
             </div>
@@ -480,7 +480,7 @@ export default function LinuxEssentialsSeries() {
           </div>
         </motion.section>
 
-        {/* Series Articles Section - Admin Dashboard Style */}
+        {/* Challenge Days Section - UPDATED TO MATCH ADMIN DASHBOARD STYLE */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -491,11 +491,11 @@ export default function LinuxEssentialsSeries() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
               <div>
                 <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
-                  Linux Series Articles
+                  Challenge Days
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {totalArticles} articles published •{" "}
-                  {totalViews.toLocaleString()} total reads
+                  {totalArticles} days published • {totalViews.toLocaleString()}{" "}
+                  total reads
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -508,30 +508,27 @@ export default function LinuxEssentialsSeries() {
 
           {articles.length === 0 ? (
             <div className="text-center py-12 md:py-20">
-              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+              <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
                 <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
               </div>
               <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-                Series Starting Soon!
+                Challenge Starting Soon!
               </h3>
               <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                The Linux Essentials Series is being prepared. Check back soon
-                for the first article!
+                The 50 Days of Cloud Challenge is being prepared. Check back
+                soon for the first day!
               </p>
             </div>
           ) : (
             <>
               <div className="divide-y divide-slate-200/50 dark:divide-gray-700/50">
                 {paginatedArticles.map((article, index) => {
-                  const partNumber = (article as any).part_number;
+                  const dayNumber = (article as any).day_number;
                   const previewText = getCleanExcerpt(article);
-                  const author = getAuthor(article.author);
                   const coverImage = getCoverImage(article);
                   const readTime = calculateReadTime(article.content);
                   const reactions = article.reactions_summary || {};
-                  const articleTags = article.tags
-                    .map((tagId) => getTagById(tagId))
-                    .filter((tag) => tag !== undefined);
+                  const articleTags = article.tags.map(tagId => getTagById(tagId)).filter(tag => tag !== undefined);
 
                   return (
                     <motion.div
@@ -542,22 +539,23 @@ export default function LinuxEssentialsSeries() {
                       className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
+                        {/* Article Cover - Updated to match admin style */}
                         <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                           <img
                             src={coverImage}
-                            alt={`Part ${partNumber}`}
+                            alt={`Day ${dayNumber}`}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />
-                          {/* Part number badge */}
+                          {/* Day number badge - similar to category badge in admin */}
                           <div className="absolute top-2 left-2 md:top-3 md:left-3">
                             <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
                               <FileText className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                              Part {partNumber}
+                              Day {dayNumber}
                             </span>
                           </div>
                         </div>
 
-                        {/* Article Info - Admin Style */}
+                        {/* Article Info - Updated to match admin dashboard */}
                         <div className="flex-1 min-w-0 w-full">
                           {/* Article Metadata - Exactly like admin dashboard */}
                           <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
@@ -571,8 +569,7 @@ export default function LinuxEssentialsSeries() {
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
-                              {article.read_count?.toLocaleString() || "0"}{" "}
-                              views
+                              {article.read_count?.toLocaleString() || "0"} views
                             </span>
                             <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                               <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
@@ -641,31 +638,6 @@ export default function LinuxEssentialsSeries() {
                               )}
                             </div>
                           )}
-
-                          {/* Author Info - Same style as admin */}
-                          {author && (
-                            <div className="flex items-center gap-2 md:gap-3 mt-4">
-                              <div className="flex items-center gap-1 md:gap-2 text-slate-700 dark:text-gray-300 font-medium">
-                                <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 p-0.5">
-                                  <img
-                                    src={author.avatar || "/placeholder.svg"}
-                                    alt={author.name}
-                                    className="w-full h-full rounded-full object-cover border border-white dark:border-gray-800"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src =
-                                        "/placeholder.svg";
-                                    }}
-                                  />
-                                </div>
-                                <Link
-                                  href={`/authors/${author.slug}`}
-                                  className="hover:text-sky-600 dark:hover:text-sky-400 transition-colors text-xs md:text-sm"
-                                >
-                                  {author.name}
-                                </Link>
-                              </div>
-                            </div>
-                          )}
                         </div>
 
                         {/* Read More Button - Same as admin's View/Edit buttons */}
@@ -689,8 +661,7 @@ export default function LinuxEssentialsSeries() {
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                      Showing {paginatedArticles.length} of {totalArticles}{" "}
-                      articles
+                      Showing {paginatedArticles.length} of {totalArticles} days
                     </div>
 
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
@@ -725,7 +696,7 @@ export default function LinuxEssentialsSeries() {
                                 onClick={() => setCurrentPage(pageNum)}
                                 className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
                                   currentPage === pageNum
-                                    ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
                                     : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
                                 }`}
                               >
