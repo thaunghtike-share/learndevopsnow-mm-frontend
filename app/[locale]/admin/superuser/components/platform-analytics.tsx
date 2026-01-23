@@ -1,30 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  Users,
   FileText,
-  MessageSquare,
-  Calendar,
-  User,
-  Eye,
-  ArrowUpRight,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Star,
-  Target,
-  BarChart3,
-  Zap,
-  PlusCircle,
-  TrendingUp as TrendingUpIcon,
-  Crown,
-  Award,
-  BookOpen,
-  Hash,
-  BarChart,
+  MessageSquare, ArrowUpRight, XCircle, BarChart3, Crown, BarChart,
   Loader2,
-  MessageCircle,
+  MessageCircle
 } from "lucide-react";
 import Link from "next/link";
 import { Bar, Pie } from "react-chartjs-2";

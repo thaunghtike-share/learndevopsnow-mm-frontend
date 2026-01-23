@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react"; 
-import { Users, FileText, LogIn, Search, UserX, Shield, Ban, UserCheck, AlertTriangle, Eye, BarChart3, TrendingUp, BookOpen } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, FileText, LogIn, Search, UserX, Shield, Ban, UserCheck } from "lucide-react";
 
 interface Author {
   id: number;

@@ -15,9 +15,7 @@ import {
   Maximize2,
   Minimize2,
   Paperclip,
-  FileText,
-  Eye,
-  X,
+  FileText, X,
   Plus,
   Check,
   LinkIcon,
@@ -25,7 +23,7 @@ import {
   AlertCircle,
   AlertTriangle,
   Info,
-  Zap,
+  Zap
 } from "lucide-react";
 
 interface Category {

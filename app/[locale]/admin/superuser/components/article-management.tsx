@@ -3,28 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import {
   FileText,
   Search,
-  Trash2,
-  CheckSquare,
-  Square,
-  AlertTriangle,
-  Eye,
-  Calendar,
-  User,
-  Loader,
-  Edit,
-  ExternalLink,
-  Clock,
-  Folder,
-  Tag as TagIcon,
-  MessageSquare,
-  Heart,
-  Sparkles,
-  Lightbulb,
-  ThumbsUp,
-  ChevronLeft,
-  ChevronRight,
-  BarChart2,
-  PenSquare,
+  Trash2, AlertTriangle, Calendar, Loader, Folder,
+  Tag as TagIcon, ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;

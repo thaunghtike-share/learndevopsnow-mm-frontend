@@ -1,7 +1,5 @@
 // Remove this line: "use client"
-import React from "react";
 import { notFound } from "next/navigation";
-import Head from "next/head";
 import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalFooter } from "@/components/minimal-footer";
 import { ArticleContent } from "@/components/article-content";

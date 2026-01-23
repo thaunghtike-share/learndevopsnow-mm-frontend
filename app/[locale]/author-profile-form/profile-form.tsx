@@ -3,18 +3,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../auth/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import {
-  Zap,
   Upload,
   Mail,
-  Globe,
-  Building,
-  Briefcase as BriefcaseIcon,
+  Globe, Briefcase as BriefcaseIcon,
   UserCircle,
   Link as LinkIcon,
   Hash,
   Save,
-  ArrowLeft,
-  CheckCircle,
+  ArrowLeft
 } from "lucide-react";
 
 export default function ProfileForm() {

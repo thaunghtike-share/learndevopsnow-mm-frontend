@@ -10,22 +10,15 @@ import {
   Folder,
   ArrowRight,
   Tag as TagIcon,
-  Star,
-  Eye,
-  TrendingUp,
-  ChevronRight,
+  Star, ChevronRight,
   ChevronLeft,
   FileText,
-  Clock,
-  Users,
-  Award,
-  Zap,
-  Sparkles,
+  Clock, Sparkles,
   MessageSquare,
   Heart,
   ThumbsUp,
   Lightbulb,
-  Search,
+  Search
 } from "lucide-react";
 import { motion } from "framer-motion";
 

@@ -23,17 +23,10 @@ import {
   Rocket,
   CheckCircle2,
   ArrowRight,
-  Play,
-  ExternalLink,
-  MessageSquare,
+  Play, MessageSquare,
   Calendar,
   Clock,
-  ChevronDown,
-  Cloud,
-  Server,
-  GitBranch,
-  Layers,
-  Terminal,
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,9 +36,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

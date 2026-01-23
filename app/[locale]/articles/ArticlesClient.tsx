@@ -5,15 +5,10 @@ import { MinimalHeader } from "@/components/minimal-header";
 import { MinimalBlogList } from "@/components/minimal-blog-list";
 import { MinimalFooter } from "@/components/minimal-footer";
 import {
-  Linkedin,
   ArrowRight,
-  TrendingUp,
-  TrendingUp as TrendingUpIcon,
-  Loader2,
+  TrendingUp, Loader2,
   BarChart,
-  BarChart2,
-  ChevronDown,
-  ChevronUp,
+  BarChart2
 } from "lucide-react";
 import { Pie, Bar } from "react-chartjs-2";
 import {

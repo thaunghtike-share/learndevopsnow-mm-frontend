@@ -11,32 +11,14 @@ import {
   Server,
   Activity,
   ExternalLink,
-  Code,
-  FileText,
-  Zap,
-  Lock,
-  Layers,
+  Code, Zap, Layers,
   Sparkles,
   Database,
   Rocket,
   ArrowRight,
-  CheckCircle2,
-  Star,
-  GitBranch,
-  RefreshCw,
-  BellRing,
-  MessageSquare,
-  Cpu,
-  MemoryStick,
-  LayoutDashboard,
-  Terminal,
-  Scale,
-  Scan,
-  Users,
-  BookOpen,
-  GitCompare,
-  Container,
-  Workflow,
+  CheckCircle2, GitBranch,
+  RefreshCw, MessageSquare, Terminal,
+  Scale, Workflow,
   Play,
   ShieldAlert,
   Key,
@@ -45,13 +27,7 @@ import {
   Calendar,
   Clock,
   ChevronDown,
-  GitPullRequest,
-  Shield,
-  Wifi,
-  HardDrive,
-  Network,
-  Cctv,
-  Fingerprint,
+  GitPullRequest
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,7 +39,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

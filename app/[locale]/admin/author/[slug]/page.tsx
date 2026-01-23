@@ -8,13 +8,12 @@ import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import AuthModal from "@/app/[locale]/auth/auth-modal";
 import {
   FileText,
-  Eye,
   TrendingUp,
   Plus,
   ArrowRight,
   Calendar,
   Folder,
-  Tag as TagIcon,
+  TagIcon,
   BarChart3,
   Edit,
   Crown,
@@ -22,15 +21,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Trash2,
-  Loader,
   AlertTriangle,
   Clock,
-  Users,
-  Award,
-  Zap,
-  Target,
-  BookOpen,
-  ShieldOff,
   Ban,
   MessageSquare,
   Heart,
@@ -42,19 +34,24 @@ import {
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
 import ProtectedAction from "@/components/ProtectedAction";
-import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   Tooltip,
   Legend,
   Title,
-  ChartOptions,
   CategoryScale,
   LinearScale,
   BarElement,
   ArcElement,
 } from "chart.js";
 import DashboardNotificationSection from "@/components/DashboardNotificationSection";
+
+// Import the new components
+import AuthorStatsPieChart from "./components/AuthorStatsPieChart";
+import AuthorViewsBarChart from "./components/AuthorViewsBarChart";
+import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
+import RestoreSuccessAlert from "./components/RestoreSuccessAlert";
+import TrashSection from "./components/TrashSection";
 
 ChartJS.register(
   ArcElement,
@@ -118,11 +115,6 @@ interface Author {
   is_banned?: boolean;
 }
 
-interface BanStatus {
-  is_banned: boolean;
-  banned_reason?: string;
-}
-
 interface BanDetails {
   is_banned: boolean;
   reason: string;
@@ -130,474 +122,6 @@ interface BanDetails {
   banned_by: string;
   banned_until?: string;
   is_temporary: boolean;
-}
-
-// Keep the original AuthorStatsPieChart component (unchanged)
-function AuthorStatsPieChart({
-  data,
-  title = "Articles by Author",
-  height = 280,
-}: {
-  data: { author: string; count: number }[];
-  title?: string;
-  height?: number;
-}) {
-  const [isClient, setIsClient] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [chartKey, setChartKey] = useState(Date.now());
-
-  useEffect(() => {
-    setIsClient(true);
-
-    // Check for dark mode
-    const checkDarkMode = () => {
-      if (typeof window !== "undefined") {
-        const html = document.documentElement;
-        const isDark = html.classList.contains("dark");
-        setIsDarkMode(isDark);
-        setChartKey(Date.now());
-      }
-    };
-
-    checkDarkMode();
-
-    // Listen for theme changes
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader className="w-8 h-8 animate-spin text-sky-500" />
-      </div>
-    );
-  }
-
-  // Sort by count and take top 8
-  const topAuthors = [...data].sort((a, b) => b.count - a.count).slice(0, 8);
-
-  // Standard pie chart colors
-  const generateColors = (count: number) => {
-    const standardColors = [
-      "rgba(255, 99, 132, 0.8)", // Red
-      "rgba(54, 162, 235, 0.8)", // Blue
-      "rgba(255, 206, 86, 0.8)", // Yellow
-      "rgba(75, 192, 192, 0.8)", // Teal
-      "rgba(153, 102, 255, 0.8)", // Purple
-      "rgba(255, 159, 64, 0.8)", // Orange
-      "rgba(199, 199, 199, 0.8)", // Gray
-      "rgba(83, 102, 255, 0.8)", // Indigo
-    ];
-
-    return standardColors.slice(0, count);
-  };
-
-  const chartData = {
-    labels: topAuthors.map((item) =>
-      item.author.length > 15
-        ? item.author.substring(0, 15) + "..."
-        : item.author
-    ),
-    datasets: [
-      {
-        label: "Articles",
-        data: topAuthors.map((item) => item.count),
-        backgroundColor: generateColors(topAuthors.length),
-        borderColor: "rgba(255, 255, 255, 0.8)",
-        borderWidth: 2,
-        hoverOffset: 15,
-      },
-    ],
-  };
-
-  const options: ChartOptions<"pie"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "right",
-        labels: {
-          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
-          font: {
-            size: 12,
-            family: "Inter, sans-serif",
-          },
-          padding: 10,
-          usePointStyle: true,
-          pointStyle: "circle",
-        },
-      },
-      tooltip: {
-        backgroundColor: isDarkMode
-          ? "rgba(30, 41, 59, 0.95)"
-          : "rgba(15, 23, 42, 0.95)",
-        titleColor: "#f1f5f9",
-        bodyColor: "#cbd5e1",
-        borderColor: "rgba(255, 255, 255, 0.1)",
-        borderWidth: 1,
-        padding: 10,
-        cornerRadius: 8,
-        callbacks: {
-          label: (context) => {
-            const value = context.raw as number;
-            const total = topAuthors.reduce((sum, item) => sum + item.count, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${context.label}: ${value} articles (${percentage}%)`;
-          },
-        },
-      },
-    },
-  };
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-blue-500" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            {title}
-          </h3>
-        </div>
-      </div>
-
-      <div className="relative" style={{ height: `${height}px` }}>
-        <Pie key={chartKey} data={chartData} options={options} />
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span className="text-sm text-black dark:text-gray-400">
-              Most Articles
-            </span>
-          </div>
-          <div className="text-sm font-medium text-black dark:text-white text-right">
-            {topAuthors[0]?.author}: {topAuthors[0]?.count} articles
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Keep the Bar chart component for "Your Top Articles" only
-function AuthorViewsBarChart({
-  data,
-  title = "Views by Author",
-  height = 280,
-}: {
-  data: { author: string; views: number }[];
-  title?: string;
-  height?: number;
-}) {
-  const [isClient, setIsClient] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [chartKey, setChartKey] = useState(Date.now());
-
-  useEffect(() => {
-    setIsClient(true);
-
-    // Check for dark mode
-    const checkDarkMode = () => {
-      if (typeof window !== "undefined") {
-        const html = document.documentElement;
-        const isDark = html.classList.contains("dark");
-        setIsDarkMode(isDark);
-        setChartKey(Date.now());
-      }
-    };
-
-    checkDarkMode();
-
-    // Listen for theme changes
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader className="w-8 h-8 animate-spin text-emerald-500" />
-      </div>
-    );
-  }
-
-  // Sort by views and take top 8
-  const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
-
-  // Generate colors for bars
-  const generateBarColors = (count: number) => {
-    const colors = [
-      "rgba(34, 197, 94, 0.8)", // Green
-      "rgba(59, 130, 246, 0.8)", // Blue
-      "rgba(168, 85, 247, 0.8)", // Purple
-      "rgba(245, 158, 11, 0.8)", // Amber
-      "rgba(239, 68, 68, 0.8)", // Red
-      "rgba(14, 165, 233, 0.8)", // Sky
-      "rgba(20, 184, 166, 0.8)", // Teal
-      "rgba(249, 115, 22, 0.8)", // Orange
-    ];
-
-    return colors.slice(0, count);
-  };
-
-  const chartData = {
-    labels: topAuthors.map((item) =>
-      item.author.length > 15
-        ? item.author.substring(0, 15) + "..."
-        : item.author
-    ),
-    datasets: [
-      {
-        label: "Views",
-        data: topAuthors.map((item) => item.views),
-        backgroundColor: generateBarColors(topAuthors.length),
-        borderColor: generateBarColors(topAuthors.length).map((color) =>
-          color.replace("0.8", "1")
-        ),
-        borderWidth: 2,
-        borderRadius: 8,
-        hoverBackgroundColor: generateBarColors(topAuthors.length).map(
-          (color) => color.replace("0.8", "1")
-        ),
-      },
-    ],
-  };
-
-  const options: ChartOptions<"bar"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: {
-          color: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-        },
-        ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
-          font: {
-            size: 11,
-            family: "Inter, sans-serif",
-          },
-          callback: (value) => {
-            if (typeof value === "number") {
-              if (value >= 1000) return (value / 1000).toFixed(1) + "k";
-              return value.toString();
-            }
-            return value;
-          },
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000", // White in dark mode, Black in light mode
-          font: {
-            size: 11,
-            family: "Inter, sans-serif",
-          },
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: isDarkMode
-          ? "rgba(30, 41, 59, 0.95)"
-          : "rgba(15, 23, 42, 0.95)",
-        titleColor: "#f1f5f9",
-        bodyColor: "#cbd5e1",
-        borderColor: "rgba(255, 255, 255, 0.1)",
-        borderWidth: 1,
-        padding: 10,
-        cornerRadius: 8,
-        callbacks: {
-          label: (context) => {
-            const value = context.raw as number;
-            const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${
-              context.dataset.label
-            }: ${value.toLocaleString()} (${percentage}%)`;
-          },
-        },
-      },
-    },
-  };
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-emerald-500" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            {title}
-          </h3>
-        </div>
-      </div>
-
-      <div className="relative" style={{ height: `${height}px` }}>
-        <Bar key={chartKey} data={chartData} options={options} />
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-            <span className="text-sm text-black dark:text-gray-400">
-              Most Viewed
-            </span>
-          </div>
-          <div className="text-sm font-medium text-black dark:text-white text-right">
-            {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
-            views
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DeleteConfirmationModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  article,
-  isLoading,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  article: Article | null;
-  isLoading: boolean;
-}) {
-  if (!isOpen || !article) return null;
-
-  return (
-    <div className="fixed inset-0 bg-white/80 dark:bg-[#000000]/80 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200/80 dark:border-gray-700"
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-slate-100 dark:bg-gray-700 rounded-xl flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5 text-slate-600 dark:text-gray-300" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Delete Article
-            </h3>
-            <p className="text-slate-500 dark:text-gray-400 text-sm">
-              This article will be moved to Trash and can be restored within 7
-              days.
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <p className="text-slate-700 dark:text-gray-300 font-medium mb-2">
-            Delete &ldquo;{article.title}&rdquo;?
-          </p>
-          <p className="text-slate-500 dark:text-gray-400 text-sm">
-            This article has {article.read_count?.toLocaleString()} views and
-            will be moved to the trash.
-          </p>
-        </div>
-
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={onClose}
-            disabled={isLoading}
-            className="px-4 py-2 text-slate-600 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 font-medium disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="px-4 py-2 bg-slate-800 dark:bg-gray-700 text-white rounded-xl hover:bg-slate-900 dark:hover:bg-gray-600 transition-all duration-200 font-medium disabled:opacity-50 flex items-center gap-2"
-          >
-            {isLoading ? (
-              <>
-                <Loader className="w-4 h-4 animate-spin" />
-                Deleting...
-              </>
-            ) : (
-              <>
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </>
-            )}
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
-function RestoreSuccessAlert({
-  message,
-  isVisible,
-}: {
-  message: string | null;
-  isVisible: boolean;
-}) {
-  if (!isVisible || !message) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[100]"
-    >
-      <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl shadow-2xl p-4 max-w-md">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
-            <svg
-              className="w-4 h-4 text-emerald-600 dark:text-emerald-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-emerald-800 dark:text-emerald-200 font-medium">
-              {message}
-            </p>
-            <p className="text-emerald-600 dark:text-emerald-400 text-sm">
-              The article will appear in your articles list shortly.
-            </p>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
 }
 
 export default function AuthorAdminDashboard() {
@@ -611,16 +135,6 @@ export default function AuthorAdminDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [banDetails, setBanDetails] = useState<BanDetails | null>(null);
   const articlesPerPage = 8;
-  const [allArticlesStats, setAllArticlesStats] = useState<
-    Array<{
-      id: number;
-      title: string;
-      read_count: number;
-      author_name: string;
-      slug: string;
-    }>
-  >([]);
-  const [chartsLoading, setChartsLoading] = useState(false);
   const [restoringSlug, setRestoringSlug] = useState<string | null>(null);
   const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
   const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
@@ -639,13 +153,11 @@ export default function AuthorAdminDashboard() {
   const [trashArticles, setTrashArticles] = useState<TrashArticle[]>([]);
   const [trashLoading, setTrashLoading] = useState(false);
   const [articlesByAuthorData, setArticlesByAuthorData] = useState([]);
-  const [viewsByAuthorData, setViewsByAuthorData] = useState([]);
   const [yourTopArticlesData, setYourTopArticlesData] = useState([]);
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [loadingCharts, setLoadingCharts] = useState(false);
   const [chartsError, setChartsError] = useState<string | null>(null);
   const [initialAuthCheck, setInitialAuthCheck] = useState(false);
-  const [isProfileLoading, setIsProfileLoading] = useState(false); // Add this
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -708,7 +220,6 @@ export default function AuthorAdminDashboard() {
       if (res.ok) {
         const data = await res.json();
         setArticlesByAuthorData(data.articles_by_author || []);
-        setViewsByAuthorData(data.views_by_author || []);
         setYourTopArticlesData(data.your_top_articles || []);
         setChartsLoaded(true);
       } else {
@@ -942,7 +453,6 @@ export default function AuthorAdminDashboard() {
       await fetchTrashArticles();
 
       setDeleteModal({ isOpen: false, article: null, isLoading: false });
-      console.log("Article deleted successfully");
     } catch (err) {
       console.error("Error deleting article:", err);
       setError((err as Error).message);
@@ -1069,18 +579,12 @@ export default function AuthorAdminDashboard() {
     window.location.reload();
   };
 
-  const handleCloseModal = () => {
-    setShowLoginModal(false);
-  };
-
   const totalArticles = author?.articles?.length || 0;
   const totalViews =
     author?.articles?.reduce(
       (sum, article) => sum + (article.read_count || 0),
       0
     ) || 0;
-  const avgViews =
-    totalArticles > 0 ? Math.round(totalViews / totalArticles) : 0;
 
   const totalComments =
     author?.articles?.reduce(
@@ -1098,39 +602,6 @@ export default function AuthorAdminDashboard() {
       (reactions.insightful || 0)
     );
   }, 0);
-
-  const totalReadTime =
-    author?.articles?.reduce(
-      (sum, article) => sum + calculateReadTime(article.content),
-      0
-    ) || 0;
-  const avgReadTime =
-    totalArticles > 0 ? Math.round(totalReadTime / totalArticles) : 0;
-
-  const getAuthorTier = () => {
-    if (totalViews > 100000)
-      return {
-        name: "Elite",
-        color: "from-purple-600 to-pink-600",
-        icon: Award,
-      };
-    if (totalViews > 50000)
-      return {
-        name: "Expert",
-        color: "from-amber-500 to-orange-600",
-        icon: Zap,
-      };
-    if (totalViews > 10000)
-      return {
-        name: "Pro",
-        color: "from-emerald-500 to-green-600",
-        icon: TrendingUp,
-      };
-    return { name: "Rising", color: "from-blue-500 to-cyan-600", icon: Users };
-  };
-
-  const authorTier = getAuthorTier();
-  const TierIcon = authorTier.icon;
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -1217,10 +688,6 @@ export default function AuthorAdminDashboard() {
     return articlesByAuthorData || [];
   };
 
-  const prepareViewsByAuthorData = () => {
-    return viewsByAuthorData || [];
-  };
-
   const prepareViewsData = () => {
     return yourTopArticlesData || [];
   };
@@ -1254,7 +721,7 @@ export default function AuthorAdminDashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-md w-full">
             <button
-              onClick={handleCloseModal}
+              onClick={() => setShowLoginModal(false)}
               className="absolute -top-12 right-0 text-white hover:text-gray-300 text-2xl font-bold"
             >
               ×
@@ -1525,7 +992,7 @@ export default function AuthorAdminDashboard() {
                       </div>
                       <div className="h-64 flex items-center justify-center">
                         <div className="text-center">
-                          <Loader className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-2" />
+                          <div className="w-8 h-8 animate-spin border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                           <p className="text-gray-500 dark:text-gray-400 text-sm">
                             Loading analytics...
                           </p>
@@ -1545,7 +1012,7 @@ export default function AuthorAdminDashboard() {
                       </div>
                       <div className="h-64 flex items-center justify-center">
                         <div className="text-center">
-                          <Loader className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-2" />
+                          <div className="w-8 h-8 animate-spin border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                           <p className="text-gray-500 dark:text-gray-400 text-sm">
                             Loading top articles...
                           </p>
@@ -1847,174 +1314,14 @@ export default function AuthorAdminDashboard() {
               )}
             </motion.section>
 
-            {/* TRASH SECTION - ADDED AT THE END */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
-            >
-              <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
-                  <div>
-                    <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
-                      Trash Bin
-                    </h2>
-                    <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                      Articles in trash are automatically deleted after 7 days
-                    </p>
-                  </div>
-                  {trashArticles.length > 0 && (
-                    <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
-                      {trashArticles.length} articles in trash
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {trashLoading ? (
-                <div className="flex items-center justify-center py-12 md:py-20">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-6"></div>
-                    <p className="text-slate-700 dark:text-gray-300 text-lg font-medium">
-                      Loading trash articles...
-                    </p>
-                  </div>
-                </div>
-              ) : trashArticles.length === 0 ? (
-                <div className="text-center py-12 md:py-20">
-                  <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-slate-500 to-slate-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
-                    <Trash2 className="w-6 h-6 md:w-10 md:h-10 text-white" />
-                  </div>
-                  <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-                    Trash is Empty
-                  </h3>
-                  <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                    Articles you delete will appear here and can be restored
-                    within 7 days
-                  </p>
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
-                  {trashArticles.map((article, index) => {
-                    const daysRemaining = article.days_remaining;
-                    const daysInTrash = article.days_in_trash;
-                    const canRestore = article.can_restore;
-
-                    return (
-                      <motion.div
-                        key={article.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
-                      >
-                        <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                          {/* Article Info */}
-                          <div className="flex-1 min-w-0 w-full">
-                            <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
-                              <span
-                                className={`inline-flex items-center gap-1.5 font-medium text-xs md:text-sm px-2 py-1 rounded-lg ${
-                                  canRestore
-                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-                                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                                }`}
-                              >
-                                {canRestore
-                                  ? `🗑️ ${daysRemaining} days remaining`
-                                  : "⏰ Expired - Cannot restore"}
-                              </span>
-                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
-                                Deleted {daysInTrash} days ago
-                              </span>
-                              <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
-                                {article.read_count?.toLocaleString()} views
-                              </span>
-                            </div>
-
-                            <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2">
-                              {article.title}
-                            </h3>
-
-                            {article.excerpt && (
-                              <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
-                                {stripMarkdown(article.excerpt).slice(0, 120)}
-                                ...
-                              </p>
-                            )}
-
-                            {article.tags && article.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 md:gap-2">
-                                {article.tags.slice(0, 3).map((tag) => (
-                                  <span
-                                    key={tag.id}
-                                    className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
-                                  >
-                                    <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
-                                    {tag.name}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
-                            {canRestore && (
-                              <button
-                                onClick={() =>
-                                  handleRestoreArticle(article.slug)
-                                }
-                                disabled={
-                                  restoringSlug === article.slug || !canRestore
-                                }
-                                className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-emerald-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {restoringSlug === article.slug ? (
-                                  <>
-                                    <Loader className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
-                                    Restoring...
-                                  </>
-                                ) : (
-                                  <>
-                                    <svg
-                                      className="w-3 h-3 md:w-4 md:h-4"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-                                      />
-                                    </svg>
-                                    Restore
-                                  </>
-                                )}
-                              </button>
-                            )}
-                            <button
-                              onClick={() =>
-                                handlePermanentDelete(article.slug)
-                              }
-                              className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                            >
-                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                              Delete Permanently
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-            </motion.section>
+            {/* TRASH SECTION - Now using the imported component */}
+            <TrashSection
+              trashArticles={trashArticles}
+              trashLoading={trashLoading}
+              restoringSlug={restoringSlug}
+              onRestoreArticle={handleRestoreArticle}
+              onPermanentDelete={handlePermanentDelete}
+            />
 
             <DashboardNotificationSection />
 

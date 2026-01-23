@@ -8,22 +8,16 @@ import {
   Brain,
   Cloud,
   Cog,
-  BarChart3,
-  Sparkles,
-  Shield,
+  BarChart3, Shield,
   Code,
   Database,
   Globe,
-  Zap,
-  Folder,
-  ChevronRight,
+  Zap, ChevronRight,
   ChevronDown,
-  ChevronUp,
-  Vault,
-  Key,
+  ChevronUp, Key,
   Container,
   GitBranch,
-  GitCommit,
+  GitCommit
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
