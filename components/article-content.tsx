@@ -744,12 +744,11 @@ export function ArticleContent({
                   return (
                     <h1
                       id={id}
-                      className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-12 mb-8 pb-4 border-b border-gray-100 dark:border-gray-800"
+                      className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mt-12 mb-8"
                       {...props}
                     >
-                      <span className="relative">
+                      <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-purple-700 dark:from-blue-500 dark:via-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
                         {children}
-                        <span className="absolute -bottom-4 left-0 w-20 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500"></span>
                       </span>
                     </h1>
                   );
@@ -760,7 +759,7 @@ export function ArticleContent({
                   return (
                     <h2
                       id={id}
-                      className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mt-10 mb-6 pl-4 border-l-4 border-blue-500 dark:border-blue-400"
+                      className="text-2xl md:text-3xl font-bold text-blue-700 dark:text-blue-600 mt-10 mb-6"
                       {...props}
                     >
                       {children}
@@ -773,10 +772,9 @@ export function ArticleContent({
                   return (
                     <h3
                       id={id}
-                      className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-8 mb-4 flex items-center gap-2"
+                      className="text-xl md:text-2xl font-semibold text-green-700 dark:text-green-600 mt-8 mb-4"
                       {...props}
                     >
-                      <span className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>
                       {children}
                     </h3>
                   );
@@ -787,7 +785,7 @@ export function ArticleContent({
                   return (
                     <h4
                       id={id}
-                      className="text-lg md:text-xl font-semibold text-gray-600 dark:text-gray-400 mt-6 mb-3 pl-2 border-l-2 border-blue-300 dark:border-blue-500"
+                      className="text-lg md:text-xl font-semibold text-purple-700 dark:text-purple-300 mt-6 mb-3"
                       {...props}
                     >
                       {children}
