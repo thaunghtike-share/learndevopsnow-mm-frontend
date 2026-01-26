@@ -409,7 +409,7 @@ export default function DashboardNotificationSection() {
                           />
                         )}
                         <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white line-clamp-2">
-                          {notification.actor_name} {notification.message}
+                          {notification.message}
                         </h3>
                       </div>
 
