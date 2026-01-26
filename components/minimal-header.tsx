@@ -293,8 +293,8 @@ export function MinimalHeader() {
       label: getNavText("All Articles", "စာများအားလုံး"),
     },
     {
-      href: `/${currentLocale}/50-days-cloud-challenge`,
-      label: getNavText("Explore 50 Days of Azure", "Azure ရက် 50 လေ့လာမယ်"),
+      href: `/${currentLocale}/learn-azure`,
+      label: getNavText("Learn Azure", "Azure လေ့လာရန်"),
     },
     {
       href: `/${currentLocale}/learn-linux-basic`,
@@ -303,6 +303,26 @@ export function MinimalHeader() {
     {
       href: `/${currentLocale}/terraform-series`,
       label: getNavText("Learn Terraform", "Terraform သင်ယူရန်"),
+    },
+    {
+      href: `/${currentLocale}/learn-aws`,
+      label: getNavText("Learn AWS", "AWS လေ့လာရန်"),
+    },
+    {
+      href: `/${currentLocale}/learn-docker`,
+      label: getNavText("Learn Docker", "Docker လေ့လာရန်"),
+    },
+    {
+      href: `/${currentLocale}/learn-kubernetes`,
+      label: getNavText("Learn Kubernetes", "Kubernetes သင်ယူရန်"),
+    },
+    {
+      href: `/${currentLocale}/learn-git`,
+      label: getNavText("Learn Git", "Git သင်ယူရန်"),
+    },
+    {
+      href: `/${currentLocale}/learn-cicd`,
+      label: getNavText("Learn CI/CD", "CI/CD လေ့လာရန်"),
     },
   ];
 
@@ -822,9 +842,14 @@ export function MinimalHeader() {
               <button
                 className={`flex items-center px-5 py-2.5 transition-all duration-200 relative group font-medium ${
                   pathname.includes("/articles") ||
-                  pathname.includes("/50-days-cloud-challenge") ||
+                  pathname.includes("/learn-azure") ||
                   pathname.includes("/learn-linux-basic") ||
-                  pathname.includes("/terraform-series")
+                  pathname.includes("/terraform-series") ||
+                  pathname.includes("/learn-aws") ||
+                  pathname.includes("/learn-docker") ||
+                  pathname.includes("/learn-kubernetes") ||
+                  pathname.includes("/learn-git") ||
+                  pathname.includes("/learn-cicd")
                     ? "text-blue-600 dark:text-blue-400 font-semibold"
                     : "text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                 }`}
@@ -851,10 +876,10 @@ export function MinimalHeader() {
                     {getNavText("Read Articles", "စာဖတ်ရန်")}
                   </Link>
                   <Link
-                    href={`/${currentLocale}/50-days-cloud-challenge`}
+                    href={`/${currentLocale}/learn-azure`}
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
-                    {getNavText("Learn 50 Days of Azure", "Azure လေ့လာရန်")}
+                    {getNavText("Learn Azure", "Azure လေ့လာရန်")}
                   </Link>
                   <Link
                     href={`/${currentLocale}/learn-linux-basic`}
@@ -867,6 +892,36 @@ export function MinimalHeader() {
                     className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
                   >
                     {getNavText("Learn Terraform", "Terraform လေ့လာရန်")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/learn-aws`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
+                  >
+                    {getNavText("Learn AWS", "AWS လေ့လာရန်")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/learn-docker`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Learn Docker", "Docker လေ့လာရန်")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/learn-kubernetes`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Learn Kubernetes", "Kubernetes လေ့လာရန်")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/learn-git`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Learn Git", "Git လေ့လာရန်")}
+                  </Link>
+                  <Link
+                    href={`/${currentLocale}/learn-cicd`}
+                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
+                  >
+                    {getNavText("Learn CI/CD", "CI/CD လေ့လာရန်")}
                   </Link>
                 </div>
               )}

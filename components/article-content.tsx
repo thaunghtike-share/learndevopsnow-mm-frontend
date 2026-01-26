@@ -56,6 +56,7 @@ import { Button } from "@/components/ui/button";
 import { SimpleTTSPlayer } from "./tts-player";
 import { ShareButtons } from "./share-buttons";
 import { BellSubscription } from "./subscription-button";
+import { SaveButton } from "./SaveButton";
 
 interface Article {
   id: number;
@@ -582,6 +583,13 @@ export function ArticleContent({
                   </div>
                 </div>
               </div>
+
+              <SaveButton
+                articleId={article.id}
+                articleTitle={article.title}
+                size="md"
+                showLabel={true}
+              />
 
               {/* TTS Player - HIDDEN ON MOBILE */}
               <div className="hidden sm:block">

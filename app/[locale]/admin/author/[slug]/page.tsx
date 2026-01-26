@@ -31,6 +31,8 @@ import {
   BarChart2,
   Search,
   ChevronDown,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -53,6 +55,7 @@ import AuthorViewsBarChart from "./components/AuthorViewsBarChart";
 import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
 import RestoreSuccessAlert from "./components/RestoreSuccessAlert";
 import TrashSection from "./components/TrashSection";
+import SavedPostsSection from "./components/SavedPostsSection";
 
 ChartJS.register(
   ArcElement,
@@ -125,7 +128,7 @@ interface BanDetails {
   is_temporary: boolean;
 }
 
-type ActiveTab = "articles" | "trash";
+type ActiveTab = "articles" | "trash" | "saved";
 
 export default function AuthorAdminDashboard() {
   const { slug } = useParams();
@@ -152,7 +155,7 @@ export default function AuthorAdminDashboard() {
     isLoading: false,
   });
 
-  // NEW: Trash articles state
+  // Trash articles state
   const [trashArticles, setTrashArticles] = useState<TrashArticle[]>([]);
   const [trashLoading, setTrashLoading] = useState(false);
   const [articlesByAuthorData, setArticlesByAuthorData] = useState([]);
@@ -162,9 +165,14 @@ export default function AuthorAdminDashboard() {
   const [chartsError, setChartsError] = useState<string | null>(null);
   const [initialAuthCheck, setInitialAuthCheck] = useState(false);
 
-  // NEW: Active tab state
+  // Active tab state
   const [activeTab, setActiveTab] = useState<ActiveTab>("articles");
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+
+  // Saved articles state
+  const [savedArticles, setSavedArticles] = useState<any[]>([]);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [unsavingId, setUnsavingId] = useState<number | null>(null);
 
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
@@ -208,7 +216,90 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // Add this function to lazy load charts
+  // Fetch saved articles
+  const fetchSavedArticles = async () => {
+    try {
+      setSavedLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/articles/saved/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Transform the data to match the component's expected structure
+        const transformedData = data.map((item: any) => ({
+          id: item.id,
+          article: {
+            id: item.article_details?.id || item.article?.id,
+            slug: item.article_details?.slug || item.article?.slug,
+            title: item.article_details?.title || item.article?.title,
+            excerpt:
+              item.article_details?.excerpt || item.article?.excerpt || "",
+            cover_image:
+              item.article_details?.cover_image || item.article?.cover_image,
+            published_at:
+              item.article_details?.published_at || item.article?.published_at,
+            author_name:
+              item.article_details?.author_name || item.article?.author_name,
+            author_slug:
+              item.article_details?.author_slug || item.article?.author_slug,
+            read_time:
+              item.article_details?.read_time || item.article?.read_time || 5,
+            read_count:
+              item.article_details?.read_count || item.article?.read_count || 0,
+            comment_count:
+              item.article_details?.comment_count ||
+              item.article?.comment_count,
+            reactions_summary:
+              item.article_details?.reactions_summary ||
+              item.article?.reactions_summary,
+            category: item.article_details?.category || item.article?.category,
+            tags: item.article_details?.tags || item.article?.tags || [],
+          },
+          saved_at: item.saved_at,
+          notes: item.notes,
+        }));
+        setSavedArticles(transformedData);
+      }
+    } catch (error) {
+      console.error("Error fetching saved articles:", error);
+    } finally {
+      setSavedLoading(false);
+    }
+  };
+
+  // Handle unsave article
+  const handleUnsaveArticle = async (articleId: number) => {
+    try {
+      setUnsavingId(articleId);
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/articles/unsave/${articleId}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Remove from local state
+        setSavedArticles((prev) =>
+          prev.filter((item) => item.article.id !== articleId)
+        );
+      }
+    } catch (error) {
+      console.error("Error unsaving article:", error);
+      alert("Failed to remove article from saved list");
+    } finally {
+      setUnsavingId(null);
+    }
+  };
+
   const loadChartsData = async () => {
     if (chartsLoaded || loadingCharts) return;
 
@@ -240,10 +331,8 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // Add this useEffect to load charts when component mounts
   useEffect(() => {
     if (author && !chartsLoaded && !loadingCharts) {
-      // Load charts after a short delay to prioritize main content
       const timer = setTimeout(() => {
         loadChartsData();
       }, 500);
@@ -252,7 +341,7 @@ export default function AuthorAdminDashboard() {
     }
   }, [author, chartsLoaded, loadingCharts]);
 
-  // NEW: Fetch trash articles
+  // Fetch trash articles
   const fetchTrashArticles = async () => {
     try {
       setTrashLoading(true);
@@ -285,7 +374,6 @@ export default function AuthorAdminDashboard() {
   }, [showRestoreSuccess]);
 
   useEffect(() => {
-    // Quick token check - no delay
     const token = localStorage.getItem("token");
     if (!token) {
       setShowLoginModal(true);
@@ -318,13 +406,11 @@ export default function AuthorAdminDashboard() {
           throw new Error("No authentication token found");
         }
 
-        // Check cache first for faster loading
         const cacheKey = `author_dashboard_cache_${slug}`;
         const cached = localStorage.getItem(cacheKey);
 
         if (cached) {
           const { data, timestamp } = JSON.parse(cached);
-          // Use cache if less than 30 seconds old
           if (Date.now() - timestamp < 30000) {
             if (data.author.slug !== slug) {
               router.push(`/admin/author/${data.author.slug}`);
@@ -336,13 +422,11 @@ export default function AuthorAdminDashboard() {
               articles: data.articles || [],
             });
 
-            // Load fresh data in background
             setTimeout(() => fetchFreshData(token, cacheKey), 100);
             return;
           }
         }
 
-        // SINGLE API CALL - no artificial delays
         await fetchFreshData(token, cacheKey);
       } catch (err) {
         console.error("Error fetching author data:", err);
@@ -357,7 +441,6 @@ export default function AuthorAdminDashboard() {
     }
   }, [slug, isAuthenticated, isLoading, router]);
 
-  // Helper function for fresh data
   const fetchFreshData = async (token: string, cacheKey?: string) => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/dashboard/optimized/`,
@@ -366,7 +449,6 @@ export default function AuthorAdminDashboard() {
           Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
-        // Use cache for faster subsequent loads
         next: { revalidate: 30 },
       }
     );
@@ -392,13 +474,11 @@ export default function AuthorAdminDashboard() {
       return;
     }
 
-    // Set all data from single response
     setAuthor({
       ...data.author,
       articles: data.articles || [],
     });
 
-    // Cache the data for faster future loads
     if (cacheKey) {
       localStorage.setItem(
         cacheKey,
@@ -409,10 +489,12 @@ export default function AuthorAdminDashboard() {
       );
     }
 
-    // Parallel loading of non-critical data
-    Promise.all([checkBanStatus(), fetchTrashArticles()]).catch((error) => {
+    Promise.all([
+      checkBanStatus(),
+      fetchTrashArticles(),
+      fetchSavedArticles(),
+    ]).catch((error) => {
       console.error("Error loading additional data:", error);
-      // Non-critical errors - don't block the UI
     });
   };
 
@@ -456,9 +538,7 @@ export default function AuthorAdminDashboard() {
           : null
       );
 
-      // Refresh trash articles after deletion
       await fetchTrashArticles();
-
       setDeleteModal({ isOpen: false, article: null, isLoading: false });
     } catch (err) {
       console.error("Error deleting article:", err);
@@ -482,12 +562,10 @@ export default function AuthorAdminDashboard() {
       );
 
       if (response.ok) {
-        // Remove from trash list
         setTrashArticles((prev) =>
           prev.filter((article) => article.slug !== articleSlug)
         );
 
-        // Show success message
         const restoredArticle = trashArticles.find(
           (a) => a.slug === articleSlug
         );
@@ -496,9 +574,7 @@ export default function AuthorAdminDashboard() {
         );
         setShowRestoreSuccess(true);
 
-        // Add a small delay to show the success message before refreshing
         setTimeout(async () => {
-          // Refresh author articles
           const authorRes = await fetch(
             `${API_BASE_URL}/authors/me/dashboard/`,
             {
@@ -528,7 +604,6 @@ export default function AuthorAdminDashboard() {
     }
   };
 
-  // NEW: Handle permanent delete from trash
   const handlePermanentDelete = async (articleSlug: string) => {
     if (
       !confirm(
@@ -551,7 +626,6 @@ export default function AuthorAdminDashboard() {
       );
 
       if (response.ok) {
-        // Remove from trash list
         setTrashArticles((prev) =>
           prev.filter((article) => article.slug !== articleSlug)
         );
@@ -690,7 +764,6 @@ export default function AuthorAdminDashboard() {
       currentPage * articlesPerPage
     ) || [];
 
-  // These should work with the lazy-loaded data:
   const prepareArticlesByAuthorData = () => {
     return articlesByAuthorData || [];
   };
@@ -1058,9 +1131,9 @@ export default function AuthorAdminDashboard() {
               </motion.div>
             </section>
 
-            {/* TAB SECTION - Right Side Layout */}
+            {/* TAB SECTION - Updated to include Saved */}
             <div className="mb-8">
-              {/* Desktop Tabs - Right Side */}
+              {/* Desktop Tabs - Updated */}
               <div className="hidden md:flex justify-center mb-8">
                 <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
                   <button
@@ -1077,6 +1150,22 @@ export default function AuthorAdminDashboard() {
                       {totalArticles}
                     </span>
                   </button>
+
+                  <button
+                    onClick={() => setActiveTab("saved")}
+                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
+                      activeTab === "saved"
+                        ? "bg-white dark:bg-gray-700 shadow-md text-emerald-600 dark:text-emerald-400"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    }`}
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    Saved
+                    <span className="ml-2 px-2 py-1 text-xs rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                      {savedArticles.length}
+                    </span>
+                  </button>
+
                   <button
                     onClick={() => setActiveTab("trash")}
                     className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
@@ -1094,7 +1183,7 @@ export default function AuthorAdminDashboard() {
                 </div>
               </div>
 
-              {/* Mobile Dropdown */}
+              {/* Mobile Dropdown - Updated */}
               <div className="md:hidden mb-6">
                 <button
                   onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
@@ -1106,6 +1195,13 @@ export default function AuthorAdminDashboard() {
                         <FileText className="w-4 h-4 text-blue-600" />
                         <span className="font-medium text-blue-600 dark:text-blue-400">
                           Articles ({totalArticles})
+                        </span>
+                      </>
+                    ) : activeTab === "saved" ? (
+                      <>
+                        <Bookmark className="w-4 h-4 text-emerald-600" />
+                        <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                          Saved ({savedArticles.length})
                         </span>
                       </>
                     ) : (
@@ -1143,6 +1239,26 @@ export default function AuthorAdminDashboard() {
                       </div>
                       <span className="text-sm text-gray-500 dark:text-gray-400">
                         {totalArticles}
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("saved");
+                        setIsMobileDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
+                        activeTab === "saved"
+                          ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
+                          : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Bookmark className="w-4 h-4" />
+                        <span className="font-medium">Saved</span>
+                      </div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {savedArticles.length}
                       </span>
                     </button>
 
@@ -1434,6 +1550,24 @@ export default function AuthorAdminDashboard() {
                     )}
                   </>
                 )}
+              </motion.section>
+            )}
+
+            {/* SAVED POSTS TAB CONTENT */}
+            {activeTab === "saved" && (
+              <motion.section
+                key="saved"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+              >
+                <SavedPostsSection
+                  savedArticles={savedArticles}
+                  savedLoading={savedLoading}
+                  onUnsaveArticle={handleUnsaveArticle}
+                  unsavingId={unsavingId}
+                />
               </motion.section>
             )}
 
