@@ -861,7 +861,7 @@ export function MinimalHeader() {
               </button>
               {isArticlesOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-64 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
+                  className="absolute top-full left-0 mt-3 w-96 bg-white dark:bg-[#000000]/95 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-2"
                   onMouseEnter={() =>
                     handleMouseEnter(setIsArticlesOpen, articlesTimeout)
                   }
@@ -869,60 +869,62 @@ export function MinimalHeader() {
                     handleMouseLeave(setIsArticlesOpen, articlesTimeout)
                   }
                 >
-                  <Link
-                    href={`/${currentLocale}/articles`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Read Articles", "စာဖတ်ရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-azure`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Learn Azure", "Azure လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-linux-basic`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Learn Linux Essentials", "Linux အခြေခံများ")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/terraform-series`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Learn Terraform", "Terraform လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-aws`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 border-b border-gray-100 dark:border-gray-700 transition-all font-medium"
-                  >
-                    {getNavText("Learn AWS", "AWS လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-docker`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
-                  >
-                    {getNavText("Learn Docker", "Docker လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-kubernetes`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
-                  >
-                    {getNavText("Learn Kubernetes", "Kubernetes လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-git`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
-                  >
-                    {getNavText("Learn Git", "Git လေ့လာရန်")}
-                  </Link>
-                  <Link
-                    href={`/${currentLocale}/learn-cicd`}
-                    className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-medium"
-                  >
-                    {getNavText("Learn CI/CD", "CI/CD လေ့လာရန်")}
-                  </Link>
+                  <div className="grid grid-cols-2 gap-0">
+                    <Link
+                      href={`/${currentLocale}/articles`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-r border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("All Articles", "စာများအားလုံး")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-azure`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn Azure", "Azure လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-linux-basic`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-r border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Linux Basics", "Linux အခြေခံ")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/terraform-series`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn Terraform", "Terraform လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-aws`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-r border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn AWS", "AWS လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-docker`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn Docker", "Docker လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-kubernetes`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-r border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Kubernetes", "Kubernetes လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-git`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium border-b border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn Git", "Git လေ့လာရန်")}
+                    </Link>
+                    <Link
+                      href={`/${currentLocale}/learn-cicd`}
+                      className="block px-4 py-3 text-black dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all font-medium col-span-2 border-b border-gray-100 dark:border-gray-700"
+                    >
+                      {getNavText("Learn CI/CD", "CI/CD လေ့လာရန်")}
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
