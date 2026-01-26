@@ -30,10 +30,11 @@ import {
   Lightbulb,
   BarChart2,
   Search,
-  ChevronDown,
   Bookmark,
-  BookmarkCheck,
   Bell,
+  Menu,
+  X,
+  Settings,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -130,8 +131,12 @@ interface BanDetails {
   is_temporary: boolean;
 }
 
-type ActiveTab = "articles" | "trash" | "saved";
-type SettingsTab = "notifications" | "settings" | null;
+type ActiveSection =
+  | "articles"
+  | "saved"
+  | "trash"
+  | "notifications"
+  | "settings";
 
 export default function AuthorAdminDashboard() {
   const { slug } = useParams();
@@ -168,11 +173,10 @@ export default function AuthorAdminDashboard() {
   const [chartsError, setChartsError] = useState<string | null>(null);
   const [initialAuthCheck, setInitialAuthCheck] = useState(false);
 
-  // Active tab states - SEPARATED
-  const [activeTab, setActiveTab] = useState<ActiveTab>("articles");
-  const [activeSettingsTab, setActiveSettingsTab] =
-    useState<SettingsTab>("notifications");
-  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+  // Active section and sidebar state
+  const [activeSection, setActiveSection] = useState<ActiveSection>("articles");
+  const [sidebarHovered, setSidebarHovered] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Saved articles state
   const [savedArticles, setSavedArticles] = useState<any[]>([]);
@@ -273,35 +277,6 @@ export default function AuthorAdminDashboard() {
       console.error("Error fetching saved articles:", error);
     } finally {
       setSavedLoading(false);
-    }
-  };
-
-  // Handle unsave article
-  const handleUnsaveArticle = async (articleId: number) => {
-    try {
-      setUnsavingId(articleId);
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${API_BASE_URL}/articles/unsave/${articleId}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        // Remove from local state
-        setSavedArticles((prev) =>
-          prev.filter((item) => item.article.id !== articleId)
-        );
-      }
-    } catch (error) {
-      console.error("Error unsaving article:", error);
-      alert("Failed to remove article from saved list");
-    } finally {
-      setUnsavingId(null);
     }
   };
 
@@ -609,6 +584,35 @@ export default function AuthorAdminDashboard() {
     }
   };
 
+  const handleUnsaveArticle = async (articleId: number) => {
+    try {
+      setUnsavingId(articleId);
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/articles/saved/${articleId}/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setSavedArticles((prev) =>
+          prev.filter((article) => article.id !== articleId)
+        );
+      } else {
+        throw new Error("Failed to unsave article");
+      }
+    } catch (error) {
+      console.error("Error unsaving article:", error);
+      alert("Failed to unsave article");
+    } finally {
+      setUnsavingId(null);
+    }
+  };
+
   const handlePermanentDelete = async (articleSlug: string) => {
     if (
       !confirm(
@@ -829,848 +833,863 @@ export default function AuthorAdminDashboard() {
         isVisible={showRestoreSuccess}
       />
 
-      <main className="px-6 md:px-11 md:py-8 relative z-10">
-        {!isAuthenticated && (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-              <Crown className="w-12 h-12 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-              Access Required
-            </h1>
-            <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
-              Please login to access your admin dashboard
-            </p>
-          </div>
-        )}
-        {isAuthenticated && loading && (
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-sky-600 mx-auto mb-6"></div>
-              <p className="text-slate-700 dark:text-gray-300 text-lg font-medium">
-                Loading your dashboard...
-              </p>
-            </div>
-          </div>
-        )}
-        {isAuthenticated && error && !loading && (
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                <AlertTriangle className="w-12 h-12 text-white" />
-              </div>
-              <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
-                {error.includes("permission") || error.includes("403")
-                  ? "Access Denied"
-                  : "Error Loading Dashboard"}
-              </h1>
-              <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
-                {error}
-              </p>
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => window.location.reload()}
-                  className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
-                >
-                  Try Again
-                </button>
-                <Link
-                  href="/"
-                  className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
-                >
-                  Go Home
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-        {isAuthenticated && author && !loading && !error && (
-          <>
-            {/* MOBILE OPTIMIZED HEADER SECTION */}
-            <section className="w-full mb-12 md:mb-16">
-              <div className="mb-8 md:mb-12">
-                <div className="flex items-center gap-4 mb-4 md:mb-6">
-                  <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-                  <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                    Author Dashboard
-                  </span>
-                </div>
-                <h1 className="text-3xl md:text-7xl font-light text-black dark:text-white mb-4 md:mb-6 tracking-tight">
-                  Welcome back, {author?.name}
-                </h1>
-              </div>
+      <main className="relative z-10">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="fixed md:hidden left-4 top-4 z-50 p-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-full shadow-2xl"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
 
-              {banDetails && (
-                <div className="mb-6 p-4 md:p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
-                  <div className="flex items-start gap-3 md:gap-4">
-                    <div className="flex-shrink-0">
-                      <Ban className="w-5 h-5 md:w-6 md:h-6 text-red-600 dark:text-red-400 mt-0.5 md:mt-1" />
+        <div className="flex">
+          {/* Desktop Sidebar - Auto-hide on hover */}
+          <div className="hidden md:block relative">
+            <motion.div
+              initial={false}
+              animate={{
+                width: sidebarHovered ? "280px" : "20px",
+              }}
+              transition={{ duration: 0.2 }}
+              className="h-screen sticky top-0 overflow-hidden group"
+              onMouseEnter={() => setSidebarHovered(true)}
+              onMouseLeave={() => setSidebarHovered(false)}
+            >
+              {/* Hidden trigger area for hover */}
+              <div className="absolute inset-y-0 left-0 w-6 z-40 hover:cursor-pointer" />
+
+              {/* Sidebar Content */}
+              <motion.div
+                animate={{
+                  opacity: sidebarHovered ? 1 : 0,
+                  x: sidebarHovered ? 0 : -20,
+                }}
+                transition={{ duration: 0.2 }}
+                className={`h-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 shadow-xl flex flex-col w-64 ${
+                  sidebarHovered ? "" : "pointer-events-none"
+                }`}
+              >
+                {/* Navigation Only - No header, no footer */}
+                <nav className="flex-1 p-4 space-y-1 overflow-y-auto mt-20">
+                  {[
+                    {
+                      id: "articles",
+                      label: "Articles",
+                      icon: FileText,
+                      color: "text-blue-600 dark:text-blue-400",
+                      bgColor: "bg-blue-100 dark:bg-blue-900/30",
+                    },
+                    {
+                      id: "saved",
+                      label: "Saved",
+                      icon: Bookmark,
+                      color: "text-emerald-600 dark:text-emerald-400",
+                      bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+                    },
+                    {
+                      id: "trash",
+                      label: "Trash",
+                      icon: Trash2,
+                      color: "text-red-600 dark:text-red-400",
+                      bgColor: "bg-red-100 dark:bg-red-900/30",
+                    },
+                    {
+                      id: "notifications",
+                      label: "Notifications",
+                      icon: Bell,
+                      color: "text-amber-600 dark:text-amber-400",
+                      bgColor: "bg-amber-100 dark:bg-amber-900/30",
+                    },
+                    {
+                      id: "settings",
+                      label: "Settings",
+                      icon: Settings,
+                      color: "text-purple-600 dark:text-purple-400",
+                      bgColor: "bg-purple-100 dark:bg-purple-900/30",
+                    },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveSection(item.id as ActiveSection)}
+                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
+                        activeSection === item.id
+                          ? `${item.bgColor} ${item.color} shadow-md`
+                          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      <div
+                        className={`p-2 rounded-lg ${item.bgColor} ${item.color}`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 flex items-center justify-between">
+                        <span className="font-medium whitespace-nowrap">
+                          {item.label}
+                        </span>
+                        {item.count !== undefined && (
+                          <span
+                            className={`px-2 py-0.5 text-xs rounded-full ${
+                              activeSection === item.id
+                                ? "bg-white/80 dark:bg-gray-800/80"
+                                : "bg-gray-200 dark:bg-gray-700"
+                            }`}
+                          >
+                            {item.count}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </nav>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* Mobile Sidebar Overlay */}
+          {mobileMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              <div className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 z-50 shadow-2xl md:hidden">
+                <div className="h-full flex flex-col">
+                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="font-bold text-gray-800 dark:text-white">
+                        Navigation
+                      </h2>
+                      <button
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-base md:text-lg font-semibold text-red-800 dark:text-red-200 mb-1 md:mb-2">
-                        Account Banned
-                      </h3>
-                      <p className="text-red-700 dark:text-red-300 text-sm md:text-base mb-2 md:mb-3">
-                        {banDetails.reason ||
-                          "Your account has been suspended due to violations of our community guidelines."}
-                      </p>
-                      <div className="text-xs md:text-sm text-red-600 dark:text-red-400 space-y-1">
-                        <p>
-                          <strong>Banned on:</strong>{" "}
-                          {new Date(banDetails.banned_at).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <strong>Banned by:</strong> {banDetails.banned_by}
-                        </p>
-                        {banDetails.is_temporary && banDetails.banned_until && (
-                          <p>
-                            <strong>Ban expires:</strong>{" "}
-                            {new Date(
-                              banDetails.banned_until
-                            ).toLocaleDateString()}
+                  </div>
+
+                  <nav className="flex-1 p-4 space-y-1">
+                    {[
+                      {
+                        id: "articles",
+                        label: "Articles",
+                        icon: FileText,
+                        count: totalArticles,
+                      },
+                      {
+                        id: "saved",
+                        label: "Saved",
+                        icon: Bookmark,
+                        count: savedArticles.length,
+                      },
+                      {
+                        id: "trash",
+                        label: "Trash",
+                        icon: Trash2,
+                        count: trashArticles.length,
+                      },
+                      {
+                        id: "notifications",
+                        label: "Notifications",
+                        icon: Bell,
+                      },
+                      {
+                        id: "settings",
+                        label: "Settings",
+                        icon: Settings,
+                      },
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveSection(item.id as ActiveSection);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
+                          activeSection === item.id
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span className="font-medium">{item.label}</span>
+                        {item.count !== undefined && (
+                          <span className="ml-auto px-2 py-0.5 text-xs rounded-full bg-gray-200 dark:bg-gray-700">
+                            {item.count}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Main Content - Your original design stays exactly the same */}
+          <div className="flex-1 px-6 md:px-11 md:py-8">
+            {/* Your entire original content here - everything remains exactly as you designed it */}
+            {!isAuthenticated && (
+              <div className="text-center py-20">
+                <div className="w-24 h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                  <Crown className="w-12 h-12 text-white" />
+                </div>
+                <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
+                  Access Required
+                </h1>
+                <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
+                  Please login to access your admin dashboard
+                </p>
+              </div>
+            )}
+            {isAuthenticated && loading && (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-sky-600 mx-auto mb-6"></div>
+                  <p className="text-slate-700 dark:text-gray-300 text-lg font-medium">
+                    Loading your dashboard...
+                  </p>
+                </div>
+              </div>
+            )}
+            {isAuthenticated && error && !loading && (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                    <AlertTriangle className="w-12 h-12 text-white" />
+                  </div>
+                  <h1 className="text-4xl font-bold text-black dark:text-white mb-4">
+                    {error.includes("permission") || error.includes("403")
+                      ? "Access Denied"
+                      : "Error Loading Dashboard"}
+                  </h1>
+                  <p className="text-lg text-black dark:text-gray-300 mb-8 max-w-md mx-auto">
+                    {error}
+                  </p>
+                  <div className="flex gap-4 justify-center">
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+                    >
+                      Try Again
+                    </button>
+                    <Link
+                      href="/"
+                      className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 shadow-lg"
+                    >
+                      Go Home
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+            {isAuthenticated && author && !loading && !error && (
+              <>
+                {/* MOBILE OPTIMIZED HEADER SECTION - ALWAYS SHOWN */}
+                <section className="w-full mb-12 md:mb-16">
+                  <div className="mb-8 md:mb-12">
+                    <div className="flex items-center gap-4 mb-4 md:mb-6">
+                      <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                      <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                        Author Dashboard
+                      </span>
+                    </div>
+                    <h1 className="text-3xl md:text-7xl font-light text-black dark:text-white mb-4 md:mb-6 tracking-tight">
+                      Welcome back, {author?.name}
+                    </h1>
+                  </div>
+
+                  {banDetails && (
+                    <div className="mb-6 p-4 md:p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
+                      <div className="flex items-start gap-3 md:gap-4">
+                        <div className="flex-shrink-0">
+                          <Ban className="w-5 h-5 md:w-6 md:h-6 text-red-600 dark:text-red-400 mt-0.5 md:mt-1" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-base md:text-lg font-semibold text-red-800 dark:text-red-200 mb-1 md:mb-2">
+                            Account Banned
+                          </h3>
+                          <p className="text-red-700 dark:text-red-300 text-sm md:text-base mb-2 md:mb-3">
+                            {banDetails.reason ||
+                              "Your account has been suspended due to violations of our community guidelines."}
                           </p>
+                          <div className="text-xs md:text-sm text-red-600 dark:text-red-400 space-y-1">
+                            <p>
+                              <strong>Banned on:</strong>{" "}
+                              {new Date(
+                                banDetails.banned_at
+                              ).toLocaleDateString()}
+                            </p>
+                            <p>
+                              <strong>Banned by:</strong> {banDetails.banned_by}
+                            </p>
+                            {banDetails.is_temporary &&
+                              banDetails.banned_until && (
+                                <p>
+                                  <strong>Ban expires:</strong>{" "}
+                                  {new Date(
+                                    banDetails.banned_until
+                                  ).toLocaleDateString()}
+                                </p>
+                              )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-12 mb-12 md:mb-16">
+                    <div className="flex-shrink-0">
+                      <div className="relative">
+                        <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
+                          <img
+                            src={author?.avatar || "/placeholder.svg"}
+                            alt={author?.name}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 bg-gradient-to-r from-amber-500 to-orange-600 p-2 md:p-3 rounded-full shadow-2xl border-2 border-white dark:border-gray-800">
+                          <Crown className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1">
+                      {author?.job_title && author?.company && (
+                        <p className="text-base md:text-xl text-blue-600 font-medium mb-4 md:mb-6">
+                          {author.job_title} at {author.company}
+                        </p>
+                      )}
+
+                      <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed mb-6 md:mb-8 max-w-2xl">
+                        {author?.bio}
+                      </p>
+
+                      <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-4">
+                        <ProtectedAction action="create new articles">
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Link
+                              href="/admin/new-article"
+                              className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 shadow-lg text-sm md:text-base w-full sm:w-auto justify-center"
+                            >
+                              <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                              Write New Article
+                            </Link>
+                          </motion.div>
+                        </ProtectedAction>
+
+                        <Link
+                          href={`/authors/${author?.slug}`}
+                          className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg md:rounded-xl font-semibold hover:shadow-xl transition-all duration-300 shadow-md text-sm md:text-base w-full sm:w-auto justify-center"
+                        >
+                          View Public Profile
+                          <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
+                        </Link>
+
+                        {user?.is_super_user && (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Link
+                              href="/admin/superuser"
+                              className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg md:rounded-xl font-semibold hover:shadow-xl transition-all duration-300 shadow-md border-2 border-purple-400/30 text-sm md:text-base w-full sm:w-auto justify-center"
+                            >
+                              <Crown className="w-4 h-4 md:w-5 md:h-5" />
+                              Superuser Dashboard
+                            </Link>
+                          </motion.div>
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                </section>
 
-              <div className="flex flex-col lg:flex-row items-start gap-6 md:gap-12 mb-12 md:mb-16">
-                <div className="flex-shrink-0">
-                  <div className="relative">
-                    <div className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-1">
-                      <img
-                        src={author?.avatar || "/placeholder.svg"}
-                        alt={author?.name}
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 bg-gradient-to-r from-amber-500 to-orange-600 p-2 md:p-3 rounded-full shadow-2xl border-2 border-white dark:border-gray-800">
-                      <Crown className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  {author?.job_title && author?.company && (
-                    <p className="text-base md:text-xl text-blue-600 font-medium mb-4 md:mb-6">
-                      {author.job_title} at {author.company}
-                    </p>
-                  )}
-
-                  <p className="text-base md:text-lg text-black dark:text-gray-300 leading-relaxed mb-6 md:mb-8 max-w-2xl">
-                    {author?.bio}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-4">
-                    <ProtectedAction action="create new articles">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Link
-                          href="/admin/new-article"
-                          className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 shadow-lg text-sm md:text-base w-full sm:w-auto justify-center"
-                        >
-                          <Plus className="w-4 h-4 md:w-5 md:h-5" />
-                          Write New Article
-                        </Link>
-                      </motion.div>
-                    </ProtectedAction>
-
-                    <Link
-                      href={`/authors/${author?.slug}`}
-                      className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg md:rounded-xl font-semibold hover:shadow-xl transition-all duration-300 shadow-md text-sm md:text-base w-full sm:w-auto justify-center"
-                    >
-                      View Public Profile
-                      <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
-                    </Link>
-
-                    {user?.is_super_user && (
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Link
-                          href="/admin/superuser"
-                          className="inline-flex items-center gap-2 md:gap-3 px-4 py-3 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg md:rounded-xl font-semibold hover:shadow-xl transition-all duration-300 shadow-md border-2 border-purple-400/30 text-sm md:text-base w-full sm:w-auto justify-center"
-                        >
-                          <Crown className="w-4 h-4 md:w-5 md:h-5" />
-                          Superuser Dashboard
-                        </Link>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* MOBILE OPTIMIZED STATS */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
-                <div className="space-y-2 md:space-y-3">
-                  <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                    {totalArticles}
-                  </div>
-                  <div className="text-xs md:text-sm text-blue-600 font-semibold uppercase tracking-wider">
-                    Articles
-                  </div>
-                </div>
-                <div className="space-y-2 md:space-y-3">
-                  <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                    {totalViews.toLocaleString()}
-                  </div>
-                  <div className="text-xs md:text-sm text-green-600 font-semibold uppercase tracking-wider">
-                    Total Views
-                  </div>
-                </div>
-                <div className="space-y-2 md:space-y-3">
-                  <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                    {totalComments}
-                  </div>
-                  <div className="text-xs md:text-sm text-pink-600 font-semibold uppercase tracking-wider">
-                    Total Comments
-                  </div>
-                </div>
-                <div className="space-y-2 md:space-y-3">
-                  <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                    {totalReactions}
-                  </div>
-                  <div className="text-xs md:text-sm text-amber-600 font-semibold uppercase tracking-wider">
-                    Total Reactions
-                  </div>
-                </div>
-              </div>
-
-              {/* BAR CHARTS SECTION - Lazy Loaded */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mb-12 md:mb-16"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 flex items-center justify-center">
-                    <BarChart2 className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white">
-                      Platform Analytics
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Real statistics based on all platform articles
-                    </p>
-                  </div>
-                </div>
-
-                {/* Lazy Loading Charts */}
-                {!chartsLoaded ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Placeholder for first chart */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="w-5 h-5 text-blue-500" />
-                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                            Articles Distribution
-                          </h3>
+                {/* MAIN CONTENT BASED ON ACTIVE SECTION */}
+                {activeSection === "articles" && (
+                  <>
+                    {/* MOBILE OPTIMIZED STATS - ONLY FOR ARTICLES TAB */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12 mb-8">
+                      <div className="space-y-2 md:space-y-3">
+                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                          {totalArticles}
+                        </div>
+                        <div className="text-xs md:text-sm text-blue-600 font-semibold uppercase tracking-wider">
+                          Articles
                         </div>
                       </div>
-                      <div className="h-64 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-8 h-8 animate-spin border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                          <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            Loading analytics...
+                      <div className="space-y-2 md:space-y-3">
+                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                          {totalViews.toLocaleString()}
+                        </div>
+                        <div className="text-xs md:text-sm text-green-600 font-semibold uppercase tracking-wider">
+                          Total Views
+                        </div>
+                      </div>
+                      <div className="space-y-2 md:space-y-3">
+                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                          {totalComments}
+                        </div>
+                        <div className="text-xs md:text-sm text-pink-600 font-semibold uppercase tracking-wider">
+                          Total Comments
+                        </div>
+                      </div>
+                      <div className="space-y-2 md:space-y-3">
+                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                          {totalReactions}
+                        </div>
+                        <div className="text-xs md:text-sm text-amber-600 font-semibold uppercase tracking-wider">
+                          Total Reactions
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BAR CHARTS SECTION - ONLY FOR ARTICLES TAB */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mb-12 md:mb-16"
+                    >
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 flex items-center justify-center">
+                          <BarChart2 className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white">
+                            Platform Analytics
+                          </h2>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Real statistics based on all platform articles
                           </p>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Placeholder for second chart */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="w-5 h-5 text-emerald-500" />
-                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                            Your Top Articles
-                          </h3>
+                      {/* Lazy Loading Charts */}
+                      {!chartsLoaded ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                          {/* Placeholder for first chart */}
+                          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-2">
+                                <TrendingUp className="w-5 h-5 text-blue-500" />
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                  Articles Distribution
+                                </h3>
+                              </div>
+                            </div>
+                            <div className="h-64 flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-8 h-8 animate-spin border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                  Loading analytics...
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Placeholder for second chart */}
+                          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-2">
+                                <BarChart3 className="w-5 h-5 text-emerald-500" />
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                  Your Top Articles
+                                </h3>
+                              </div>
+                            </div>
+                            <div className="h-64 flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-8 h-8 animate-spin border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                  Loading top articles...
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="h-64 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-8 h-8 animate-spin border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                          <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            Loading top articles...
+                      ) : chartsError ? (
+                        <div className="text-center py-8">
+                          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                          </div>
+                          <p className="text-red-600 dark:text-red-400">
+                            {chartsError}
                           </p>
+                          <button
+                            onClick={loadChartsData}
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                          >
+                            Retry
+                          </button>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : chartsError ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
-                    </div>
-                    <p className="text-red-600 dark:text-red-400">
-                      {chartsError}
-                    </p>
-                    <button
-                      onClick={loadChartsData}
-                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <AuthorStatsPieChart
-                      data={prepareArticlesByAuthorData()}
-                      title="Articles Distribution"
-                    />
-                    <AuthorViewsBarChart
-                      data={prepareViewsData()}
-                      title="Your Top Articles"
-                      height={280}
-                    />
-                  </div>
-                )}
-              </motion.div>
-            </section>
-
-            {/* MAIN CONTENT TABS - ONLY ARTICLES/SAVED/TRASH */}
-            <div className="mb-8">
-              {/* Desktop Tabs - Only for main content */}
-              <div className="hidden md:flex justify-center mb-8">
-                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
-                  <button
-                    onClick={() => setActiveTab("articles")}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                      activeTab === "articles"
-                        ? "bg-white dark:bg-gray-700 shadow-md text-blue-600 dark:text-blue-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    }`}
-                  >
-                    <FileText className="w-4 h-4" />
-                    Articles
-                    <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900/30">
-                      {totalArticles}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("saved")}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                      activeTab === "saved"
-                        ? "bg-white dark:bg-gray-700 shadow-md text-emerald-600 dark:text-emerald-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    }`}
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    Saved
-                    <span className="ml-2 px-2 py-1 text-xs rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                      {savedArticles.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("trash")}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                      activeTab === "trash"
-                        ? "bg-white dark:bg-gray-700 shadow-md text-red-600 dark:text-red-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    }`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Trash
-                    <span className="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900/30">
-                      {trashArticles.length}
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Mobile Dropdown - Only for main content */}
-              <div className="md:hidden mb-6">
-                <button
-                  onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    {activeTab === "articles" ? (
-                      <>
-                        <FileText className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium text-blue-600 dark:text-blue-400">
-                          Articles ({totalArticles})
-                        </span>
-                      </>
-                    ) : activeTab === "saved" ? (
-                      <>
-                        <Bookmark className="w-4 h-4 text-emerald-600" />
-                        <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                          Saved ({savedArticles.length})
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                        <span className="font-medium text-red-600 dark:text-red-400">
-                          Trash ({trashArticles.length})
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${
-                      isMobileDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {isMobileDropdownOpen && (
-                  <div className="mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden">
-                    <button
-                      onClick={() => {
-                        setActiveTab("articles");
-                        setIsMobileDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
-                        activeTab === "articles"
-                          ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                          : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        <span className="font-medium">Articles</span>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {totalArticles}
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveTab("saved");
-                        setIsMobileDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
-                        activeTab === "saved"
-                          ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
-                          : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Bookmark className="w-4 h-4" />
-                        <span className="font-medium">Saved</span>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {savedArticles.length}
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setActiveTab("trash");
-                        setIsMobileDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors ${
-                        activeTab === "trash"
-                          ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
-                          : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Trash2 className="w-4 h-4" />
-                        <span className="font-medium">Trash</span>
-                      </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {trashArticles.length}
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ARTICLES TAB CONTENT */}
-              {activeTab === "articles" && (
-                <motion.section
-                  key="articles"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
-                >
-                  <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
-                      <div>
-                        <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
-                          Your Articles
-                        </h2>
-                        <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                          {totalArticles} articles •{" "}
-                          {totalViews.toLocaleString()} reads
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
-                          Page {currentPage} of {totalPages}
+                      ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                          <AuthorStatsPieChart
+                            data={prepareArticlesByAuthorData()}
+                            title="Articles Distribution"
+                          />
+                          <AuthorViewsBarChart
+                            data={prepareViewsData()}
+                            title="Your Top Articles"
+                            height={280}
+                          />
                         </div>
-                      </div>
-                    </div>
-                  </div>
+                      )}
+                    </motion.div>
 
-                  {author?.articles && author.articles.length === 0 ? (
-                    <div className="text-center py-12 md:py-20">
-                      <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
-                        <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
-                      </div>
-                      <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-                        Ready to Share Your Knowledge?
-                      </h3>
-                      <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                        Create your first article and start building your
-                        audience.
-                      </p>
-                      <ProtectedAction action="create new articles">
-                        <Link
-                          href="/admin/new-article"
-                          className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 shadow-lg text-sm md:text-base"
-                        >
-                          <Plus className="w-4 h-4 md:w-5 md:h-5" />
-                          Create Your First Article
-                        </Link>
-                      </ProtectedAction>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
-                        {paginatedArticles.map((article, index) => {
-                          const previewText = getCleanExcerpt(article);
-                          const coverImage = getCoverImage(article);
-                          const readTime = calculateReadTime(article.content);
-                          const reactions = article.reactions_summary || {};
-
-                          return (
-                            <motion.div
-                              key={article.id}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
-                            >
-                              <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                                {/* MOBILE OPTIMIZED COVER */}
-                                <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
-                                  <img
-                                    src={coverImage}
-                                    alt={article.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                  />
-                                  <div className="absolute top-2 left-2 md:top-3 md:left-3">
-                                    {article.category && (
-                                      <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
-                                        <Folder className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                                        {article.category.name}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* MOBILE OPTIMIZED CONTENT */}
-                                <div className="flex-1 min-w-0 w-full">
-                                  <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
-                                    <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                      <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
-                                      {formatDate(article.published_at)}
-                                    </span>
-                                    <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                      <Clock className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
-                                      {readTime} min read
-                                    </span>
-                                    <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                      <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
-                                      {article.read_count?.toLocaleString()}{" "}
-                                      views
-                                    </span>
-                                    <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                      <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
-                                      {article.comment_count || 0}
-                                    </span>
-                                  </div>
-
-                                  <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
-                                    <Link href={`/articles/${article.slug}`}>
-                                      {article.title}
-                                    </Link>
-                                  </h3>
-
-                                  <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
-                                    {(reactions.like ?? 0) > 0 && (
-                                      <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
-                                        <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
-                                        {reactions.like}
-                                      </span>
-                                    )}
-                                    {(reactions.love ?? 0) > 0 && (
-                                      <span className="inline-flex items-center gap-1 text-xs md:text-sm text-red-500 dark:text-red-400 font-medium">
-                                        <Heart className="w-3 h-3 md:w-4 md:h-4" />
-                                        {reactions.love}
-                                      </span>
-                                    )}
-                                    {(reactions.celebrate ?? 0) > 0 && (
-                                      <span className="inline-flex items-center gap-1 text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-medium">
-                                        <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-                                        {reactions.celebrate}
-                                      </span>
-                                    )}
-                                    {(reactions.insightful ?? 0) > 0 && (
-                                      <span className="inline-flex items-center gap-1 text-xs md:text-sm text-green-600 dark:text-green-400 font-medium">
-                                        <Lightbulb className="w-3 h-3 md:w-4 md:h-4" />
-                                        {reactions.insightful}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
-                                    {previewText}
-                                  </p>
-
-                                  {article.tags && article.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
-                                      {article.tags.slice(0, 3).map((tag) => (
-                                        <span
-                                          key={tag.id}
-                                          className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
-                                        >
-                                          <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
-                                          {tag.name}
-                                        </span>
-                                      ))}
-                                      {article.tags.length > 3 && (
-                                        <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
-                                          +{article.tags.length - 3} more
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* MOBILE OPTIMIZED ACTION BUTTONS */}
-                                <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
-                                  <ProtectedAction action="edit articles">
-                                    <Link
-                                      href={`/admin/edit-article/${article.slug}`}
-                                      className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                                    >
-                                      <Edit className="w-3 h-3 md:w-4 md:h-4" />
-                                      Edit
-                                    </Link>
-                                  </ProtectedAction>
-                                  <ProtectedAction action="delete articles">
-                                    <button
-                                      onClick={() => openDeleteModal(article)}
-                                      className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                                    >
-                                      <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                                      Delete
-                                    </button>
-                                  </ProtectedAction>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-
-                      {/* MOBILE OPTIMIZED PAGINATION */}
-                      {totalPages > 1 && (
-                        <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
-                          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                              Showing {paginatedArticles.length} of{" "}
-                              {totalArticles} articles
-                            </div>
-
-                            <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                              <button
-                                onClick={() =>
-                                  setCurrentPage((prev) =>
-                                    Math.max(1, prev - 1)
-                                  )
-                                }
-                                disabled={currentPage === 1}
-                                className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                              >
-                                <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
-                                <span className="hidden xs:inline">
-                                  Previous
-                                </span>
-                              </button>
-
-                              <div className="hidden xs:flex items-center gap-1">
-                                {Array.from(
-                                  { length: Math.min(3, totalPages) },
-                                  (_, i) => {
-                                    let pageNum;
-                                    if (totalPages <= 3) {
-                                      pageNum = i + 1;
-                                    } else if (currentPage <= 2) {
-                                      pageNum = i + 1;
-                                    } else if (currentPage >= totalPages - 1) {
-                                      pageNum = totalPages - 2 + i;
-                                    } else {
-                                      pageNum = currentPage - 1 + i;
-                                    }
-                                    return (
-                                      <button
-                                        key={pageNum}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
-                                          currentPage === pageNum
-                                            ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
-                                            : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
-                                        }`}
-                                      >
-                                        {pageNum}
-                                      </button>
-                                    );
-                                  }
-                                )}
-                              </div>
-
-                              <button
-                                onClick={() =>
-                                  setCurrentPage((prev) =>
-                                    Math.min(totalPages, prev + 1)
-                                  )
-                                }
-                                disabled={currentPage === totalPages}
-                                className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                              >
-                                <span className="hidden xs:inline">Next</span>
-                                <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-                              </button>
-                            </div>
-
-                            <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
+                    {/* ARTICLES LIST SECTION */}
+                    <motion.section
+                      key="articles"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+                    >
+                      <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
+                          <div>
+                            <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
+                              Your Articles
+                            </h2>
+                            <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
+                              {totalArticles} articles •{" "}
+                              {totalViews.toLocaleString()} reads
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-xs md:text-sm text-slate-500 dark:text-gray-500 font-medium">
                               Page {currentPage} of {totalPages}
                             </div>
                           </div>
                         </div>
+                      </div>
+
+                      {author?.articles && author.articles.length === 0 ? (
+                        <div className="text-center py-12 md:py-20">
+                          <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+                            <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
+                          </div>
+                          <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
+                            Ready to Share Your Knowledge?
+                          </h3>
+                          <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
+                            Create your first article and start building your
+                            audience.
+                          </p>
+                          <ProtectedAction action="create new articles">
+                            <Link
+                              href="/admin/new-article"
+                              className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 shadow-lg text-sm md:text-base"
+                            >
+                              <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                              Create Your First Article
+                            </Link>
+                          </ProtectedAction>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
+                            {paginatedArticles.map((article, index) => {
+                              const previewText = getCleanExcerpt(article);
+                              const coverImage = getCoverImage(article);
+                              const readTime = calculateReadTime(
+                                article.content
+                              );
+                              const reactions = article.reactions_summary || {};
+
+                              return (
+                                <motion.div
+                                  key={article.id}
+                                  initial={{ opacity: 0, x: -20 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: index * 0.1 }}
+                                  className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
+                                >
+                                  <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
+                                    {/* MOBILE OPTIMIZED COVER */}
+                                    <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                                      <img
+                                        src={coverImage}
+                                        alt={article.title}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                      />
+                                      <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                                        {article.category && (
+                                          <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                                            <Folder className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                                            {article.category.name}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* MOBILE OPTIMIZED CONTENT */}
+                                    <div className="flex-1 min-w-0 w-full">
+                                      <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
+                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                          <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                          {formatDate(article.published_at)}
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                          <Clock className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                          {readTime} min read
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                          <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                                          {article.read_count?.toLocaleString()}{" "}
+                                          views
+                                        </span>
+                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                          <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
+                                          {article.comment_count || 0}
+                                        </span>
+                                      </div>
+
+                                      <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                                        <Link
+                                          href={`/articles/${article.slug}`}
+                                        >
+                                          {article.title}
+                                        </Link>
+                                      </h3>
+
+                                      <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
+                                        {(reactions.like ?? 0) > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
+                                            <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
+                                            {reactions.like}
+                                          </span>
+                                        )}
+                                        {(reactions.love ?? 0) > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-red-500 dark:text-red-400 font-medium">
+                                            <Heart className="w-3 h-3 md:w-4 md:h-4" />
+                                            {reactions.love}
+                                          </span>
+                                        )}
+                                        {(reactions.celebrate ?? 0) > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+                                            <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
+                                            {reactions.celebrate}
+                                          </span>
+                                        )}
+                                        {(reactions.insightful ?? 0) > 0 && (
+                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-green-600 dark:text-green-400 font-medium">
+                                            <Lightbulb className="w-3 h-3 md:w-4 md:h-4" />
+                                            {reactions.insightful}
+                                          </span>
+                                        )}
+                                      </div>
+
+                                      <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                                        {previewText}
+                                      </p>
+
+                                      {article.tags &&
+                                        article.tags.length > 0 && (
+                                          <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                                            {article.tags
+                                              .slice(0, 3)
+                                              .map((tag) => (
+                                                <span
+                                                  key={tag.id}
+                                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
+                                                >
+                                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                                  {tag.name}
+                                                </span>
+                                              ))}
+                                            {article.tags.length > 3 && (
+                                              <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                                +{article.tags.length - 3} more
+                                              </span>
+                                            )}
+                                          </div>
+                                        )}
+                                    </div>
+
+                                    {/* MOBILE OPTIMIZED ACTION BUTTONS */}
+                                    <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
+                                      <ProtectedAction action="edit articles">
+                                        <Link
+                                          href={`/admin/edit-article/${article.slug}`}
+                                          className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                        >
+                                          <Edit className="w-3 h-3 md:w-4 md:h-4" />
+                                          Edit
+                                        </Link>
+                                      </ProtectedAction>
+                                      <ProtectedAction action="delete articles">
+                                        <button
+                                          onClick={() =>
+                                            openDeleteModal(article)
+                                          }
+                                          className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                        >
+                                          <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                                          Delete
+                                        </button>
+                                      </ProtectedAction>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+
+                          {/* MOBILE OPTIMIZED PAGINATION */}
+                          {totalPages > 1 && (
+                            <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
+                                  Showing {paginatedArticles.length} of{" "}
+                                  {totalArticles} articles
+                                </div>
+
+                                <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                                  <button
+                                    onClick={() =>
+                                      setCurrentPage((prev) =>
+                                        Math.max(1, prev - 1)
+                                      )
+                                    }
+                                    disabled={currentPage === 1}
+                                    className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                                  >
+                                    <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
+                                    <span className="hidden xs:inline">
+                                      Previous
+                                    </span>
+                                  </button>
+
+                                  <div className="hidden xs:flex items-center gap-1">
+                                    {Array.from(
+                                      { length: Math.min(3, totalPages) },
+                                      (_, i) => {
+                                        let pageNum;
+                                        if (totalPages <= 3) {
+                                          pageNum = i + 1;
+                                        } else if (currentPage <= 2) {
+                                          pageNum = i + 1;
+                                        } else if (
+                                          currentPage >=
+                                          totalPages - 1
+                                        ) {
+                                          pageNum = totalPages - 2 + i;
+                                        } else {
+                                          pageNum = currentPage - 1 + i;
+                                        }
+                                        return (
+                                          <button
+                                            key={pageNum}
+                                            onClick={() =>
+                                              setCurrentPage(pageNum)
+                                            }
+                                            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
+                                              currentPage === pageNum
+                                                ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                                : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                                            }`}
+                                          >
+                                            {pageNum}
+                                          </button>
+                                        );
+                                      }
+                                    )}
+                                  </div>
+
+                                  <button
+                                    onClick={() =>
+                                      setCurrentPage((prev) =>
+                                        Math.min(totalPages, prev + 1)
+                                      )
+                                    }
+                                    disabled={currentPage === totalPages}
+                                    className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                                  >
+                                    <span className="hidden xs:inline">
+                                      Next
+                                    </span>
+                                    <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
+                                  </button>
+                                </div>
+
+                                <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
+                                  Page {currentPage} of {totalPages}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
-                    </>
-                  )}
-                </motion.section>
-              )}
+                    </motion.section>
+                  </>
+                )}
 
-              {/* SAVED POSTS TAB CONTENT */}
-              {activeTab === "saved" && (
-                <motion.section
-                  key="saved"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
-                >
-                  <SavedPostsSection
-                    savedArticles={savedArticles}
-                    savedLoading={savedLoading}
-                    onUnsaveArticle={handleUnsaveArticle}
-                    unsavingId={unsavingId}
-                  />
-                </motion.section>
-              )}
-
-              {/* TRASH TAB CONTENT */}
-              {activeTab === "trash" && (
-                <motion.section
-                  key="trash"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
-                >
-                  <TrashSection
-                    trashArticles={trashArticles}
-                    trashLoading={trashLoading}
-                    restoringSlug={restoringSlug}
-                    onRestoreArticle={handleRestoreArticle}
-                    onPermanentDelete={handlePermanentDelete}
-                  />
-                </motion.section>
-              )}
-            </div>
-
-            {/* SEPARATE SECTION FOR NOTIFICATIONS & SETTINGS - BELOW MAIN CONTENT */}
-            <div className="mt-12 mb-8">
-              {/* NOTIFICATIONS & SETTINGS TABS */}
-              <div className="flex justify-center mb-8">
-                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
-                  <button
-                    onClick={() => setActiveSettingsTab("notifications")}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                      activeSettingsTab === "notifications"
-                        ? "bg-white dark:bg-gray-700 shadow-md text-amber-600 dark:text-amber-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    }`}
+                {/* SAVED POSTS SECTION */}
+                {activeSection === "saved" && (
+                  <motion.section
+                    key="saved"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
                   >
-                    <MessageSquare className="w-4 h-4" />
-                    Notifications
-                  </button>
+                    <SavedPostsSection
+                      savedArticles={savedArticles}
+                      savedLoading={savedLoading}
+                      onUnsaveArticle={handleUnsaveArticle}
+                      unsavingId={unsavingId}
+                    />
+                  </motion.section>
+                )}
 
-                  <button
-                    onClick={() => setActiveSettingsTab("settings")}
-                    className={`px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                      activeSettingsTab === "settings"
-                        ? "bg-white dark:bg-gray-700 shadow-md text-purple-600 dark:text-purple-400"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                    }`}
+                {/* TRASH SECTION */}
+                {activeSection === "trash" && (
+                  <motion.section
+                    key="trash"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
                   >
-                    <Bell className="w-4 h-4" />
-                    Settings
-                  </button>
-                </div>
-              </div>
+                    <TrashSection
+                      trashArticles={trashArticles}
+                      trashLoading={trashLoading}
+                      restoringSlug={restoringSlug}
+                      onRestoreArticle={handleRestoreArticle}
+                      onPermanentDelete={handlePermanentDelete}
+                    />
+                  </motion.section>
+                )}
 
-              {/* NOTIFICATIONS CONTENT */}
-              {activeSettingsTab === "notifications" && (
-                <motion.div
-                  key="notifications"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
-                >
-                  <DashboardNotificationSection />
-                </motion.div>
-              )}
+                {/* NOTIFICATIONS SECTION */}
+                {activeSection === "notifications" && (
+                  <motion.section
+                    key="notifications"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className=""
+                  >
+                    <DashboardNotificationSection />
+                  </motion.section>
+                )}
 
-              {/* SETTINGS CONTENT */}
-              {activeSettingsTab === "settings" && (
-                <motion.div
-                  key="settings"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
-                >
-                  <NotificationSettings />
-                </motion.div>
-              )}
-
-              {/* DEFAULT STATE - SHOW NOTIFICATIONS IF NO TAB SELECTED */}
-              {activeSettingsTab === null && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
-                >
-                  <DashboardNotificationSection />
-                </motion.div>
-              )}
-            </div>
-
-            {/* Bottom spacing */}
-            <div className="h-8 md:h-16"></div>
-          </>
-        )}
+                {/* SETTINGS SECTION */}
+                {activeSection === "settings" && (
+                  <motion.section
+                    key="settings"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+                  >
+                    <NotificationSettings />
+                  </motion.section>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </main>
 
       <MinimalFooter />
