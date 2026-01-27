@@ -17,10 +17,10 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title)
 
 function AuthorViewsBarChart({
   data,
-  title = "Views by Author",
+  title = "Your Top Articles",
   height = 280,
 }: {
-  data: { author: string; views: number }[];
+  data: { title?: string; read_count?: number }[];
   title?: string;
   height?: number;
 }) {
@@ -59,7 +59,11 @@ function AuthorViewsBarChart({
     );
   }
 
-  const topAuthors = [...data].sort((a, b) => b.views - a.views).slice(0, 8);
+  // Transform data to ensure consistent structure
+  const validData = (data || []).filter(item => item && item.title);
+  const topArticles = [...validData]
+    .sort((a, b) => (b.read_count || 0) - (a.read_count || 0))
+    .slice(0, 20);
 
   const generateBarColors = (count: number) => {
     const colors = [
@@ -77,22 +81,22 @@ function AuthorViewsBarChart({
   };
 
   const chartData = {
-    labels: topAuthors.map((item) =>
-      item.author.length > 15
-        ? item.author.substring(0, 15) + "..."
-        : item.author
+    labels: topArticles.map((item) =>
+      (item.title || '').length > 15
+        ? (item.title || '').substring(0, 15) + "..."
+        : item.title || 'Unknown'
     ),
     datasets: [
       {
         label: "Views",
-        data: topAuthors.map((item) => item.views),
-        backgroundColor: generateBarColors(topAuthors.length),
-        borderColor: generateBarColors(topAuthors.length).map((color) =>
+        data: topArticles.map((item) => item.read_count || 0),
+        backgroundColor: generateBarColors(topArticles.length),
+        borderColor: generateBarColors(topArticles.length).map((color) =>
           color.replace("0.8", "1")
         ),
         borderWidth: 2,
         borderRadius: 8,
-        hoverBackgroundColor: generateBarColors(topAuthors.length).map(
+        hoverBackgroundColor: generateBarColors(topArticles.length).map(
           (color) => color.replace("0.8", "1")
         ),
       },
@@ -153,8 +157,8 @@ function AuthorViewsBarChart({
         callbacks: {
           label: (context) => {
             const value = context.raw as number;
-            const total = topAuthors.reduce((sum, item) => sum + item.views, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
+            const total = topArticles.reduce((sum, item) => sum + (item.read_count || 0), 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : "0";
             return `${
               context.dataset.label
             }: ${value.toLocaleString()} (${percentage}%)`;
@@ -188,8 +192,7 @@ function AuthorViewsBarChart({
             </span>
           </div>
           <div className="text-sm font-medium text-black dark:text-white text-right">
-            {topAuthors[0]?.author}: {topAuthors[0]?.views.toLocaleString()}{" "}
-            views
+            {topArticles[0]?.title || 'Unknown'}: {topArticles[0]?.read_count?.toLocaleString() || 0} views
           </div>
         </div>
       </div>

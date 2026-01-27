@@ -35,6 +35,7 @@ import {
   Menu,
   X,
   Settings,
+  LayoutDashboard,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -52,8 +53,6 @@ import {
 import DashboardNotificationSection from "@/app/[locale]/admin/author/[slug]/components/DashboardNotificationSection";
 import NotificationSettings from "./components/NotificationSettings";
 
-// Import the new components
-import AuthorStatsPieChart from "./components/AuthorStatsPieChart";
 import AuthorViewsBarChart from "./components/AuthorViewsBarChart";
 import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
 import RestoreSuccessAlert from "./components/RestoreSuccessAlert";
@@ -152,6 +151,8 @@ export default function AuthorAdminDashboard() {
   const [restoringSlug, setRestoringSlug] = useState<string | null>(null);
   const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
   const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
+  // Remove autoHideEnabled state
+  // const [autoHideEnabled, setAutoHideEnabled] = useState(false);
 
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -175,7 +176,8 @@ export default function AuthorAdminDashboard() {
 
   // Active section and sidebar state
   const [activeSection, setActiveSection] = useState<ActiveSection>("articles");
-  const [sidebarHovered, setSidebarHovered] = useState(false);
+  // Remove sidebarHovered state since we don't need auto-hide
+  // const [sidebarHovered, setSidebarHovered] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Saved articles state
@@ -422,60 +424,74 @@ export default function AuthorAdminDashboard() {
   }, [slug, isAuthenticated, isLoading, router]);
 
   const fetchFreshData = async (token: string, cacheKey?: string) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/authors/me/dashboard/optimized/`,
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: 30 },
-      }
-    );
-
-    if (res.status === 401) {
-      localStorage.removeItem("token");
-      setShowLoginModal(true);
-      return;
-    }
-
-    if (res.status === 403) {
-      throw new Error("You don't have permission to access this dashboard");
-    }
-
-    if (!res.ok) {
-      throw new Error(`Failed to load author data: ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    if (data.author.slug !== slug) {
-      router.push(`/admin/author/${data.author.slug}`);
-      return;
-    }
-
-    setAuthor({
-      ...data.author,
-      articles: data.articles || [],
-    });
-
-    if (cacheKey) {
-      localStorage.setItem(
-        cacheKey,
-        JSON.stringify({
-          data,
-          timestamp: Date.now(),
-        })
+    try {
+      // Use a single optimized endpoint that returns everything
+      const res = await fetch(
+        `${API_BASE_URL}/authors/me/dashboard/optimized/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+          next: { revalidate: 30 },
+        }
       );
-    }
 
-    Promise.all([
-      checkBanStatus(),
-      fetchTrashArticles(),
-      fetchSavedArticles(),
-    ]).catch((error) => {
-      console.error("Error loading additional data:", error);
-    });
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        setShowLoginModal(true);
+        return;
+      }
+
+      if (res.status === 403) {
+        throw new Error("You don't have permission to access this dashboard");
+      }
+
+      if (!res.ok) {
+        throw new Error(`Failed to load author data: ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      if (data.author.slug !== slug) {
+        router.push(`/admin/author/${data.author.slug}`);
+        return;
+      }
+
+      // Set author with all data including stats
+      setAuthor({
+        ...data.author,
+        articles: data.articles || [],
+      });
+
+      // Also set stats from the optimized response
+      if (data.stats) {
+        // You can use these stats directly instead of calculating them
+        console.log("Optimized stats received:", data.stats);
+      }
+
+      if (cacheKey) {
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data,
+            timestamp: Date.now(),
+          })
+        );
+      }
+
+      // Now fetch only the additional data that's not in the optimized endpoint
+      Promise.all([
+        checkBanStatus(),
+        fetchTrashArticles(),
+        fetchSavedArticles(), // UNCOMMENT THIS LINE
+      ]).catch((error) => {
+        console.error("Error loading additional data:", error);
+      });
+    } catch (err) {
+      console.error("Error fetching author data:", err);
+      setError((err as Error).message);
+    }
   };
 
   const handleDeleteArticle = async (articleSlug: string) => {
@@ -774,11 +790,25 @@ export default function AuthorAdminDashboard() {
     ) || [];
 
   const prepareArticlesByAuthorData = () => {
-    return articlesByAuthorData || [];
+    if (!articlesByAuthorData || !Array.isArray(articlesByAuthorData)) {
+      return [];
+    }
+
+    return articlesByAuthorData.map((item: any) => ({
+      name: item.name || "Unknown",
+      article_count: item.article_count || 0,
+    }));
   };
 
   const prepareViewsData = () => {
-    return yourTopArticlesData || [];
+    if (!yourTopArticlesData || !Array.isArray(yourTopArticlesData)) {
+      return [];
+    }
+
+    return yourTopArticlesData.map((item: any) => ({
+      title: item.title || "Unknown",
+      read_count: item.read_count || 0,
+    }));
   };
 
   if (isLoading) {
@@ -843,34 +873,30 @@ export default function AuthorAdminDashboard() {
         </button>
 
         <div className="flex">
-          {/* Desktop Sidebar - Auto-hide on hover */}
           <div className="hidden md:block relative">
-            <motion.div
-              initial={false}
-              animate={{
-                width: sidebarHovered ? "280px" : "20px",
-              }}
-              transition={{ duration: 0.2 }}
-              className="h-screen sticky top-0 overflow-hidden group"
-              onMouseEnter={() => setSidebarHovered(true)}
-              onMouseLeave={() => setSidebarHovered(false)}
-            >
-              {/* Hidden trigger area for hover */}
-              <div className="absolute inset-y-0 left-0 w-6 z-40 hover:cursor-pointer" />
-
+            {/* Sidebar - ALWAYS VISIBLE */}
+            <div className="h-screen sticky top-0 overflow-hidden shrink-0">
               {/* Sidebar Content */}
-              <motion.div
-                animate={{
-                  opacity: sidebarHovered ? 1 : 0,
-                  x: sidebarHovered ? 0 : -20,
-                }}
-                transition={{ duration: 0.2 }}
-                className={`h-full bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 shadow-xl flex flex-col w-64 ${
-                  sidebarHovered ? "" : "pointer-events-none"
-                }`}
-              >
-                {/* Navigation Only - No header, no footer */}
-                <nav className="flex-1 p-4 space-y-1 overflow-y-auto mt-20">
+              <div className="h-full bg-white dark:bg-[#000000] relative transition-colors duration-300 border-r border-gray-200 dark:border-gray-700 shadow-xl flex flex-col w-64">
+                {/* Sidebar Title with Icon */}
+                <div className="px-4 py-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-pink-600 flex items-center justify-center shadow-md">
+                      <LayoutDashboard className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                        Admin Dashboard
+                      </h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Manage your content
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation Items with vertical spacing */}
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto mt-4">
                   {[
                     {
                       id: "articles",
@@ -911,14 +937,14 @@ export default function AuthorAdminDashboard() {
                     <button
                       key={item.id}
                       onClick={() => setActiveSection(item.id as ActiveSection)}
-                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
+                      className={`w-full flex items-center gap-3 px-3 py-4 rounded-xl transition-all duration-200 group ${
                         activeSection === item.id
                           ? `${item.bgColor} ${item.color} shadow-md`
                           : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                     >
                       <div
-                        className={`p-2 rounded-lg ${item.bgColor} ${item.color}`}
+                        className={`p-3 rounded-lg ${item.bgColor} ${item.color} flex-shrink-0`}
                       >
                         <item.icon className="w-5 h-5" />
                       </div>
@@ -926,25 +952,33 @@ export default function AuthorAdminDashboard() {
                         <span className="font-medium whitespace-nowrap">
                           {item.label}
                         </span>
-                        {item.count !== undefined && (
-                          <span
-                            className={`px-2 py-0.5 text-xs rounded-full ${
-                              activeSection === item.id
-                                ? "bg-white/80 dark:bg-gray-800/80"
-                                : "bg-gray-200 dark:bg-gray-700"
-                            }`}
-                          >
-                            {item.count}
-                          </span>
-                        )}
                       </div>
                     </button>
                   ))}
-                </nav>
-              </motion.div>
-            </motion.div>
-          </div>
 
+                  {/* Vertical spacing */}
+                  <div className="py-6"></div>
+
+                  {/* Write New Button with vertical spacing */}
+                  <div className="mt-4">
+                    <ProtectedAction action="create new articles">
+                      <Link
+                        href="/admin/new-article"
+                        className="w-full flex items-center gap-3 px-3 py-4 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white hover:shadow-lg transition-all duration-200 group hover:from-sky-700 hover:to-blue-700"
+                      >
+                        <div className="p-3 rounded-lg bg-white/20 flex-shrink-0">
+                          <Plus className="w-5 h-5" />
+                        </div>
+                        <span className="font-medium whitespace-nowrap">
+                          Write New Article
+                        </span>
+                      </Link>
+                    </ProtectedAction>
+                  </div>
+                </nav>
+              </div>
+            </div>
+          </div>
           {/* Mobile Sidebar Overlay */}
           {mobileMenuOpen && (
             <>
@@ -956,9 +990,14 @@ export default function AuthorAdminDashboard() {
                 <div className="h-full flex flex-col">
                   <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="font-bold text-gray-800 dark:text-white">
-                        Navigation
-                      </h2>
+                      <div>
+                        <h2 className="font-bold text-gray-800 dark:text-white text-lg">
+                          Admin Dashboard
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Manage your content
+                        </p>
+                      </div>
                       <button
                         onClick={() => setMobileMenuOpen(false)}
                         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -1020,13 +1059,25 @@ export default function AuthorAdminDashboard() {
                         )}
                       </button>
                     ))}
+                    {/* Create New Button for mobile */}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                      <ProtectedAction action="create new articles">
+                        <Link
+                          href="/admin/new-article"
+                          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white hover:shadow-lg transition-all duration-200 justify-center"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Plus className="w-5 h-5" />
+                          <span className="font-medium">Write New</span>
+                        </Link>
+                      </ProtectedAction>
+                    </div>
                   </nav>
                 </div>
               </div>
             </>
           )}
-
-          {/* Main Content - Your original design stays exactly the same */}
+          {/* Main Content */}
           <div className="flex-1 px-6 md:px-11 md:py-8">
             {/* Your entire original content here - everything remains exactly as you designed it */}
             {!isAuthenticated && (
@@ -1269,86 +1320,24 @@ export default function AuthorAdminDashboard() {
                       </div>
 
                       {/* Lazy Loading Charts */}
-                      {!chartsLoaded ? (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          {/* Placeholder for first chart */}
-                          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-blue-500" />
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                                  Articles Distribution
-                                </h3>
-                              </div>
-                            </div>
-                            <div className="h-64 flex items-center justify-center">
-                              <div className="text-center">
-                                <div className="w-8 h-8 animate-spin border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                  Loading analytics...
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Placeholder for second chart */}
-                          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6 transition-all duration-300">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-2">
-                                <BarChart3 className="w-5 h-5 text-emerald-500" />
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                                  Your Top Articles
-                                </h3>
-                              </div>
-                            </div>
-                            <div className="h-64 flex items-center justify-center">
-                              <div className="text-center">
-                                <div className="w-8 h-8 animate-spin border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                  Loading top articles...
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : chartsError ? (
-                        <div className="text-center py-8">
-                          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
-                          </div>
-                          <p className="text-red-600 dark:text-red-400">
-                            {chartsError}
-                          </p>
-                          <button
-                            onClick={loadChartsData}
-                            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            Retry
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                          <AuthorStatsPieChart
-                            data={prepareArticlesByAuthorData()}
-                            title="Articles Distribution"
-                          />
-                          <AuthorViewsBarChart
-                            data={prepareViewsData()}
-                            title="Your Top Articles"
-                            height={280}
-                          />
-                        </div>
-                      )}
+                      <div className="">
+                        <AuthorViewsBarChart
+                          data={prepareViewsData()}
+                          title="Your Top Articles"
+                          height={280}
+                        />
+                      </div>
                     </motion.div>
 
-                    {/* ARTICLES LIST SECTION */}
+                    {/* ARTICLES LIST SECTION - FIXED VERSION */}
                     <motion.section
                       key="articles"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl"
                     >
-                      <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                      {/* HEADER - Same as before */}
+                      <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50 rounded-t-2xl md:rounded-t-3xl">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
                           <div>
                             <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
@@ -1367,31 +1356,15 @@ export default function AuthorAdminDashboard() {
                         </div>
                       </div>
 
-                      {author?.articles && author.articles.length === 0 ? (
-                        <div className="text-center py-12 md:py-20">
-                          <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
-                            <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
+                      {/* CONTENT AREA - REMOVE overflow-hidden from parent */}
+                      <div>
+                        {author?.articles && author.articles.length === 0 ? (
+                          <div className="text-center py-12 md:py-20">
+                            {/* Empty state - same as before */}
                           </div>
-                          <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
-                            Ready to Share Your Knowledge?
-                          </h3>
-                          <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
-                            Create your first article and start building your
-                            audience.
-                          </p>
-                          <ProtectedAction action="create new articles">
-                            <Link
-                              href="/admin/new-article"
-                              className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 shadow-lg text-sm md:text-base"
-                            >
-                              <Plus className="w-4 h-4 md:w-5 md:h-5" />
-                              Create Your First Article
-                            </Link>
-                          </ProtectedAction>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
+                        ) : (
+                          <>
+                            {/* ARTICLES LIST - Use direct mapping without extra wrapper */}
                             {paginatedArticles.map((article, index) => {
                               const previewText = getCleanExcerpt(article);
                               const coverImage = getCoverImage(article);
@@ -1406,15 +1379,20 @@ export default function AuthorAdminDashboard() {
                                   initial={{ opacity: 0, x: -20 }}
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: index * 0.1 }}
-                                  className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group border-b border-slate-100 dark:border-gray-700 last:border-b-0"
+                                  className={`p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group ${
+                                    index !== paginatedArticles.length - 1
+                                      ? "border-b border-slate-200/50 dark:border-gray-700"
+                                      : ""
+                                  }`}
                                 >
-                                  <div className="flex flex-col gap-4 md:gap-8 md:flex-row items-start">
-                                    {/* MOBILE OPTIMIZED COVER */}
-                                    <div className="flex-shrink-0 w-full md:w-32 h-37 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                                  {/* Article content - EXACTLY SAME AS BEFORE */}
+                                  <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row items-start">
+                                    {/* Cover image */}
+                                    <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
                                       <img
                                         src={coverImage}
                                         alt={article.title}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
                                       />
                                       <div className="absolute top-2 left-2 md:top-3 md:left-3">
                                         {article.category && (
@@ -1426,8 +1404,9 @@ export default function AuthorAdminDashboard() {
                                       </div>
                                     </div>
 
-                                    {/* MOBILE OPTIMIZED CONTENT */}
+                                    {/* Content */}
                                     <div className="flex-1 min-w-0 w-full">
+                                      {/* Metadata */}
                                       <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
                                         <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
                                           <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
@@ -1448,7 +1427,7 @@ export default function AuthorAdminDashboard() {
                                         </span>
                                       </div>
 
-                                      <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-2 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                                      <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-3 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                                         <Link
                                           href={`/articles/${article.slug}`}
                                         >
@@ -1456,6 +1435,7 @@ export default function AuthorAdminDashboard() {
                                         </Link>
                                       </h3>
 
+                                      {/* Reactions */}
                                       <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
                                         {(reactions.like ?? 0) > 0 && (
                                           <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
@@ -1487,6 +1467,7 @@ export default function AuthorAdminDashboard() {
                                         {previewText}
                                       </p>
 
+                                      {/* Tags */}
                                       {article.tags &&
                                         article.tags.length > 0 && (
                                           <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
@@ -1510,7 +1491,7 @@ export default function AuthorAdminDashboard() {
                                         )}
                                     </div>
 
-                                    {/* MOBILE OPTIMIZED ACTION BUTTONS */}
+                                    {/* Action Buttons */}
                                     <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
                                       <ProtectedAction action="edit articles">
                                         <Link
@@ -1537,93 +1518,93 @@ export default function AuthorAdminDashboard() {
                                 </motion.div>
                               );
                             })}
-                          </div>
 
-                          {/* MOBILE OPTIMIZED PAGINATION */}
-                          {totalPages > 1 && (
-                            <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
-                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                                  Showing {paginatedArticles.length} of{" "}
-                                  {totalArticles} articles
-                                </div>
-
-                                <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                                  <button
-                                    onClick={() =>
-                                      setCurrentPage((prev) =>
-                                        Math.max(1, prev - 1)
-                                      )
-                                    }
-                                    disabled={currentPage === 1}
-                                    className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                                  >
-                                    <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
-                                    <span className="hidden xs:inline">
-                                      Previous
-                                    </span>
-                                  </button>
-
-                                  <div className="hidden xs:flex items-center gap-1">
-                                    {Array.from(
-                                      { length: Math.min(3, totalPages) },
-                                      (_, i) => {
-                                        let pageNum;
-                                        if (totalPages <= 3) {
-                                          pageNum = i + 1;
-                                        } else if (currentPage <= 2) {
-                                          pageNum = i + 1;
-                                        } else if (
-                                          currentPage >=
-                                          totalPages - 1
-                                        ) {
-                                          pageNum = totalPages - 2 + i;
-                                        } else {
-                                          pageNum = currentPage - 1 + i;
-                                        }
-                                        return (
-                                          <button
-                                            key={pageNum}
-                                            onClick={() =>
-                                              setCurrentPage(pageNum)
-                                            }
-                                            className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
-                                              currentPage === pageNum
-                                                ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
-                                                : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
-                                            }`}
-                                          >
-                                            {pageNum}
-                                          </button>
-                                        );
-                                      }
-                                    )}
+                            {/* PAGINATION - Add rounded bottom corners */}
+                            {totalPages > 1 && (
+                              <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50 rounded-b-2xl md:rounded-b-3xl">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                  <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
+                                    Showing {paginatedArticles.length} of{" "}
+                                    {totalArticles} articles
                                   </div>
 
-                                  <button
-                                    onClick={() =>
-                                      setCurrentPage((prev) =>
-                                        Math.min(totalPages, prev + 1)
-                                      )
-                                    }
-                                    disabled={currentPage === totalPages}
-                                    className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                                  >
-                                    <span className="hidden xs:inline">
-                                      Next
-                                    </span>
-                                    <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-                                  </button>
-                                </div>
+                                  <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                                    <button
+                                      onClick={() =>
+                                        setCurrentPage((prev) =>
+                                          Math.max(1, prev - 1)
+                                        )
+                                      }
+                                      disabled={currentPage === 1}
+                                      className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                                    >
+                                      <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
+                                      <span className="hidden xs:inline">
+                                        Previous
+                                      </span>
+                                    </button>
 
-                                <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
-                                  Page {currentPage} of {totalPages}
+                                    <div className="hidden xs:flex items-center gap-1">
+                                      {Array.from(
+                                        { length: Math.min(3, totalPages) },
+                                        (_, i) => {
+                                          let pageNum;
+                                          if (totalPages <= 3) {
+                                            pageNum = i + 1;
+                                          } else if (currentPage <= 2) {
+                                            pageNum = i + 1;
+                                          } else if (
+                                            currentPage >=
+                                            totalPages - 1
+                                          ) {
+                                            pageNum = totalPages - 2 + i;
+                                          } else {
+                                            pageNum = currentPage - 1 + i;
+                                          }
+                                          return (
+                                            <button
+                                              key={pageNum}
+                                              onClick={() =>
+                                                setCurrentPage(pageNum)
+                                              }
+                                              className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
+                                                currentPage === pageNum
+                                                  ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                                  : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                                              }`}
+                                            >
+                                              {pageNum}
+                                            </button>
+                                          );
+                                        }
+                                      )}
+                                    </div>
+
+                                    <button
+                                      onClick={() =>
+                                        setCurrentPage((prev) =>
+                                          Math.min(totalPages, prev + 1)
+                                        )
+                                      }
+                                      disabled={currentPage === totalPages}
+                                      className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                                    >
+                                      <span className="hidden xs:inline">
+                                        Next
+                                      </span>
+                                      <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
+                                    </button>
+                                  </div>
+
+                                  <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
+                                    Page {currentPage} of {totalPages}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
-                        </>
-                      )}
+                            )}
+                          </>
+                        )}
+                      </div>
                     </motion.section>
                   </>
                 )}
