@@ -1271,15 +1271,16 @@ export default function AuthorAdminDashboard() {
                       className="mb-12 md:mb-16"
                     >
                       <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 flex items-center justify-center">
-                          <BarChart2 className="w-5 h-5 text-blue-600" />
-                        </div>
                         <div>
-                          <h2 className="text-xl md:text-2xl font-bold text-black dark:text-white">
-                            Platform Analytics
-                          </h2>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Real statistics based on all platform articles
+                          <div className="flex items-center gap-4 mb-4 md:mb-6">
+                            <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+                            <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                              Platform Analytics
+                            </span>
+                          </div>
+                          <p className="text-base text-black dark:text-gray-400">
+                            Track how many people are reading your articles over
+                            time. Real statistics based on all platform articles
                           </p>
                         </div>
                       </div>

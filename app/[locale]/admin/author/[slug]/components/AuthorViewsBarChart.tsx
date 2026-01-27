@@ -18,7 +18,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title)
 function AuthorViewsBarChart({
   data,
   title = "Your Top Articles",
-  height = 280,
+  height = 300,
 }: {
   data: { title?: string; read_count?: number }[];
   title?: string;
@@ -170,16 +170,7 @@ function AuthorViewsBarChart({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 md:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-emerald-500" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            {title}
-          </h3>
-        </div>
-      </div>
-
-      <div className="relative" style={{ height: `${height}px` }}>
+      <div className="relative mb-4" style={{ height: `${height}px` }}>
         <Bar key={chartKey} data={chartData} options={options} />
       </div>
 
