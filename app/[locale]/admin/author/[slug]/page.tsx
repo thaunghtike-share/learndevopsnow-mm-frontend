@@ -886,7 +886,7 @@ export default function AuthorAdminDashboard() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                        Admin Dashboard
+                        Dashboard
                       </h2>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Manage your content
@@ -992,7 +992,7 @@ export default function AuthorAdminDashboard() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h2 className="font-bold text-gray-800 dark:text-white text-lg">
-                          Admin Dashboard
+                          Dashboard
                         </h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
                           Manage your content
@@ -1263,41 +1263,6 @@ export default function AuthorAdminDashboard() {
                 {activeSection === "articles" && (
                   <>
                     {/* MOBILE OPTIMIZED STATS - ONLY FOR ARTICLES TAB */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12 mb-8">
-                      <div className="space-y-2 md:space-y-3">
-                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                          {totalArticles}
-                        </div>
-                        <div className="text-xs md:text-sm text-blue-600 font-semibold uppercase tracking-wider">
-                          Articles
-                        </div>
-                      </div>
-                      <div className="space-y-2 md:space-y-3">
-                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                          {totalViews.toLocaleString()}
-                        </div>
-                        <div className="text-xs md:text-sm text-green-600 font-semibold uppercase tracking-wider">
-                          Total Views
-                        </div>
-                      </div>
-                      <div className="space-y-2 md:space-y-3">
-                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                          {totalComments}
-                        </div>
-                        <div className="text-xs md:text-sm text-pink-600 font-semibold uppercase tracking-wider">
-                          Total Comments
-                        </div>
-                      </div>
-                      <div className="space-y-2 md:space-y-3">
-                        <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                          {totalReactions}
-                        </div>
-                        <div className="text-xs md:text-sm text-amber-600 font-semibold uppercase tracking-wider">
-                          Total Reactions
-                        </div>
-                      </div>
-                    </div>
-
                     {/* BAR CHARTS SECTION - ONLY FOR ARTICLES TAB */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -1329,15 +1294,14 @@ export default function AuthorAdminDashboard() {
                       </div>
                     </motion.div>
 
-                    {/* ARTICLES LIST SECTION - FIXED VERSION */}
+                    {/* ARTICLES LIST SECTION - FIXED TO MATCH SAVED SECTION */}
                     <motion.section
                       key="articles"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl"
+                      className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden"
                     >
-                      {/* HEADER - Same as before */}
-                      <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50 rounded-t-2xl md:rounded-t-3xl">
+                      <div className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
                           <div>
                             <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
@@ -1356,255 +1320,246 @@ export default function AuthorAdminDashboard() {
                         </div>
                       </div>
 
-                      {/* CONTENT AREA - REMOVE overflow-hidden from parent */}
-                      <div>
-                        {author?.articles && author.articles.length === 0 ? (
-                          <div className="text-center py-12 md:py-20">
-                            {/* Empty state - same as before */}
+                      {author?.articles && author.articles.length === 0 ? (
+                        <div className="text-center py-12 md:py-20">
+                          <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-sky-500 to-blue-600 rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl">
+                            <FileText className="w-6 h-6 md:w-10 md:h-10 text-white" />
                           </div>
-                        ) : (
-                          <>
-                            {/* ARTICLES LIST - Use direct mapping without extra wrapper */}
-                            {paginatedArticles.map((article, index) => {
-                              const previewText = getCleanExcerpt(article);
-                              const coverImage = getCoverImage(article);
-                              const readTime = calculateReadTime(
-                                article.content
-                              );
-                              const reactions = article.reactions_summary || {};
+                          <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white mb-3 md:mb-4">
+                            Ready to Share Your Knowledge?
+                          </h3>
+                          <p className="text-sm md:text-lg text-slate-600 dark:text-gray-400 mb-6 md:mb-8 font-medium max-w-md mx-auto px-4">
+                            Create your first article and start building your
+                            audience.
+                          </p>
+                          <ProtectedAction action="create new articles">
+                            <Link
+                              href="/admin/new-article"
+                              className="inline-flex items-center gap-2 md:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-xl md:rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 shadow-lg text-sm md:text-base"
+                            >
+                              <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                              Create Your First Article
+                            </Link>
+                          </ProtectedAction>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-200/50 dark:divide-gray-700">
+                          {paginatedArticles.map((article, index) => {
+                            const previewText = getCleanExcerpt(article);
+                            const coverImage = getCoverImage(article);
+                            const readTime = calculateReadTime(article.content);
+                            const reactions = article.reactions_summary || {};
 
-                              return (
-                                <motion.div
-                                  key={article.id}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: index * 0.1 }}
-                                  className={`p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group ${
-                                    index !== paginatedArticles.length - 1
-                                      ? "border-b border-slate-200/50 dark:border-gray-700"
-                                      : ""
-                                  }`}
-                                >
-                                  {/* Article content - EXACTLY SAME AS BEFORE */}
-                                  <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row items-start">
-                                    {/* Cover image */}
-                                    <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
-                                      <img
-                                        src={coverImage}
-                                        alt={article.title}
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                                      />
-                                      <div className="absolute top-2 left-2 md:top-3 md:left-3">
-                                        {article.category && (
-                                          <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
-                                            <Folder className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                                            {article.category.name}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0 w-full">
-                                      {/* Metadata */}
-                                      <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
-                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                          <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
-                                          {formatDate(article.published_at)}
+                            return (
+                              <motion.div
+                                key={article.id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="p-4 md:p-8 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+                              >
+                                <div className="flex flex-col gap-4 lg:gap-8 lg:flex-row items-start">
+                                  {/* MOBILE OPTIMIZED COVER */}
+                                  <div className="flex-shrink-0 w-full md:w-32 h-48 md:h-32 rounded-xl md:rounded-2xl overflow-hidden border border-slate-200/50 dark:border-gray-600 shadow-lg group-hover:shadow-xl transition-all duration-300 relative">
+                                    <img
+                                      src={coverImage}
+                                      alt={article.title}
+                                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                    <div className="absolute top-2 left-2 md:top-3 md:left-3">
+                                      {article.category && (
+                                        <span className="inline-flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-semibold">
+                                          <Folder className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                                          {article.category.name}
                                         </span>
-                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                          <Clock className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
-                                          {readTime} min read
-                                        </span>
-                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                          <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
-                                          {article.read_count?.toLocaleString()}{" "}
-                                          views
-                                        </span>
-                                        <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
-                                          <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
-                                          {article.comment_count || 0}
-                                        </span>
-                                      </div>
-
-                                      <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-3 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
-                                        <Link
-                                          href={`/articles/${article.slug}`}
-                                        >
-                                          {article.title}
-                                        </Link>
-                                      </h3>
-
-                                      {/* Reactions */}
-                                      <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
-                                        {(reactions.like ?? 0) > 0 && (
-                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
-                                            <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
-                                            {reactions.like}
-                                          </span>
-                                        )}
-                                        {(reactions.love ?? 0) > 0 && (
-                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-red-500 dark:text-red-400 font-medium">
-                                            <Heart className="w-3 h-3 md:w-4 md:h-4" />
-                                            {reactions.love}
-                                          </span>
-                                        )}
-                                        {(reactions.celebrate ?? 0) > 0 && (
-                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-medium">
-                                            <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
-                                            {reactions.celebrate}
-                                          </span>
-                                        )}
-                                        {(reactions.insightful ?? 0) > 0 && (
-                                          <span className="inline-flex items-center gap-1 text-xs md:text-sm text-green-600 dark:text-green-400 font-medium">
-                                            <Lightbulb className="w-3 h-3 md:w-4 md:h-4" />
-                                            {reactions.insightful}
-                                          </span>
-                                        )}
-                                      </div>
-
-                                      <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
-                                        {previewText}
-                                      </p>
-
-                                      {/* Tags */}
-                                      {article.tags &&
-                                        article.tags.length > 0 && (
-                                          <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
-                                            {article.tags
-                                              .slice(0, 3)
-                                              .map((tag) => (
-                                                <span
-                                                  key={tag.id}
-                                                  className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
-                                                >
-                                                  <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
-                                                  {tag.name}
-                                                </span>
-                                              ))}
-                                            {article.tags.length > 3 && (
-                                              <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
-                                                +{article.tags.length - 3} more
-                                              </span>
-                                            )}
-                                          </div>
-                                        )}
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
-                                      <ProtectedAction action="edit articles">
-                                        <Link
-                                          href={`/admin/edit-article/${article.slug}`}
-                                          className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                                        >
-                                          <Edit className="w-3 h-3 md:w-4 md:h-4" />
-                                          Edit
-                                        </Link>
-                                      </ProtectedAction>
-                                      <ProtectedAction action="delete articles">
-                                        <button
-                                          onClick={() =>
-                                            openDeleteModal(article)
-                                          }
-                                          className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
-                                        >
-                                          <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                                          Delete
-                                        </button>
-                                      </ProtectedAction>
+                                      )}
                                     </div>
                                   </div>
-                                </motion.div>
-                              );
-                            })}
-
-                            {/* PAGINATION - Add rounded bottom corners */}
-                            {totalPages > 1 && (
-                              <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50 rounded-b-2xl md:rounded-b-3xl">
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                  <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                                    Showing {paginatedArticles.length} of{" "}
-                                    {totalArticles} articles
-                                  </div>
-
-                                  <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-                                    <button
-                                      onClick={() =>
-                                        setCurrentPage((prev) =>
-                                          Math.max(1, prev - 1)
-                                        )
-                                      }
-                                      disabled={currentPage === 1}
-                                      className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                                    >
-                                      <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
-                                      <span className="hidden xs:inline">
-                                        Previous
+                                  {/* MOBILE OPTIMIZED CONTENT */}
+                                  <div className="flex-1 min-w-0 w-full">
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-2 md:mb-3">
+                                      <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                        <Calendar className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                        {formatDate(article.published_at)}
                                       </span>
-                                    </button>
+                                      <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                        <Clock className="w-3 h-3 md:w-4 md:h-4 text-slate-500 dark:text-gray-500" />
+                                        {readTime} min read
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                        <Search className="w-3 h-3 md:w-4 md:h-4 text-sky-600" />
+                                        {article.read_count?.toLocaleString()}{" "}
+                                        views
+                                      </span>
+                                      <span className="inline-flex items-center gap-1.5 text-slate-600 dark:text-gray-400 font-medium text-xs md:text-sm">
+                                        <MessageSquare className="w-3 h-3 md:w-4 md:h-4 text-pink-600 dark:text-pink-400" />
+                                        {article.comment_count || 0}
+                                      </span>
+                                    </div>
 
-                                    <div className="hidden xs:flex items-center gap-1">
-                                      {Array.from(
-                                        { length: Math.min(3, totalPages) },
-                                        (_, i) => {
-                                          let pageNum;
-                                          if (totalPages <= 3) {
-                                            pageNum = i + 1;
-                                          } else if (currentPage <= 2) {
-                                            pageNum = i + 1;
-                                          } else if (
-                                            currentPage >=
-                                            totalPages - 1
-                                          ) {
-                                            pageNum = totalPages - 2 + i;
-                                          } else {
-                                            pageNum = currentPage - 1 + i;
-                                          }
-                                          return (
-                                            <button
-                                              key={pageNum}
-                                              onClick={() =>
-                                                setCurrentPage(pageNum)
-                                              }
-                                              className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
-                                                currentPage === pageNum
-                                                  ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
-                                                  : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
-                                              }`}
-                                            >
-                                              {pageNum}
-                                            </button>
-                                          );
-                                        }
+                                    <h3 className="text-lg md:text-2xl font-bold text-slate-800 dark:text-white mb-2 md:mb-3 line-clamp-3 group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                                      <Link href={`/articles/${article.slug}`}>
+                                        {article.title}
+                                      </Link>
+                                    </h3>
+
+                                    <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-3 md:mb-4">
+                                      {(reactions.like ?? 0) > 0 && (
+                                        <span className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 dark:text-blue-400 font-medium">
+                                          <ThumbsUp className="w-3 h-3 md:w-4 md:h-4" />
+                                          {reactions.like}
+                                        </span>
+                                      )}
+                                      {(reactions.love ?? 0) > 0 && (
+                                        <span className="inline-flex items-center gap-1 text-xs md:text-sm text-red-500 dark:text-red-400 font-medium">
+                                          <Heart className="w-3 h-3 md:w-4 md:h-4" />
+                                          {reactions.love}
+                                        </span>
+                                      )}
+                                      {(reactions.celebrate ?? 0) > 0 && (
+                                        <span className="inline-flex items-center gap-1 text-xs md:text-sm text-yellow-600 dark:text-yellow-400 font-medium">
+                                          <Sparkles className="w-3 h-3 md:w-4 md:h-4" />
+                                          {reactions.celebrate}
+                                        </span>
+                                      )}
+                                      {(reactions.insightful ?? 0) > 0 && (
+                                        <span className="inline-flex items-center gap-1 text-xs md:text-sm text-green-600 dark:text-green-400 font-medium">
+                                          <Lightbulb className="w-3 h-3 md:w-4 md:h-4" />
+                                          {reactions.insightful}
+                                        </span>
                                       )}
                                     </div>
 
-                                    <button
-                                      onClick={() =>
-                                        setCurrentPage((prev) =>
-                                          Math.min(totalPages, prev + 1)
-                                        )
-                                      }
-                                      disabled={currentPage === totalPages}
-                                      className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
-                                    >
-                                      <span className="hidden xs:inline">
-                                        Next
-                                      </span>
-                                      <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-                                    </button>
-                                  </div>
+                                    <p className="text-black dark:text-gray-400 text-sm md:text-lg line-clamp-2 mb-3 md:mb-4 font-medium leading-relaxed">
+                                      {previewText}
+                                    </p>
 
-                                  <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
-                                    Page {currentPage} of {totalPages}
+                                    {article.tags &&
+                                      article.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-0">
+                                          {article.tags
+                                            .slice(0, 3)
+                                            .map((tag) => (
+                                              <span
+                                                key={tag.id}
+                                                className="inline-flex items-center gap-1 bg-slate-100/80 dark:bg-gray-700 text-slate-700 dark:text-gray-300 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600"
+                                              >
+                                                <TagIcon className="w-2.5 h-2.5 md:w-3.5 md:h-3.5" />
+                                                {tag.name}
+                                              </span>
+                                            ))}
+                                          {article.tags.length > 3 && (
+                                            <span className="inline-flex items-center bg-slate-100/80 dark:bg-gray-700 text-slate-600 dark:text-gray-400 px-2 py-1 md:px-3 md:py-1.5 rounded-lg md:rounded-xl text-xs font-medium border border-slate-200/50 dark:border-gray-600">
+                                              +{article.tags.length - 3} more
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                  </div>
+                                  {/* MOBILE OPTIMIZED ACTION BUTTONS */}
+                                  <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end md:justify-start">
+                                    <ProtectedAction action="edit articles">
+                                      <Link
+                                        href={`/admin/edit-article/${article.slug}`}
+                                        className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-blue-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                      >
+                                        <Edit className="w-3 h-3 md:w-4 md:h-4" />
+                                        Edit
+                                      </Link>
+                                    </ProtectedAction>
+                                    <ProtectedAction action="delete articles">
+                                      <button
+                                        onClick={() => openDeleteModal(article)}
+                                        className="inline-flex items-center gap-1 md:gap-2 px-3 py-2 md:px-5 md:py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg md:rounded-xl hover:shadow-lg transition-all duration-300 font-semibold shadow-md hover:scale-105 text-xs md:text-sm w-full md:w-auto justify-center"
+                                      >
+                                        <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                                        Delete
+                                      </button>
+                                    </ProtectedAction>
                                   </div>
                                 </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* MOBILE OPTIMIZED PAGINATION - MUST BE INSIDE THE SAME SECTION */}
+                      {totalPages > 1 && (
+                        <div className="px-4 md:px-8 py-4 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
+                          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
+                              Showing {paginatedArticles.length} of{" "}
+                              {totalArticles} articles
+                            </div>
+
+                            <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+                              <button
+                                onClick={() =>
+                                  setCurrentPage((prev) =>
+                                    Math.max(1, prev - 1)
+                                  )
+                                }
+                                disabled={currentPage === 1}
+                                className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                              >
+                                <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
+                                <span className="hidden xs:inline">
+                                  Previous
+                                </span>
+                              </button>
+
+                              <div className="hidden xs:flex items-center gap-1">
+                                {Array.from(
+                                  { length: Math.min(3, totalPages) },
+                                  (_, i) => {
+                                    let pageNum;
+                                    if (totalPages <= 3) {
+                                      pageNum = i + 1;
+                                    } else if (currentPage <= 2) {
+                                      pageNum = i + 1;
+                                    } else if (currentPage >= totalPages - 1) {
+                                      pageNum = totalPages - 2 + i;
+                                    } else {
+                                      pageNum = currentPage - 1 + i;
+                                    }
+                                    return (
+                                      <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
+                                          currentPage === pageNum
+                                            ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                            : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                                        }`}
+                                      >
+                                        {pageNum}
+                                      </button>
+                                    );
+                                  }
+                                )}
                               </div>
-                            )}
-                          </>
-                        )}
-                      </div>
+
+                              <button
+                                onClick={() =>
+                                  setCurrentPage((prev) =>
+                                    Math.min(totalPages, prev + 1)
+                                  )
+                                }
+                                disabled={currentPage === totalPages}
+                                className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
+                              >
+                                <span className="hidden xs:inline">Next</span>
+                                <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
+                              </button>
+                            </div>
+
+                            <div className="xs:hidden text-xs text-slate-500 dark:text-gray-500 font-medium text-center">
+                              Page {currentPage} of {totalPages}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </motion.section>
                   </>
                 )}
