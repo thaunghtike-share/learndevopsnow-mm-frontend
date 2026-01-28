@@ -8,13 +8,11 @@ import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import AuthModal from "@/app/[locale]/auth/auth-modal";
 import {
   FileText,
-  TrendingUp,
   Plus,
   ArrowRight,
   Calendar,
   Folder,
   TagIcon,
-  BarChart3,
   Edit,
   Crown,
   Sparkles,
@@ -28,14 +26,13 @@ import {
   Heart,
   ThumbsUp,
   Lightbulb,
-  BarChart2,
   Search,
   Bookmark,
   Bell,
   Menu,
   X,
   Settings,
-  LayoutDashboard,
+  BarChart3,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -58,6 +55,7 @@ import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
 import RestoreSuccessAlert from "./components/RestoreSuccessAlert";
 import TrashSection from "./components/TrashSection";
 import SavedPostsSection from "./components/SavedPostsSection";
+import StatsSection from "./components/StatsSection";
 
 ChartJS.register(
   ArcElement,
@@ -132,6 +130,7 @@ interface BanDetails {
 
 type ActiveSection =
   | "articles"
+  | "stats"
   | "saved"
   | "trash"
   | "notifications"
@@ -878,23 +877,6 @@ export default function AuthorAdminDashboard() {
             <div className="h-screen sticky top-0 overflow-hidden shrink-0">
               {/* Sidebar Content */}
               <div className="h-full bg-white dark:bg-[#000000] relative transition-colors duration-300 border-r border-gray-200 dark:border-gray-700 shadow-xl flex flex-col w-64">
-                {/* Sidebar Title with Icon */}
-                <div className="px-4 py-6 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-pink-600 flex items-center justify-center shadow-md">
-                      <LayoutDashboard className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                        Dashboard
-                      </h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Manage your content
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Navigation Items with vertical spacing */}
                 <nav className="flex-1 p-4 space-y-2 overflow-y-auto mt-4">
                   {[
@@ -904,6 +886,13 @@ export default function AuthorAdminDashboard() {
                       icon: FileText,
                       color: "text-blue-600 dark:text-blue-400",
                       bgColor: "bg-blue-100 dark:bg-blue-900/30",
+                    },
+                    {
+                      id: "stats",
+                      label: "Stats",
+                      icon: BarChart3, // You'll need to import this icon
+                      color: "text-purple-600 dark:text-purple-400",
+                      bgColor: "bg-purple-100 dark:bg-purple-900/30",
                     },
                     {
                       id: "saved",
@@ -1262,39 +1251,6 @@ export default function AuthorAdminDashboard() {
                 {/* MAIN CONTENT BASED ON ACTIVE SECTION */}
                 {activeSection === "articles" && (
                   <>
-                    {/* MOBILE OPTIMIZED STATS - ONLY FOR ARTICLES TAB */}
-                    {/* BAR CHARTS SECTION - ONLY FOR ARTICLES TAB */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="mb-12 md:mb-16"
-                    >
-                      <div className="flex items-center gap-3 mb-6">
-                        <div>
-                          <div className="flex items-center gap-4 mb-4 md:mb-6">
-                            <div className="h-px w-12 md:w-16 bg-gradient-to-r from-blue-500 to-purple-600"></div>
-                            <span className="text-xs md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                              Platform Analytics
-                            </span>
-                          </div>
-                          <p className="text-base text-black dark:text-gray-400">
-                            Track how many people are reading your articles over
-                            time. Real statistics based on all platform articles
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Lazy Loading Charts */}
-                      <div className="">
-                        <AuthorViewsBarChart
-                          data={prepareViewsData()}
-                          title="Your Top Articles"
-                          height={280}
-                        />
-                      </div>
-                    </motion.div>
-
                     {/* ARTICLES LIST SECTION - FIXED TO MATCH SAVED SECTION */}
                     <motion.section
                       key="articles"
@@ -1563,6 +1519,26 @@ export default function AuthorAdminDashboard() {
                       )}
                     </motion.section>
                   </>
+                )}
+
+                {activeSection === "stats" && (
+                  <motion.section
+                    key="stats"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+                  >
+                    <StatsSection
+                      totalArticles={totalArticles}
+                      totalViews={totalViews}
+                      totalComments={totalComments}
+                      totalReactions={totalReactions || 0}
+                      topArticles={prepareViewsData()}
+                      articlesByAuthor={prepareArticlesByAuthorData()}
+                      chartsLoaded={chartsLoaded}
+                      loadingCharts={loadingCharts}
+                    />
+                  </motion.section>
                 )}
 
                 {/* SAVED POSTS SECTION */}
