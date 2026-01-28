@@ -10,15 +10,22 @@ import {
   Folder,
   ArrowRight,
   Tag as TagIcon,
-  Star, ChevronRight,
+  Star,
+  ChevronRight,
   ChevronLeft,
   FileText,
-  Clock, Sparkles,
+  Clock,
+  Sparkles,
   MessageSquare,
   Heart,
   ThumbsUp,
   Lightbulb,
-  Search
+  Search,
+  UserPlus,
+  Users,
+  UserMinus,
+  Plus,
+  Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -91,18 +98,22 @@ export default function AuthorDetailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(DEFAULT_PAGE_SIZE);
 
+  // Follow states
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+
   useEffect(() => {
     async function fetchAuthor() {
       try {
         setLoading(true);
-        // Use the optimized endpoint
         const res = await fetch(`${API_BASE_URL}/authors/${slug}/public/`);
         if (!res.ok) throw new Error("Failed to load author details");
         const data: ApiResponse = await res.json();
 
-        console.log("API Response:", data); // Debug log
+        console.log("API Response:", data);
 
-        // Extract data from API response
         const authorData = data.author || data;
         const articlesData = data.articles || [];
         const statsData = data.stats || {
@@ -111,16 +122,20 @@ export default function AuthorDetailPage() {
           total_comments: articlesData.reduce((sum, a) => sum + (a.comment_count || 0), 0),
           total_reactions: articlesData.reduce((sum, a) => {
             const reactions = a.reactions_summary || {};
-            return sum + (reactions.like || 0) + (reactions.love || 0) + 
-                   (reactions.celebrate || 0) + (reactions.insightful || 0);
+            return (
+              sum +
+              (reactions.like || 0) +
+              (reactions.love || 0) +
+              (reactions.celebrate || 0) +
+              (reactions.insightful || 0)
+            );
           }, 0),
         };
 
-        // Set author data
         setAuthor({
           id: authorData.id,
           name: authorData.name || "Unknown Author",
-          slug: authorData.slug || slug as string,
+          slug: authorData.slug || (slug as string),
           bio: authorData.bio || "",
           avatar: authorData.avatar || "/placeholder.svg",
           job_title: authorData.job_title || "",
@@ -129,14 +144,18 @@ export default function AuthorDetailPage() {
           articles: articlesData,
         });
 
-        // Set articles
-        const sortedArticles = [...articlesData].sort((a, b) => 
-          new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+        const sortedArticles = [...articlesData].sort(
+          (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
         );
         setArticles(sortedArticles);
 
-        // Set stats
         setStats(statsData);
+
+        // Check follow status if logged in
+        const token = localStorage.getItem("token");
+        if (token) {
+          await checkFollowStatus(token);
+        }
 
       } catch (err) {
         console.error("Error fetching author:", err);
@@ -145,11 +164,87 @@ export default function AuthorDetailPage() {
         setLoading(false);
       }
     }
-    
+
     if (slug) fetchAuthor();
   }, [slug]);
 
-  // Helper functions
+  const checkFollowStatus = async (token: string) => {
+    try {
+      // Check if this is the current user's own profile
+      const userResponse = await fetch(`${API_BASE_URL}/authors/me/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setIsCurrentUser(userData.slug === author?.slug);
+      }
+
+      // Get follow status
+      const followResponse = await fetch(`${API_BASE_URL}/authors/${slug}/follow-status/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+
+      if (followResponse.ok) {
+        const followData = await followResponse.json();
+        setIsFollowing(followData.is_following);
+        setFollowersCount(followData.followers_count);
+      }
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      alert("Please login to follow authors");
+      return;
+    }
+
+    setFollowLoading(true);
+
+    try {
+      if (isFollowing) {
+        const response = await fetch(`${API_BASE_URL}/authors/${slug}/unfollow/`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          setIsFollowing(false);
+          setFollowersCount((prev) => prev - 1);
+        }
+      } else {
+        const response = await fetch(`${API_BASE_URL}/authors/${slug}/follow/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          setIsFollowing(true);
+          setFollowersCount((prev) => prev + 1);
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling follow:", error);
+      alert("Something went wrong");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   const calculateReadTime = (content?: string) => {
     if (!content) return 5;
     const wordsPerMinute = 200;
@@ -228,7 +323,6 @@ export default function AuthorDetailPage() {
       day: "numeric",
     });
 
-  // Get author tier
   const getAuthorTier = () => {
     if (stats.total_views > 100000)
       return { name: "Elite", color: "from-purple-600 to-pink-600" };
@@ -241,7 +335,6 @@ export default function AuthorDetailPage() {
 
   const authorTier = getAuthorTier();
 
-  // Pagination
   const totalPages = Math.ceil(stats.total_articles / pageSize);
   const paginatedArticles = articles.slice(
     (currentPage - 1) * pageSize,
@@ -306,7 +399,6 @@ export default function AuthorDetailPage() {
     );
   }
 
-  // Check if author data exists
   if (!author) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#000000] transition-colors duration-300">
@@ -379,6 +471,35 @@ export default function AuthorDetailPage() {
                   </a>
                 )}
               </div>
+              
+              {/* Follow Button - Under Avatar */}
+              {!isCurrentUser && (
+                <div className="mt-4">
+                  <button
+                    onClick={handleFollowToggle}
+                    disabled={followLoading}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 w-full justify-center ${
+                      isFollowing
+                        ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white  hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
+                        : "bg-gradient-to-r from-sky-600 to-blue-600 text-white hover:shadow-lg hover:scale-105 shadow-md"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {followLoading ? (
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    ) : isFollowing ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Following</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        <span>Follow</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
             
             <div className="flex-1">
@@ -407,7 +528,7 @@ export default function AuthorDetailPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 md:gap-12 max-w-4xl mx-auto text-center py-8 md:py-12">
             <div className="space-y-2 md:space-y-3">
               <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
                 {stats.total_articles}
@@ -418,10 +539,18 @@ export default function AuthorDetailPage() {
             </div>
             <div className="space-y-2 md:space-y-3">
               <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {followersCount}
+              </div>
+              <div className="text-xs md:text-sm text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
+                Followers
+              </div>
+            </div>
+            <div className="space-y-2 md:space-y-3">
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
                 {stats.total_views.toLocaleString()}
               </div>
               <div className="text-xs md:text-sm text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">
-                Total Views
+                Views
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
@@ -429,7 +558,7 @@ export default function AuthorDetailPage() {
                 {stats.total_comments}
               </div>
               <div className="text-xs md:text-sm text-pink-600 dark:text-pink-400 font-semibold uppercase tracking-wider">
-                Total Comments
+                Comments
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
@@ -437,7 +566,7 @@ export default function AuthorDetailPage() {
                 {stats.total_reactions}
               </div>
               <div className="text-xs md:text-sm text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider">
-                Total Reactions
+                Reactions
               </div>
             </div>
           </div>
