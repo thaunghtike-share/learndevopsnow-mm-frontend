@@ -27,6 +27,7 @@ import {
   Plus,
   Check,
 } from "lucide-react";
+import toast from 'react-hot-toast';
 import { motion } from "framer-motion";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -118,8 +119,14 @@ export default function AuthorDetailPage() {
         const articlesData = data.articles || [];
         const statsData = data.stats || {
           total_articles: articlesData.length,
-          total_views: articlesData.reduce((sum, a) => sum + (a.read_count || 0), 0),
-          total_comments: articlesData.reduce((sum, a) => sum + (a.comment_count || 0), 0),
+          total_views: articlesData.reduce(
+            (sum, a) => sum + (a.read_count || 0),
+            0
+          ),
+          total_comments: articlesData.reduce(
+            (sum, a) => sum + (a.comment_count || 0),
+            0
+          ),
           total_reactions: articlesData.reduce((sum, a) => {
             const reactions = a.reactions_summary || {};
             return (
@@ -145,7 +152,9 @@ export default function AuthorDetailPage() {
         });
 
         const sortedArticles = [...articlesData].sort(
-          (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+          (a, b) =>
+            new Date(b.published_at).getTime() -
+            new Date(a.published_at).getTime()
         );
         setArticles(sortedArticles);
 
@@ -156,7 +165,6 @@ export default function AuthorDetailPage() {
         if (token) {
           await checkFollowStatus(token);
         }
-
       } catch (err) {
         console.error("Error fetching author:", err);
         setError((err as Error).message);
@@ -183,11 +191,14 @@ export default function AuthorDetailPage() {
       }
 
       // Get follow status
-      const followResponse = await fetch(`${API_BASE_URL}/authors/${slug}/follow-status/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
+      const followResponse = await fetch(
+        `${API_BASE_URL}/authors/${slug}/follow-status/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
 
       if (followResponse.ok) {
         const followData = await followResponse.json();
@@ -201,9 +212,15 @@ export default function AuthorDetailPage() {
 
   const handleFollowToggle = async () => {
     const token = localStorage.getItem("token");
-    
+
     if (!token) {
-      alert("Please login to follow authors");
+      toast.error("Please login to follow authors");
+      return;
+    }
+
+    // Check if trying to follow self
+    if (author?.slug && isCurrentUser) {
+      toast.error("You cannot follow yourself");
       return;
     }
 
@@ -211,35 +228,51 @@ export default function AuthorDetailPage() {
 
     try {
       if (isFollowing) {
-        const response = await fetch(`${API_BASE_URL}/authors/${slug}/unfollow/`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/authors/${slug}/unfollow/`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (response.ok) {
           setIsFollowing(false);
           setFollowersCount((prev) => prev - 1);
+          toast.success(`Unfollowed ${author?.name}`);
+        } else {
+          const data = await response.json();
+          toast.error(data.error || "Failed to unfollow");
         }
       } else {
-        const response = await fetch(`${API_BASE_URL}/authors/${slug}/follow/`, {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/authors/${slug}/follow/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Token ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await response.json();
 
         if (response.ok) {
           setIsFollowing(true);
           setFollowersCount((prev) => prev + 1);
+          toast.success(`Now following ${author?.name}`);
+        } else {
+          // Show error message from backend
+          toast.error(data.error || "Failed to follow author");
         }
       }
     } catch (error) {
       console.error("Error toggling follow:", error);
-      alert("Something went wrong");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setFollowLoading(false);
     }
@@ -330,7 +363,7 @@ export default function AuthorDetailPage() {
       return { name: "Expert", color: "from-amber-500 to-orange-600" };
     if (stats.total_views > 10000)
       return { name: "Pro", color: "from-emerald-500 to-green-600" };
-    return { name: "Rising", color: "from-blue-500 to-cyan-600" };
+    return { name: "Rising", color: "from-blue-600 to-sky-600" };
   };
 
   const authorTier = getAuthorTier();
@@ -471,7 +504,7 @@ export default function AuthorDetailPage() {
                   </a>
                 )}
               </div>
-              
+
               {/* Follow Button - Under Avatar */}
               {!isCurrentUser && (
                 <div className="mt-4">
@@ -501,12 +534,14 @@ export default function AuthorDetailPage() {
                 </div>
               )}
             </div>
-            
+
             <div className="flex-1">
               {(author.job_title || author.company) && (
                 <p className="text-base md:text-xl text-blue-600 dark:text-blue-400 font-medium mb-4 md:mb-6">
                   {author.job_title}
-                  {author.company && author.company.trim() !== "" && ` at ${author.company}`}
+                  {author.company &&
+                    author.company.trim() !== "" &&
+                    ` at ${author.company}`}
                 </p>
               )}
 
@@ -517,7 +552,9 @@ export default function AuthorDetailPage() {
               )}
 
               <div className="flex flex-wrap gap-2 md:gap-3">
-                <span className={`px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${authorTier.color} text-white text-xs md:text-sm font-medium rounded-full shadow-sm`}>
+                <span
+                  className={`px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r ${authorTier.color} text-white text-xs md:text-sm font-medium rounded-full shadow-sm`}
+                >
                   {authorTier.name} Author
                 </span>
                 <span className="px-3 py-1.5 md:px-4 md:py-2 bg-black dark:bg-gray-700 text-white dark:text-gray-300 text-xs md:text-sm font-medium rounded-full shadow-sm">
@@ -586,7 +623,8 @@ export default function AuthorDetailPage() {
                   Latest Articles
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
-                  {stats.total_articles} articles • {stats.total_views.toLocaleString()} reads
+                  {stats.total_articles} articles •{" "}
+                  {stats.total_views.toLocaleString()} reads
                 </p>
               </div>
               <div className="flex items-center gap-2 md:gap-3">
@@ -748,12 +786,15 @@ export default function AuthorDetailPage() {
                 <div className="px-4 py-4 md:px-8 md:py-6 border-t border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-xs md:text-sm text-slate-600 dark:text-gray-400 font-medium text-center sm:text-left">
-                      Showing {paginatedArticles.length} of {stats.total_articles} articles
+                      Showing {paginatedArticles.length} of{" "}
+                      {stats.total_articles} articles
                     </div>
 
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(1, prev - 1))
+                        }
                         disabled={currentPage === 1}
                         className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
                       >
@@ -763,31 +804,39 @@ export default function AuthorDetailPage() {
 
                       {/* Page Numbers */}
                       <div className="hidden xs:flex items-center gap-1">
-                        {Array.from({ length: Math.min(3, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 3) pageNum = i + 1;
-                          else if (currentPage <= 2) pageNum = i + 1;
-                          else if (currentPage >= totalPages - 1) pageNum = totalPages - 2 + i;
-                          else pageNum = currentPage - 1 + i;
-                          
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => setCurrentPage(pageNum)}
-                              className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
-                                currentPage === pageNum
-                                  ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
-                                  : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
+                        {Array.from(
+                          { length: Math.min(3, totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 3) pageNum = i + 1;
+                            else if (currentPage <= 2) pageNum = i + 1;
+                            else if (currentPage >= totalPages - 1)
+                              pageNum = totalPages - 2 + i;
+                            else pageNum = currentPage - 1 + i;
+
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all shadow-sm ${
+                                  currentPage === pageNum
+                                    ? "bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md"
+                                    : "border border-slate-300 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 backdrop-blur-sm"
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          }
+                        )}
                       </div>
 
                       <button
-                        onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(totalPages, prev + 1)
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="flex items-center gap-1 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-slate-300 dark:border-gray-600 text-xs md:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-gray-700 transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm hover:shadow-md text-slate-700 dark:text-gray-300 flex-1 sm:flex-none justify-center"
                       >

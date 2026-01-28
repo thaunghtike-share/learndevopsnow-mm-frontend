@@ -37,6 +37,7 @@
     "react-chartjs-2": "^5.3.1",
     "react-countup": "^6.5.3",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.6.0",
     "react-markdown": "^10.1.0",
     "react-md": "^6.2.2",

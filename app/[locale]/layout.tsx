@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import "./globals.css";
 import { GoogleAnalytics } from '@next/third-parties/google'
-// REMOVE: import { TopBannerWithModal } from "@/components/TopBannerWithModal";
+import { Toaster } from "react-hot-toast"; // Add this import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -168,10 +168,30 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {/* REMOVE: <TopBannerWithModal /> from here */}
-          
           {/* Your existing content */}
           {children}
+          
+          {/* Add Toaster here */}
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                style: {
+                  background: '#10b981', // Green for success
+                },
+              },
+              error: {
+                style: {
+                  background: '#ef4444', // Red for errors
+                },
+              },
+            }}
+          />
         </NextIntlClientProvider>
         <GoogleAnalytics gaId="G-1XGYJMR2B7" />
       </body>
