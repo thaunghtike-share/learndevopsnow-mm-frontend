@@ -33,6 +33,8 @@ import {
   X,
   Settings,
   BarChart3,
+  Users,
+  UserPlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import BanNotification from "@/components/BanNotification";
@@ -56,6 +58,7 @@ import RestoreSuccessAlert from "./components/RestoreSuccessAlert";
 import TrashSection from "./components/TrashSection";
 import SavedPostsSection from "./components/SavedPostsSection";
 import StatsSection from "./components/StatsSection";
+import ConnectionsSection from "./components/FollowersFollowingSection";
 
 ChartJS.register(
   ArcElement,
@@ -64,7 +67,7 @@ ChartJS.register(
   BarElement,
   Tooltip,
   Legend,
-  Title
+  Title,
 );
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
@@ -132,6 +135,7 @@ type ActiveSection =
   | "articles"
   | "stats"
   | "saved"
+  | "connections"
   | "trash"
   | "notifications"
   | "settings";
@@ -433,7 +437,7 @@ export default function AuthorAdminDashboard() {
             "Content-Type": "application/json",
           },
           next: { revalidate: 30 },
-        }
+        },
       );
 
       if (res.status === 401) {
@@ -475,7 +479,7 @@ export default function AuthorAdminDashboard() {
           JSON.stringify({
             data,
             timestamp: Date.now(),
-          })
+          }),
         );
       }
 
@@ -527,10 +531,10 @@ export default function AuthorAdminDashboard() {
           ? {
               ...prev,
               articles: prev.articles.filter(
-                (article) => article.slug !== articleSlug
+                (article) => article.slug !== articleSlug,
               ),
             }
-          : null
+          : null,
       );
 
       await fetchTrashArticles();
@@ -553,19 +557,19 @@ export default function AuthorAdminDashboard() {
           headers: {
             Authorization: `Token ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
         setTrashArticles((prev) =>
-          prev.filter((article) => article.slug !== articleSlug)
+          prev.filter((article) => article.slug !== articleSlug),
         );
 
         const restoredArticle = trashArticles.find(
-          (a) => a.slug === articleSlug
+          (a) => a.slug === articleSlug,
         );
         setRestoreSuccess(
-          `"${restoredArticle?.title}" has been restored successfully!`
+          `"${restoredArticle?.title}" has been restored successfully!`,
         );
         setShowRestoreSuccess(true);
 
@@ -576,7 +580,7 @@ export default function AuthorAdminDashboard() {
               headers: {
                 Authorization: `Token ${token}`,
               },
-            }
+            },
           );
 
           if (authorRes.ok) {
@@ -610,12 +614,12 @@ export default function AuthorAdminDashboard() {
           headers: {
             Authorization: `Token ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
         setSavedArticles((prev) =>
-          prev.filter((article) => article.id !== articleId)
+          prev.filter((article) => article.id !== articleId),
         );
       } else {
         throw new Error("Failed to unsave article");
@@ -631,7 +635,7 @@ export default function AuthorAdminDashboard() {
   const handlePermanentDelete = async (articleSlug: string) => {
     if (
       !confirm(
-        "Are you sure you want to permanently delete this article? This action cannot be undone."
+        "Are you sure you want to permanently delete this article? This action cannot be undone.",
       )
     ) {
       return;
@@ -646,12 +650,12 @@ export default function AuthorAdminDashboard() {
           headers: {
             Authorization: `Token ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
         setTrashArticles((prev) =>
-          prev.filter((article) => article.slug !== articleSlug)
+          prev.filter((article) => article.slug !== articleSlug),
         );
       }
     } catch (error) {
@@ -688,13 +692,13 @@ export default function AuthorAdminDashboard() {
   const totalViews =
     author?.articles?.reduce(
       (sum, article) => sum + (article.read_count || 0),
-      0
+      0,
     ) || 0;
 
   const totalComments =
     author?.articles?.reduce(
       (sum, article) => sum + (article.comment_count || 0),
-      0
+      0,
     ) || 0;
 
   const totalReactions = author?.articles?.reduce((sum, article) => {
@@ -785,7 +789,7 @@ export default function AuthorAdminDashboard() {
   const paginatedArticles =
     author?.articles?.slice(
       (currentPage - 1) * articlesPerPage,
-      currentPage * articlesPerPage
+      currentPage * articlesPerPage,
     ) || [];
 
   const prepareArticlesByAuthorData = () => {
@@ -900,6 +904,13 @@ export default function AuthorAdminDashboard() {
                       icon: Bookmark,
                       color: "text-emerald-600 dark:text-emerald-400",
                       bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+                    },
+                    {
+                      id: "connections",
+                      label: "Connections",
+                      icon: Users,
+                      color: "text-blue-600 dark:text-blue-400",
+                      bgColor: "bg-blue-100 dark:bg-blue-900/30",
                     },
                     {
                       id: "trash",
@@ -1157,7 +1168,7 @@ export default function AuthorAdminDashboard() {
                             <p>
                               <strong>Banned on:</strong>{" "}
                               {new Date(
-                                banDetails.banned_at
+                                banDetails.banned_at,
                               ).toLocaleDateString()}
                             </p>
                             <p>
@@ -1168,7 +1179,7 @@ export default function AuthorAdminDashboard() {
                                 <p>
                                   <strong>Ban expires:</strong>{" "}
                                   {new Date(
-                                    banDetails.banned_until
+                                    banDetails.banned_until,
                                   ).toLocaleDateString()}
                                 </p>
                               )}
@@ -1454,7 +1465,7 @@ export default function AuthorAdminDashboard() {
                               <button
                                 onClick={() =>
                                   setCurrentPage((prev) =>
-                                    Math.max(1, prev - 1)
+                                    Math.max(1, prev - 1),
                                   )
                                 }
                                 disabled={currentPage === 1}
@@ -1493,14 +1504,14 @@ export default function AuthorAdminDashboard() {
                                         {pageNum}
                                       </button>
                                     );
-                                  }
+                                  },
                                 )}
                               </div>
 
                               <button
                                 onClick={() =>
                                   setCurrentPage((prev) =>
-                                    Math.min(totalPages, prev + 1)
+                                    Math.min(totalPages, prev + 1),
                                   )
                                 }
                                 disabled={currentPage === totalPages}
@@ -1555,6 +1566,17 @@ export default function AuthorAdminDashboard() {
                       onUnsaveArticle={handleUnsaveArticle}
                       unsavingId={unsavingId}
                     />
+                  </motion.section>
+                )}
+
+                {activeSection === "connections" && (
+                  <motion.section
+                    key="connections"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl md:rounded-3xl border border-slate-200/60 dark:border-gray-700 shadow-2xl overflow-hidden mb-12 md:mb-16"
+                  >
+                    <ConnectionsSection authorSlug={author?.slug || ""} />
                   </motion.section>
                 )}
 

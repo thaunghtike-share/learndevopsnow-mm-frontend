@@ -138,7 +138,7 @@ export default function NotificationSettings() {
       icon: MessageSquare,
       title: "Comments on Your Articles",
       description:
-        "Receive notifications when someone comments on your articles",
+        "Receive email notifications when someone comments on your articles",
       enabled: settings.comments,
       statusText: settings.comments ? "Enabled" : "Disabled",
     },
@@ -219,7 +219,7 @@ export default function NotificationSettings() {
         <div className="flex items-center gap-4 mb-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white mb-2">
-              Notification Settings
+              Email Notification Settings
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Control how and when you receive notifications
