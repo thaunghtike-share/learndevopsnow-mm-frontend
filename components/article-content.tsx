@@ -148,6 +148,8 @@ function excerpt(content: string) {
   return plainText.length === 120 ? plainText + "..." : plainText;
 }
 
+
+
 const isYouTubeParagraph = (
   children: any
 ): { isYouTube: boolean; url?: string; title?: string } => {
@@ -1186,7 +1188,7 @@ export function ArticleContent({
         >
           <div className="space-y-4">
             {/* Beautiful Blue Theme Table of Contents */}
-            <div className="bg-white dark:bg-gray-900 p-6">
+            <div className="bg-white dark:bg-[#000000]/95 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                   <ListOrdered className="w-5 h-5 text-white" />

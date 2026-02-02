@@ -1,11 +1,16 @@
 "use client";
 import { useState, useRef } from "react";
-import { Upload, File, FileImage, FileCode, FileText, X, Check, AlertCircle } from "lucide-react";
+import { Upload, File, FileImage, FileCode, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface FileUploaderProps {
-  onFileUpload: (fileInfo: { name: string; url: string; type: string }) => void;
+  onFileUpload: (fileInfo: { 
+    name: string; 
+    url: string; 
+    path: string; 
+    type: string;
+  }) => void;
   onCancel: () => void;
 }
 
@@ -106,6 +111,7 @@ export function FileUploader({ onFileUpload, onCancel }: FileUploaderProps) {
         onFileUpload({
           name: selectedFile.name,
           url: data.url,
+          path: data.path,
           type: data.type
         });
         toast.success('File uploaded successfully!');
