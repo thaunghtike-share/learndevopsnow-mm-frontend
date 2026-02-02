@@ -9,16 +9,23 @@ import {
   Reply,
   Trash2,
   Edit,
-  MoreHorizontal,
   ChevronDown,
   ChevronUp,
   X,
   AlertCircle,
-  CheckCircle,
   MessageSquare,
+  Code,
+  Upload,
+  FileText,
+  Download,
+  Maximize2,
+  Copy,
+  Check,
+  Image as ImageIcon,
 } from "lucide-react";
+import { CodeBlockEditor } from "@/components/comment/CodeBlockEditor";
+import { FileUploader } from "@/components/comment/FileUploader";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import Link from "next/link";
@@ -37,6 +44,14 @@ interface Comment {
   is_author: boolean;
   author_id?: number;
   replies: Comment[];
+  code_snippet?: string;
+  code_language?: string;
+  has_attachment?: boolean;
+  attachment_name?: string;
+  attachment_type?: string;
+  attachment_url?: string;
+  image_url?: string;
+  file_url?: string;
 }
 
 interface ReactionsSummary {
@@ -98,7 +113,6 @@ const ReactionButton = ({
     onClick();
   };
 
-  // Tooltip content with reactor names
   const getTooltipContent = () => {
     if (reactorNames.length === 0) {
       return "Be the first to react!";
@@ -152,7 +166,6 @@ const ReactionButton = ({
             : ""
         }
       >
-        {/* Loading spinner overlay */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 rounded-xl">
             <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin"></div>
@@ -165,12 +178,10 @@ const ReactionButton = ({
         </span>
       </button>
 
-      {/* Hover tooltip showing reactor names */}
       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-50">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3 min-w-[200px]">
           {getTooltipContent()}
         </div>
-        {/* Tooltip arrow */}
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
           <div className="w-3 h-3 bg-white dark:bg-gray-900 border-r border-b border-gray-200 dark:border-gray-700 transform rotate-45"></div>
         </div>
@@ -199,9 +210,18 @@ export function CommentsReactions({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
-
-  // Add loading state for reactions
   const [loadingReaction, setLoadingReaction] = useState<string | null>(null);
+
+  // NEW STATES FOR CODE AND FILE UPLOAD
+  const [showCodeEditor, setShowCodeEditor] = useState(false);
+  const [showFileUploader, setShowFileUploader] = useState(false);
+  const [codeToInsert, setCodeToInsert] = useState("");
+  const [codeLanguage, setCodeLanguage] = useState("");
+  const [filesToAttach, setFilesToAttach] = useState<Array<{
+    name: string;
+    url: string;
+    type: string;
+  }>>([]);
 
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [reactorNames, setReactorNames] = useState<{
@@ -250,7 +270,6 @@ export function CommentsReactions({
           setUserReactions(data.user_reactions);
         }
 
-        // Store reactor names
         if (data.reactor_names) {
           setReactorNames(data.reactor_names);
         }
@@ -274,13 +293,33 @@ export function CommentsReactions({
     }
   };
 
+  // NEW FUNCTION: Handle code insertion
+  const handleInsertCode = (code: string, language: string) => {
+    const formattedCode = `\`\`\`${language}\n${code}\n\`\`\``;
+    setCodeToInsert(formattedCode);
+    setCodeLanguage(language);
+    setShowCodeEditor(false);
+    toast.success("Code ready to insert!");
+  };
+
+  // NEW FUNCTION: Handle file upload
+  const handleFileUpload = (fileInfo: { name: string; url: string; type: string }) => {
+    setFilesToAttach(prev => [...prev, fileInfo]);
+    setShowFileUploader(false);
+    toast.success("File attached!");
+  };
+
+  // NEW FUNCTION: Remove attached file
+  const removeAttachedFile = (index: number) => {
+    setFilesToAttach(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleReaction = async (reactionType: string) => {
     if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
 
-    // Show immediate feedback toast
     const toastId = toast.loading(
       userReactions.includes(reactionType) 
         ? "Removing reaction..." 
@@ -298,20 +337,16 @@ export function CommentsReactions({
         return;
       }
 
-      // Show immediate optimistic update
       const currentCount = reactions[reactionType as keyof ReactionsSummary] || 0;
       const currentActive = userReactions.includes(reactionType);
       
-      // Optimistically update UI
       if (currentActive) {
-        // Removing reaction
         setReactions(prev => ({
           ...prev,
           [reactionType]: Math.max(0, currentCount - 1)
         }));
         setUserReactions(prev => prev.filter(r => r !== reactionType));
       } else {
-        // Adding reaction - remove other reactions first
         setUserReactions(prev => {
           const filtered = prev.filter(r => r !== reactionType);
           return [...filtered, reactionType];
@@ -334,7 +369,6 @@ export function CommentsReactions({
       );
 
       if (response.ok) {
-        // Fetch updated data from server
         await fetchReactions();
         toast.success(
           currentActive 
@@ -344,17 +378,14 @@ export function CommentsReactions({
         );
       } else if (response.status === 401) {
         setShowAuthModal(true);
-        // Revert optimistic update on error
         await fetchReactions();
         toast.error("Please sign in again", { id: toastId });
       } else {
-        // Revert optimistic update on error
         await fetchReactions();
         toast.error("Failed to update reaction", { id: toastId });
       }
     } catch (error) {
       console.error("Failed to toggle reaction:", error);
-      // Revert optimistic update on error
       await fetchReactions();
       toast.error("Failed to add reaction", { id: toastId });
     } finally {
@@ -366,12 +397,13 @@ export function CommentsReactions({
     setShowAuthModal(true);
   };
 
+  // UPDATED FUNCTION: Now handles code and file attachments
   const submitComment = async (
     content: string,
     parentId: number | null = null
   ) => {
-    if (!content.trim()) {
-      toast.error("Please enter a comment");
+    if (!content.trim() && !codeToInsert && filesToAttach.length === 0) {
+      toast.error("Please enter a comment, code, or attach a file");
       return;
     }
 
@@ -388,6 +420,21 @@ export function CommentsReactions({
         return;
       }
 
+      // Build full content with code and file links
+      let fullContent = content.trim();
+      
+      // Add code if present
+      if (codeToInsert) {
+        fullContent += (fullContent ? '\n\n' : '') + codeToInsert;
+      }
+      
+      // Add file links if present
+      if (filesToAttach.length > 0) {
+        filesToAttach.forEach(file => {
+          fullContent += (fullContent ? '\n\n' : '') + `[📎 ${file.name}](${file.url})`;
+        });
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/articles/${articleSlug}/comments/`,
         {
@@ -397,7 +444,7 @@ export function CommentsReactions({
             Authorization: `Token ${token}`,
           },
           body: JSON.stringify({
-            content: content.trim(),
+            content: fullContent.trim(),
             parent: parentId,
           }),
         }
@@ -409,6 +456,10 @@ export function CommentsReactions({
           toast.success("Reply posted!");
         } else {
           setNewComment("");
+          // Clear attachments after successful submission
+          setCodeToInsert("");
+          setCodeLanguage("");
+          setFilesToAttach([]);
           toast.success("Comment posted!");
         }
       } else if (response.status === 401) {
@@ -542,6 +593,115 @@ export function CommentsReactions({
     return isAuthenticated && comment.author_id === user?.id;
   };
 
+  // NEW FUNCTION: Render code blocks and file attachments
+  const renderCommentContent = (content: string, comment?: Comment) => {
+    if (!content) return '';
+    
+    const parts = [];
+    let lastIndex = 0;
+    const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+    let match;
+    
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+      
+      const language = match[1] || 'text';
+      const code = match[2];
+      parts.push(
+        <div key={match.index} className="my-2">
+          <div className="flex items-center justify-between bg-gray-800 text-gray-200 px-3 py-1 rounded-t text-xs">
+            <span className="font-mono">{language}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(code);
+                toast.success('Code copied!');
+              }}
+              className="hover:text-white flex items-center gap-1"
+            >
+              <Copy className="w-3 h-3" />
+              Copy
+            </button>
+          </div>
+          <pre className="bg-gray-900 text-gray-100 p-3 rounded-b overflow-x-auto text-sm font-mono">
+            <code>{code}</code>
+          </pre>
+        </div>
+      );
+      
+      lastIndex = codeBlockRegex.lastIndex;
+    }
+    
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+    
+    // Also check for attachments in comment object
+    if (comment?.has_attachment || comment?.attachment_url) {
+      parts.push(
+        <div key="attachment" className="mt-3">
+          {comment.attachment_type === 'image' ? (
+            <div className="relative group inline-block">
+              <img 
+                src={comment.image_url || comment.attachment_url} 
+                alt={comment.attachment_name || 'Attachment'}
+                className="max-w-full max-h-96 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => window.open(comment.image_url || comment.attachment_url, '_blank')}
+              />
+              <div className="absolute top-2 right-2 bg-black/70 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                <Maximize2 className="w-4 h-4" />
+                <span className="text-xs">Open</span>
+              </div>
+            </div>
+          ) : (
+            <a 
+              href={comment.file_url || comment.attachment_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <FileText className="w-6 h-6 text-gray-500" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  {comment.attachment_name || 'Download file'}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Click to download
+                </p>
+              </div>
+              <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </a>
+          )}
+        </div>
+      );
+    }
+    
+    if (parts.length === 0) {
+      return content.split('\n').map((line, index) => (
+        <span key={index}>
+          {line}
+          <br />
+        </span>
+      ));
+    }
+    
+    return parts.map((part, index) => 
+      typeof part === 'string' ? (
+        <span key={index}>
+          {part.split('\n').map((line, i) => (
+            <span key={i}>
+              {line}
+              <br />
+            </span>
+          ))}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   interface CommentItemProps {
     comment: Comment;
     depth?: number;
@@ -553,7 +713,6 @@ export function CommentsReactions({
     const [localReplyContent, setLocalReplyContent] = useState("");
     const [isReplying, setIsReplying] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const userOwnsComment = isCommentOwner(comment);
     const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -607,18 +766,12 @@ export function CommentsReactions({
     };
 
     const confirmDelete = () => {
-      console.log("confirmDelete function called");
-
-      // Simple window.confirm approach that always works
       const shouldDelete = window.confirm(
         "Are you sure you want to delete this comment? This action cannot be undone."
       );
 
       if (shouldDelete) {
-        console.log("User confirmed deletion, calling handleDelete");
         handleDelete();
-      } else {
-        console.log("User cancelled deletion");
       }
     };
 
@@ -770,9 +923,9 @@ export function CommentsReactions({
                 </div>
               </div>
             ) : (
-              <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed">
-                {comment.content}
-              </p>
+              <div className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed whitespace-pre-wrap">
+                {renderCommentContent(comment.content, comment)}
+              </div>
             )}
 
             <div className="flex items-center gap-3 flex-wrap">
@@ -808,7 +961,6 @@ export function CommentsReactions({
               {userOwnsComment && (
                 <button
                   onClick={() => {
-                    console.log("Setting comment to delete:", comment.id);
                     setCommentToDelete(comment.id);
                     setShowDeleteModal(true);
                   }}
@@ -1000,10 +1152,77 @@ export function CommentsReactions({
                 className="rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none min-h-[100px] text-sm"
                 rows={3}
               />
+
+              {/* NEW: Code and File Upload Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCodeEditor(!showCodeEditor)}
+                  className="flex items-center gap-1 text-xs"
+                >
+                  <Code className="w-4 h-4" />
+                  Add Code
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFileUploader(!showFileUploader)}
+                  className="flex items-center gap-1 text-xs"
+                >
+                  <Upload className="w-4 h-4" />
+                  Attach File
+                </Button>
+              </div>
+
+              {/* Show code editor when toggled */}
+              {showCodeEditor && (
+                <CodeBlockEditor
+                  onCodeSubmit={handleInsertCode}
+                  onCancel={() => setShowCodeEditor(false)}
+                />
+              )}
+
+              {/* Show file uploader when toggled */}
+              {showFileUploader && (
+                <FileUploader
+                  onFileUpload={handleFileUpload}
+                  onCancel={() => setShowFileUploader(false)}
+                />
+              )}
+
+              {/* Show attached files preview */}
+              {filesToAttach.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Attached files:
+                  </p>
+                  {filesToAttach.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded"
+                    >
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm truncate">{file.name}</span>
+                      </div>
+                      <button
+                        onClick={() => removeAttachedFile(index)}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex justify-end">
                 <Button
                   onClick={() => submitComment(newComment)}
-                  disabled={!newComment.trim() || loading}
+                  disabled={(!newComment.trim() && !codeToInsert && filesToAttach.length === 0) || loading}
                   className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6"
                 >
                   <Send className="w-4 h-4 mr-2" />
@@ -1099,7 +1318,6 @@ export function CommentsReactions({
                 <Button
                   onClick={async () => {
                     if (commentToDelete) {
-                      console.log("Deleting comment:", commentToDelete);
                       try {
                         const token = localStorage.getItem("token");
                         if (!token) {
@@ -1118,8 +1336,6 @@ export function CommentsReactions({
                             },
                           }
                         );
-
-                        console.log("Delete response status:", response.status);
 
                         if (response.ok) {
                           fetchComments();
