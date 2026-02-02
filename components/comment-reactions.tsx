@@ -306,22 +306,27 @@ export function CommentsReactions({
     setCodeLanguage(language);
     setShowCodeEditor(false);
 
-    // Show preview in the comment textarea but don't duplicate it
+    // Append the actual code to the textarea for preview
     setNewComment((prev) => {
-      // Check if this exact code is already in the textarea
-      if (prev.includes(formattedCode)) {
-        return prev; // Don't add if already there
-      }
-
-      // Add a visual indicator
       const separator = prev.trim() ? "\n\n" : "";
-      const codeIndicator = `[${language.toUpperCase()} code block added - ${code.split("\n").length} lines]`;
-      return prev + separator + codeIndicator;
+      return prev + separator + formattedCode;
     });
 
     toast.success(
       `Code block added (${language}, ${code.split("\n").length} lines)`,
     );
+  };
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setNewComment(newValue);
+
+    // Check if code block was manually deleted from textarea
+    if (codeToInsert && !newValue.includes(codeToInsert)) {
+      setCodeToInsert(""); // Clear cached code
+      setCodeLanguage(""); // Clear language
+      toast.info("Code block removed");
+    }
   };
 
   // Handle file upload for new comment
@@ -413,6 +418,14 @@ export function CommentsReactions({
       return;
     }
 
+    // Check if content is truly empty (no text, no code, no files)
+    const hasContent =
+      content.trim().length > 0 || codeToInsert || filesToAttach.length > 0;
+    if (!hasContent) {
+      toast.error("Please add some text, code, or a file");
+      return;
+    }
+
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -421,18 +434,9 @@ export function CommentsReactions({
         return;
       }
 
-      // Build final content - use codeToInsert if it exists
+      // The content already contains the code (added in handleInsertCode)
+      // So we just use the content as-is
       let finalContent = content.trim();
-
-      // Replace the code indicator with actual code
-      if (codeToInsert) {
-        // Remove any existing code indicator
-        const codeIndicatorRegex = /\[[A-Z]+\s+code block added - \d+ lines\]/g;
-        finalContent = finalContent.replace(codeIndicatorRegex, "").trim();
-
-        // Add the actual code
-        finalContent += (finalContent ? "\n\n" : "") + codeToInsert;
-      }
 
       // If content is empty but we have file, add placeholder
       if (!finalContent && filesToAttach.length > 0) {
@@ -449,8 +453,8 @@ export function CommentsReactions({
         requestBody.parent = parentId;
       }
 
-      // Add code language
-      if (codeLanguage) {
+      // Add code language if we have code
+      if (codeToInsert) {
         requestBody.code_language = codeLanguage;
       }
 
@@ -1254,7 +1258,7 @@ export function CommentsReactions({
               <Textarea
                 placeholder="What are your thoughts?"
                 value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                onChange={handleCommentChange} // Use the new handler
                 className="rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none min-h-[100px] text-sm"
                 rows={3}
               />

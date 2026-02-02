@@ -23,6 +23,7 @@ export function CodeBlockEditor({ onCodeSubmit, onCancel }: CodeBlockEditorProps
     { value: 'python', label: 'Python' },
     { value: 'java', label: 'Java' },
     { value: 'cpp', label: 'C++' },
+    { value: 'YAML', label: 'YAML' },
     { value: 'go', label: 'Go' },
     { value: 'rust', label: 'Rust' },
     { value: 'sql', label: 'SQL' },
@@ -97,15 +98,6 @@ export function CodeBlockEditor({ onCodeSubmit, onCancel }: CodeBlockEditorProps
               </option>
             ))}
           </select>
-          {code && (
-            <button
-              onClick={copyToClipboard}
-              className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 px-2 py-1"
-              title="Copy code"
-            >
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            </button>
-          )}
           <button
             onClick={onCancel}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
