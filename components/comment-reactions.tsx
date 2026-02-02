@@ -300,13 +300,28 @@ export function CommentsReactions({
     }
   };
 
-  // Handle code insertion for new comment
   const handleInsertCode = (code: string, language: string) => {
     const formattedCode = `\`\`\`${language}\n${code}\n\`\`\``;
     setCodeToInsert(formattedCode);
     setCodeLanguage(language);
     setShowCodeEditor(false);
-    toast.success("Code ready to insert!");
+
+    // Show preview in the comment textarea but don't duplicate it
+    setNewComment((prev) => {
+      // Check if this exact code is already in the textarea
+      if (prev.includes(formattedCode)) {
+        return prev; // Don't add if already there
+      }
+
+      // Add a visual indicator
+      const separator = prev.trim() ? "\n\n" : "";
+      const codeIndicator = `[${language.toUpperCase()} code block added - ${code.split("\n").length} lines]`;
+      return prev + separator + codeIndicator;
+    });
+
+    toast.success(
+      `Code block added (${language}, ${code.split("\n").length} lines)`,
+    );
   };
 
   // Handle file upload for new comment
@@ -406,9 +421,16 @@ export function CommentsReactions({
         return;
       }
 
-      // Build final content
+      // Build final content - use codeToInsert if it exists
       let finalContent = content.trim();
+
+      // Replace the code indicator with actual code
       if (codeToInsert) {
+        // Remove any existing code indicator
+        const codeIndicatorRegex = /\[[A-Z]+\s+code block added - \d+ lines\]/g;
+        finalContent = finalContent.replace(codeIndicatorRegex, "").trim();
+
+        // Add the actual code
         finalContent += (finalContent ? "\n\n" : "") + codeToInsert;
       }
 
