@@ -64,9 +64,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/layout.png",
+    shortcut: "/layout.png",
+    apple: "/layout.png",
   },
   openGraph: {
     type: "website",
