@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Upload, File, FileImage, FileCode, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 
 interface FileUploaderProps {
   onFileUpload: (fileInfo: { 
@@ -114,7 +114,6 @@ export function FileUploader({ onFileUpload, onCancel }: FileUploaderProps) {
           path: data.path,
           type: data.type
         });
-        toast.success('File uploaded successfully!');
         setSelectedFile(null);
         setPreviewUrl(null);
       } else {

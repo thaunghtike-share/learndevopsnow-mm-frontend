@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 import Link from "next/link";
-import { toast } from "sonner";
+import toast, { Toaster } from "react-hot-toast";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -325,7 +325,7 @@ export function CommentsReactions({
     if (codeToInsert && !newValue.includes(codeToInsert)) {
       setCodeToInsert(""); // Clear cached code
       setCodeLanguage(""); // Clear language
-      toast.info("Code block removed");
+      toast.success("Code block removed");
     }
   };
 
@@ -352,7 +352,7 @@ export function CommentsReactions({
       return;
     }
 
-    const toastId = toast.loading(
+    const loadingToast = toast.loading(
       userReactions.includes(reactionType)
         ? "Removing reaction..."
         : "Adding reaction...",
@@ -365,7 +365,7 @@ export function CommentsReactions({
       if (!token) {
         setShowAuthModal(true);
         setLoadingReaction(null);
-        toast.dismiss(toastId);
+        toast.dismiss(loadingToast);
         return;
       }
 
@@ -386,20 +386,20 @@ export function CommentsReactions({
           userReactions.includes(reactionType)
             ? `Removed ${reactionType} reaction`
             : `Added ${reactionType} reaction`,
-          { id: toastId },
+          { id: loadingToast }
         );
       } else if (response.status === 401) {
         setShowAuthModal(true);
         await fetchReactions();
-        toast.error("Please sign in again", { id: toastId });
+        toast.error("Please sign in again", { id: loadingToast });
       } else {
         await fetchReactions();
-        toast.error("Failed to update reaction", { id: toastId });
+        toast.error("Failed to update reaction", { id: loadingToast });
       }
     } catch (error) {
       console.error("Failed to toggle reaction:", error);
       await fetchReactions();
-      toast.error("Failed to add reaction", { id: toastId });
+      toast.error("Failed to add reaction", { id: loadingToast });
     } finally {
       setLoadingReaction(null);
     }
@@ -426,11 +426,13 @@ export function CommentsReactions({
       return;
     }
 
+    const loadingToast = toast.loading("Posting comment...");
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setShowAuthModal(true);
+        toast.dismiss(loadingToast);
         return;
       }
 
@@ -487,23 +489,25 @@ export function CommentsReactions({
         setCodeToInsert("");
         setCodeLanguage("");
         setFilesToAttach([]);
-        toast.success(parentId ? "Reply posted!" : "Comment posted!");
+        toast.success(parentId ? "Reply posted!" : "Comment posted!", {
+          id: loadingToast,
+        });
       } else {
         const errorText = await response.text();
         console.error("RAW ERROR:", errorText);
 
         if (response.status === 400) {
-          toast.error("Please add some text or a file");
+          toast.error("Please add some text or a file", { id: loadingToast });
         } else if (response.status === 401) {
           setShowAuthModal(true);
-          toast.error("Please sign in");
+          toast.error("Please sign in", { id: loadingToast });
         } else {
-          toast.error("Error posting comment");
+          toast.error("Error posting comment", { id: loadingToast });
         }
       }
     } catch (error) {
       console.error("Network error:", error);
-      toast.error("Network error");
+      toast.error("Network error", { id: loadingToast });
     } finally {
       setLoading(false);
     }
@@ -520,10 +524,12 @@ export function CommentsReactions({
       type: string;
     }>,
   ) => {
+    const loadingToast = toast.loading("Updating comment...");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setShowAuthModal(true);
+        toast.dismiss(loadingToast);
         return;
       }
 
@@ -534,7 +540,7 @@ export function CommentsReactions({
 
       // Ensure content is not empty
       if (!finalContent && (!filesToAttach || filesToAttach.length === 0)) {
-        toast.error("Please enter content");
+        toast.error("Please enter content", { id: loadingToast });
         return;
       }
 
@@ -562,25 +568,28 @@ export function CommentsReactions({
 
       if (response.ok) {
         fetchComments();
-        toast.success("Comment updated!");
+        toast.success("Comment updated!", { id: loadingToast });
       } else if (response.status === 401) {
         setShowAuthModal(true);
+        toast.error("Please sign in", { id: loadingToast });
       } else if (response.status === 403) {
-        toast.error("You can only edit your own comments");
+        toast.error("You can only edit your own comments", { id: loadingToast });
       } else {
-        toast.error("Failed to update");
+        toast.error("Failed to update", { id: loadingToast });
       }
     } catch (error) {
       console.error("Update error:", error);
-      toast.error("Update failed");
+      toast.error("Update failed", { id: loadingToast });
     }
   };
 
   const deleteComment = async (commentId: number) => {
+    const loadingToast = toast.loading("Deleting comment...");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setShowAuthModal(true);
+        toast.dismiss(loadingToast);
         return;
       }
 
@@ -594,17 +603,20 @@ export function CommentsReactions({
 
       if (response.ok) {
         fetchComments();
-        toast.success("Comment deleted!");
+        setShowDeleteModal(false);
+        setCommentToDelete(null);
+        toast.success("Comment deleted!", { id: loadingToast });
       } else if (response.status === 401) {
         setShowAuthModal(true);
+        toast.error("Please sign in", { id: loadingToast });
       } else if (response.status === 403) {
-        toast.error("You can only delete your own comments");
+        toast.error("You can only delete your own comments", { id: loadingToast });
       } else {
-        toast.error("Failed to delete comment");
+        toast.error("Failed to delete comment", { id: loadingToast });
       }
     } catch (error) {
       console.error("Failed to delete comment:", error);
-      toast.error("Failed to delete comment");
+      toast.error("Failed to delete comment", { id: loadingToast });
     }
   };
 
@@ -748,8 +760,6 @@ export function CommentsReactions({
     const [showReplies, setShowReplies] = useState(true);
     const [localReplyContent, setLocalReplyContent] = useState("");
     const [isReplying, setIsReplying] = useState(false);
-
-    // LOCAL STATE FOR EDITING (like your original working code)
     const [isEditing, setIsEditing] = useState(false);
     const [localEditContent, setLocalEditContent] = useState(
       comment.display_content || comment.content,
@@ -763,6 +773,7 @@ export function CommentsReactions({
         type: string;
       }>
     >([]);
+    const [isSaving, setIsSaving] = useState(false);
 
     const userOwnsComment = isCommentOwner(comment);
     const editTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -786,6 +797,7 @@ export function CommentsReactions({
       setLocalEditContent(comment.display_content || comment.content);
       setLocalEditCodeToInsert("");
       setLocalEditFilesToAttach([]);
+      setIsSaving(false);
     };
 
     // Handle code insertion for edit
@@ -823,13 +835,20 @@ export function CommentsReactions({
         return;
       }
 
-      await updateComment(
-        comment.id,
-        finalContent,
-        localEditCodeToInsert,
-        localEditFilesToAttach,
-      );
-      setIsEditing(false);
+      setIsSaving(true);
+      try {
+        await updateComment(
+          comment.id,
+          finalContent,
+          localEditCodeToInsert,
+          localEditFilesToAttach,
+        );
+        setIsEditing(false);
+      } catch (error) {
+        // Error is already handled in updateComment
+      } finally {
+        setIsSaving(false);
+      }
     };
 
     const handleStartReply = () => {
@@ -964,7 +983,7 @@ export function CommentsReactions({
                     size="sm"
                     onClick={() => {
                       // You can create a separate FileUploader for edit mode
-                      toast.info(
+                      toast.success(
                         "Use the main file uploader above to attach files",
                       );
                     }}
@@ -1014,13 +1033,21 @@ export function CommentsReactions({
                     size="sm"
                     onClick={handleSubmitEdit}
                     disabled={
-                      !localEditContent.trim() &&
-                      !localEditCodeToInsert &&
-                      localEditFilesToAttach.length === 0
+                      (!localEditContent.trim() &&
+                        !localEditCodeToInsert &&
+                        localEditFilesToAttach.length === 0) ||
+                      isSaving
                     }
                     className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs"
                   >
-                    Save Changes
+                    {isSaving ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </div>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </Button>
                 </div>
               </div>
@@ -1132,7 +1159,14 @@ export function CommentsReactions({
                     disabled={!localReplyContent.trim() || loading}
                     className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs"
                   >
-                    {loading ? "Posting..." : "Post Reply"}
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Posting...
+                      </div>
+                    ) : (
+                      "Post Reply"
+                    )}
                   </Button>
                 </div>
               </div>
@@ -1158,330 +1192,339 @@ export function CommentsReactions({
   const displayedComments = showAllComments ? comments : comments.slice(0, 3);
 
   return (
-    <div className="space-y-8">
-      {/* Reactions Section */}
-      <div className="text-center">
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
-          How do you feel about this article?
-        </h3>
-        <div className="flex justify-center flex-wrap gap-3">
-          <ReactionButton
-            type="like"
-            count={reactions.like}
-            icon={ThumbsUp}
-            isActive={userReactions.includes("like")}
-            onClick={() => handleReaction("like")}
-            isAuthenticated={isAuthenticated}
-            onAuthRequired={handleAuthRequired}
-            reactorNames={reactorNames.like}
-            isLoading={loadingReaction === "like"}
-          />
+    <>
+      <div className="space-y-8">
+        {/* Reactions Section */}
+        <div className="text-center">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
+            How do you feel about this article?
+          </h3>
+          <div className="flex justify-center flex-wrap gap-3">
+            <ReactionButton
+              type="like"
+              count={reactions.like}
+              icon={ThumbsUp}
+              isActive={userReactions.includes("like")}
+              onClick={() => handleReaction("like")}
+              isAuthenticated={isAuthenticated}
+              onAuthRequired={handleAuthRequired}
+              reactorNames={reactorNames.like}
+              isLoading={loadingReaction === "like"}
+            />
 
-          <ReactionButton
-            type="love"
-            count={reactions.love}
-            icon={Heart}
-            isActive={userReactions.includes("love")}
-            onClick={() => handleReaction("love")}
-            isAuthenticated={isAuthenticated}
-            onAuthRequired={handleAuthRequired}
-            reactorNames={reactorNames.love}
-            isLoading={loadingReaction === "love"}
-          />
+            <ReactionButton
+              type="love"
+              count={reactions.love}
+              icon={Heart}
+              isActive={userReactions.includes("love")}
+              onClick={() => handleReaction("love")}
+              isAuthenticated={isAuthenticated}
+              onAuthRequired={handleAuthRequired}
+              reactorNames={reactorNames.love}
+              isLoading={loadingReaction === "love"}
+            />
 
-          <ReactionButton
-            type="celebrate"
-            count={reactions.celebrate}
-            icon={Sparkles}
-            isActive={userReactions.includes("celebrate")}
-            onClick={() => handleReaction("celebrate")}
-            isAuthenticated={isAuthenticated}
-            onAuthRequired={handleAuthRequired}
-            reactorNames={reactorNames.celebrate}
-            isLoading={loadingReaction === "celebrate"}
-          />
+            <ReactionButton
+              type="celebrate"
+              count={reactions.celebrate}
+              icon={Sparkles}
+              isActive={userReactions.includes("celebrate")}
+              onClick={() => handleReaction("celebrate")}
+              isAuthenticated={isAuthenticated}
+              onAuthRequired={handleAuthRequired}
+              reactorNames={reactorNames.celebrate}
+              isLoading={loadingReaction === "celebrate"}
+            />
 
-          <ReactionButton
-            type="insightful"
-            count={reactions.insightful}
-            icon={Lightbulb}
-            isActive={userReactions.includes("insightful")}
-            onClick={() => handleReaction("insightful")}
-            isAuthenticated={isAuthenticated}
-            onAuthRequired={handleAuthRequired}
-            reactorNames={reactorNames.insightful}
-            isLoading={loadingReaction === "insightful"}
-          />
-        </div>
-      </div>
-
-      {/* Comments Section */}
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Comments
-              </h3>
-            </div>
+            <ReactionButton
+              type="insightful"
+              count={reactions.insightful}
+              icon={Lightbulb}
+              isActive={userReactions.includes("insightful")}
+              onClick={() => handleReaction("insightful")}
+              isAuthenticated={isAuthenticated}
+              onAuthRequired={handleAuthRequired}
+              reactorNames={reactorNames.insightful}
+              isLoading={loadingReaction === "insightful"}
+            />
           </div>
-          {comments.length > 3 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAllComments(!showAllComments)}
-              className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs"
-            >
-              {showAllComments ? (
-                <>
-                  <ChevronUp className="w-3 h-3 mr-1" />
-                  Show Less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-3 h-3 mr-1" />
-                  Show All
-                </>
-              )}
-            </Button>
-          )}
         </div>
 
-        {/* Comment Form */}
-        <div className="mb-6">
-          {isAuthenticated ? (
-            <div className="space-y-3">
-              <Textarea
-                placeholder="What are your thoughts?"
-                value={newComment}
-                onChange={handleCommentChange} // Use the new handler
-                className="rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none min-h-[100px] text-sm"
-                rows={3}
-              />
-
-              {/* Code and File Upload Buttons */}
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowCodeEditor(!showCodeEditor)}
-                  className="flex items-center gap-1 text-xs"
-                >
-                  <Code className="w-4 h-4" />
-                  Add Code
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowFileUploader(!showFileUploader)}
-                  className="flex items-center gap-1 text-xs"
-                >
-                  <Upload className="w-4 h-4" />
-                  Attach File
-                </Button>
+        {/* Comments Section */}
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-white" />
               </div>
-
-              {/* Show code editor when toggled */}
-              {showCodeEditor && (
-                <CodeBlockEditor
-                  onCodeSubmit={handleInsertCode}
-                  onCancel={() => setShowCodeEditor(false)}
-                />
-              )}
-
-              {/* Show file uploader when toggled */}
-              {showFileUploader && (
-                <FileUploader
-                  onFileUpload={handleFileUpload}
-                  onCancel={() => setShowFileUploader(false)}
-                />
-              )}
-
-              {/* Show attached files preview */}
-              {filesToAttach.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Attached files:
-                  </p>
-                  {filesToAttach.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded"
-                    >
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm truncate">{file.name}</span>
-                      </div>
-                      <button
-                        onClick={() => removeAttachedFile(index)}
-                        className="text-gray-400 hover:text-red-500"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <Button
-                  onClick={() => submitComment(newComment)}
-                  disabled={
-                    (!newComment.trim() &&
-                      !codeToInsert &&
-                      filesToAttach.length === 0) ||
-                    loading
-                  }
-                  className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6"
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  {loading ? "Posting..." : "Post Comment"}
-                </Button>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Comments
+                </h3>
               </div>
             </div>
-          ) : (
-            <div className="p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
-                <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Sign in to join the conversation
-              </p>
+            {comments.length > 3 && (
               <Button
-                onClick={() => setShowAuthModal(true)}
-                className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Sign In to Comment
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Comments List */}
-        <div className="space-y-6">
-          {displayedComments.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="w-6 h-6 text-gray-400 dark:text-gray-500" />
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {isAuthenticated
-                  ? "Be the first to share your thoughts!"
-                  : "Sign in to be the first to comment!"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {displayedComments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0"
-                >
-                  <CommentItem comment={comment} />
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                Delete Comment
-              </h3>
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setCommentToDelete(null);
-                }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              </button>
-            </div>
-
-            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
-              Are you sure you want to delete this comment?
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
-              This action cannot be undone.
-            </p>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setCommentToDelete(null);
-                }}
                 variant="outline"
-                className="flex-1"
+                size="sm"
+                onClick={() => setShowAllComments(!showAllComments)}
+                className="rounded-lg border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs"
               >
-                Cancel
+                {showAllComments ? (
+                  <>
+                    <ChevronUp className="w-3 h-3 mr-1" />
+                    Show Less
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3 mr-1" />
+                    Show All
+                  </>
+                )}
               </Button>
-              <Button
-                onClick={async () => {
-                  if (commentToDelete) {
-                    await deleteComment(commentToDelete);
-                  }
-                  setShowDeleteModal(false);
-                  setCommentToDelete(null);
-                }}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-              >
-                Delete
-              </Button>
-            </div>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                Sign In Required
-              </h3>
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              </button>
-            </div>
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
-              Please sign in to react to articles and leave comments.
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
-              Join our community of readers and share your thoughts!
-            </p>
-            <Button
-              onClick={() => setShowAuthModal(false)}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg"
-            >
-              Got it, I'll sign in
-            </Button>
+          {/* Comment Form */}
+          <div className="mb-6">
+            {isAuthenticated ? (
+              <div className="space-y-3">
+                <Textarea
+                  placeholder="What are your thoughts?"
+                  value={newComment}
+                  onChange={handleCommentChange} // Use the new handler
+                  className="rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 resize-none min-h-[100px] text-sm"
+                  rows={3}
+                />
+
+                {/* Code and File Upload Buttons */}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowCodeEditor(!showCodeEditor)}
+                    className="flex items-center gap-1 text-xs"
+                  >
+                    <Code className="w-4 h-4" />
+                    Add Code
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFileUploader(!showFileUploader)}
+                    className="flex items-center gap-1 text-xs"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Attach File
+                  </Button>
+                </div>
+
+                {/* Show code editor when toggled */}
+                {showCodeEditor && (
+                  <CodeBlockEditor
+                    onCodeSubmit={handleInsertCode}
+                    onCancel={() => setShowCodeEditor(false)}
+                  />
+                )}
+
+                {/* Show file uploader when toggled */}
+                {showFileUploader && (
+                  <FileUploader
+                    onFileUpload={handleFileUpload}
+                    onCancel={() => setShowFileUploader(false)}
+                  />
+                )}
+
+                {/* Show attached files preview */}
+                {filesToAttach.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Attached files:
+                    </p>
+                    {filesToAttach.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded"
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm truncate">{file.name}</span>
+                        </div>
+                        <button
+                          onClick={() => removeAttachedFile(index)}
+                          className="text-gray-400 hover:text-red-500"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => submitComment(newComment)}
+                    disabled={
+                      (!newComment.trim() &&
+                        !codeToInsert &&
+                        filesToAttach.length === 0) ||
+                      loading
+                    }
+                    className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-6"
+                  >
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Posting...
+                      </div>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4 mr-2" />
+                        Post Comment
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  Sign in to join the conversation
+                </p>
+                <Button
+                  onClick={() => setShowAuthModal(true)}
+                  className="rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Sign In to Comment
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Comments List */}
+          <div className="space-y-6">
+            {displayedComments.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {isAuthenticated
+                    ? "Be the first to share your thoughts!"
+                    : "Sign in to be the first to comment!"}
+                </p>
+              </div>
+            ) : (
+              <>
+                {displayedComments.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className="pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0"
+                  >
+                    <CommentItem comment={comment} />
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Delete Comment
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setCommentToDelete(null);
+                  }}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
+                Are you sure you want to delete this comment?
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
+                This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setCommentToDelete(null);
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (commentToDelete) {
+                      await deleteComment(commentToDelete);
+                    }
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Auth Modal */}
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-md w-full shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  Sign In Required
+                </h3>
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 text-center">
+                Please sign in to react to articles and leave comments.
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 text-center">
+                Join our community of readers and share your thoughts!
+              </p>
+              <Button
+                onClick={() => setShowAuthModal(false)}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg"
+              >
+                Got it, I'll sign in
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
