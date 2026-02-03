@@ -27,8 +27,9 @@ import {
   Plus,
   Check,
 } from "lucide-react";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import ConnectionsSection from "./components/ConnectionSection";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 const DEFAULT_PAGE_SIZE = 8;
@@ -81,6 +82,7 @@ interface ApiResponse {
     total_views: number;
     total_comments: number;
     total_reactions: number;
+    total_followers?: number; // Added this field
   };
 }
 
@@ -93,6 +95,7 @@ export default function AuthorDetailPage() {
     total_views: 0,
     total_comments: 0,
     total_reactions: 0,
+    total_followers: 0,
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,19 +116,17 @@ export default function AuthorDetailPage() {
         if (!res.ok) throw new Error("Failed to load author details");
         const data: ApiResponse = await res.json();
 
-        console.log("API Response:", data);
-
         const authorData = data.author || data;
         const articlesData = data.articles || [];
         const statsData = data.stats || {
           total_articles: articlesData.length,
           total_views: articlesData.reduce(
             (sum, a) => sum + (a.read_count || 0),
-            0
+            0,
           ),
           total_comments: articlesData.reduce(
             (sum, a) => sum + (a.comment_count || 0),
-            0
+            0,
           ),
           total_reactions: articlesData.reduce((sum, a) => {
             const reactions = a.reactions_summary || {};
@@ -137,6 +138,7 @@ export default function AuthorDetailPage() {
               (reactions.insightful || 0)
             );
           }, 0),
+          total_followers: 0,
         };
 
         setAuthor({
@@ -154,13 +156,20 @@ export default function AuthorDetailPage() {
         const sortedArticles = [...articlesData].sort(
           (a, b) =>
             new Date(b.published_at).getTime() -
-            new Date(a.published_at).getTime()
+            new Date(a.published_at).getTime(),
         );
         setArticles(sortedArticles);
 
-        setStats(statsData);
+        setStats({
+          total_articles: statsData.total_articles,
+          total_views: statsData.total_views,
+          total_comments: statsData.total_comments,
+          total_reactions: statsData.total_reactions,
+          total_followers: statsData.total_followers || 0,
+        });
 
-        // Check follow status if logged in
+        setFollowersCount(statsData.total_followers || 0);
+
         const token = localStorage.getItem("token");
         if (token) {
           await checkFollowStatus(token);
@@ -178,7 +187,6 @@ export default function AuthorDetailPage() {
 
   const checkFollowStatus = async (token: string) => {
     try {
-      // Check if this is the current user's own profile
       const userResponse = await fetch(`${API_BASE_URL}/authors/me/`, {
         headers: {
           Authorization: `Token ${token}`,
@@ -190,14 +198,13 @@ export default function AuthorDetailPage() {
         setIsCurrentUser(userData.slug === author?.slug);
       }
 
-      // Get follow status
       const followResponse = await fetch(
         `${API_BASE_URL}/authors/${slug}/follow-status/`,
         {
           headers: {
             Authorization: `Token ${token}`,
           },
-        }
+        },
       );
 
       if (followResponse.ok) {
@@ -218,7 +225,6 @@ export default function AuthorDetailPage() {
       return;
     }
 
-    // Check if trying to follow self
     if (author?.slug && isCurrentUser) {
       toast.error("You cannot follow yourself");
       return;
@@ -236,12 +242,16 @@ export default function AuthorDetailPage() {
               Authorization: `Token ${token}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (response.ok) {
           setIsFollowing(false);
           setFollowersCount((prev) => prev - 1);
+          setStats((prev) => ({
+            ...prev,
+            total_followers: prev.total_followers - 1,
+          }));
           toast.success(`Unfollowed ${author?.name}`);
         } else {
           const data = await response.json();
@@ -256,7 +266,7 @@ export default function AuthorDetailPage() {
               Authorization: `Token ${token}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         const data = await response.json();
@@ -264,9 +274,12 @@ export default function AuthorDetailPage() {
         if (response.ok) {
           setIsFollowing(true);
           setFollowersCount((prev) => prev + 1);
+          setStats((prev) => ({
+            ...prev,
+            total_followers: prev.total_followers + 1,
+          }));
           toast.success(`Now following ${author?.name}`);
         } else {
-          // Show error message from backend
           toast.error(data.error || "Failed to follow author");
         }
       }
@@ -371,7 +384,7 @@ export default function AuthorDetailPage() {
   const totalPages = Math.ceil(stats.total_articles / pageSize);
   const paginatedArticles = articles.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   if (error) {
@@ -576,18 +589,18 @@ export default function AuthorDetailPage() {
             </div>
             <div className="space-y-2 md:space-y-3">
               <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
-                {followersCount}
-              </div>
-              <div className="text-xs md:text-sm text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
-                Followers
-              </div>
-            </div>
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
                 {stats.total_views.toLocaleString()}
               </div>
               <div className="text-xs md:text-sm text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">
                 Views
+              </div>
+            </div>
+            <div className="space-y-2 md:space-y-3">
+              <div className="text-2xl md:text-5xl font-light text-black dark:text-white">
+                {followersCount}
+              </div>
+              <div className="text-xs md:text-sm text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
+                Followers
               </div>
             </div>
             <div className="space-y-2 md:space-y-3">
@@ -609,7 +622,10 @@ export default function AuthorDetailPage() {
           </div>
         </section>
 
-        {/* Articles Section */}
+        {/* Connections Section - Separate Section */}
+        <ConnectionsSection authorSlug={author?.slug || ""} />
+
+        {/* Articles Section - Always Visible */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -619,7 +635,7 @@ export default function AuthorDetailPage() {
           <div className="px-4 py-4 md:px-8 md:py-6 border-b border-slate-200/50 dark:border-gray-700 bg-gradient-to-r from-white to-slate-50/50 dark:from-gray-800 dark:to-gray-700/50">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4">
               <div>
-                <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-1 md:mb-2">
+                <h2 className="text-xl md:text-3xl font-bold bg-gradient-to-br from-blue-600 to-sky-600 dark:from-blue-300 dark:to-sky-300 bg-clip-text text-transparent mb-1 md:mb-2">
                   Latest Articles
                 </h2>
                 <p className="text-xs md:text-base text-slate-600 dark:text-gray-400 font-medium">
@@ -827,14 +843,14 @@ export default function AuthorDetailPage() {
                                 {pageNum}
                               </button>
                             );
-                          }
+                          },
                         )}
                       </div>
 
                       <button
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            Math.min(totalPages, prev + 1)
+                            Math.min(totalPages, prev + 1),
                           )
                         }
                         disabled={currentPage === totalPages}
