@@ -6,16 +6,35 @@ import rehypeRaw from "rehype-raw";
 import React from "react";
 import "highlight.js/styles/atom-one-light.css";
 import CountUp from "react-countup";
-import { BarChart3, ChevronRight, Home } from "lucide-react";
+import {
+  BarChart3,
+  ChevronRight,
+  Home,
+  Flag,
+  AlertTriangle,
+  Send,
+  X,
+  CheckCircle,
+  Loader2,
+  Shield,
+  Edit,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { visit } from "unist-util-visit";
 import { CommentsReactions } from "./comment-reactions";
-import { ArrowRight, ListOrdered, TrendingUp, ChevronLeft, FileText } from "lucide-react";
+import {
+  ArrowRight,
+  ListOrdered,
+  TrendingUp,
+  ChevronLeft,
+  FileText,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { SimpleTTSPlayer } from "./tts-player";
 import { ShareButtons } from "./share-buttons";
 import { SaveButton } from "./SaveButton";
+import { useAuth } from "@/app/[locale]/auth/hooks/use-auth";
 
 interface Article {
   id: number;
@@ -80,7 +99,8 @@ interface ArticleContentProps {
 function flattenChildren(children: any): string {
   if (typeof children === "string") return children;
   if (Array.isArray(children)) return children.map(flattenChildren).join("");
-  if (children?.props?.children) return flattenChildren(children.props.children);
+  if (children?.props?.children)
+    return flattenChildren(children.props.children);
   return "";
 }
 
@@ -211,6 +231,16 @@ export function ArticleContent({
   } | null>(null);
   const objectUrlRef = useRef<string | null>(null);
 
+  // Add report form states
+  const [showReportForm, setShowReportForm] = useState(false);
+  const [reportType, setReportType] = useState("abuse");
+  const [description, setDescription] = useState("");
+  const [suggestedCorrection, setSuggestedCorrection] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const { isAuthenticated, user } = useAuth();
+
   const validHeadings = headings.filter(({ text, level }) => {
     const cleanText = text.trim();
     const isLevelValid = level >= 2 && level <= 3;
@@ -280,7 +310,10 @@ export function ArticleContent({
         }
       });
     };
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions,
+    );
     validHeadings.forEach(({ id }) => {
       const element = document.getElementById(id);
       if (element) {
@@ -325,6 +358,74 @@ export function ArticleContent({
         }
       });
     };
+  };
+
+  const handleSubmitReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated || !user) {
+      setErrorMessage("You must be logged in as an author to submit reports");
+      return;
+    }
+
+    if (!description.trim()) {
+      setErrorMessage("Please provide a description");
+      return;
+    }
+
+    if (reportType === "correction" && !suggestedCorrection.trim()) {
+      setErrorMessage("Please provide the correct information");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+
+      const payload = {
+        article_slug_input: article.slug,
+        report_type: reportType,
+        description: description.trim(),
+        suggested_correction:
+          reportType === "correction" ? suggestedCorrection.trim() : "",
+        supporting_evidence: suggestedCorrection.trim(), // Using the same field for simplicity
+      };
+
+      const response = await fetch(`${API_BASE_URL}/reports/submit/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setDescription("");
+        setSuggestedCorrection("");
+        // Reset form after 5 seconds
+        setTimeout(() => {
+          setShowReportForm(false);
+          setSubmitSuccess(false);
+        }, 5000);
+      } else {
+        setErrorMessage(
+          data.error || data.errors?.join(", ") || "Failed to submit report",
+        );
+      }
+    } catch (error) {
+      setErrorMessage("Network error. Please try again.");
+      console.error("Report submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -413,11 +514,14 @@ export function ArticleContent({
                     </div>
                     <div className="flex items-center gap-1 text-black dark:text-gray-400 text-sm sm:text-base">
                       <span>
-                        {new Date(article.published_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {new Date(article.published_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )}
                       </span>
                     </div>
                   </div>
@@ -491,7 +595,10 @@ export function ArticleContent({
                     }
                     return String(children);
                   };
-                  const codeString = extractCodeString(childrenContent).replace(/\n$/, "");
+                  const codeString = extractCodeString(childrenContent).replace(
+                    /\n$/,
+                    "",
+                  );
                   const lines = codeString.split("\n");
                   const getLanguageName = (lang: string): string => {
                     if (!lang || lang.trim() === "") return "Code";
@@ -802,7 +909,7 @@ export function ArticleContent({
                               } catch (e) {}
                             }
                             objectUrlRef.current = URL.createObjectURL(
-                              props.src as Blob
+                              props.src as Blob,
                             );
                             srcValue = objectUrlRef.current;
                           }
@@ -921,7 +1028,7 @@ export function ArticleContent({
                               <div className="text-right">
                                 <span className="text-xs font-medium text-sky-600 dark:text-sky-400 px-2 py-1 rounded-full">
                                   {new Date(
-                                    article.published_at
+                                    article.published_at,
                                   ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
@@ -977,6 +1084,7 @@ export function ArticleContent({
             )}
           </div>
         </article>
+        {/* SIDEBAR - ONLY THIS SECTION IS UPDATED */}
         <aside
           className="hidden lg:block lg:col-span-1"
           style={{
@@ -990,6 +1098,7 @@ export function ArticleContent({
           }}
         >
           <div className="space-y-4">
+            {/* EXISTING Table of Contents - NO CHANGES */}
             <div className="bg-white dark:bg-[#000000]/95 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
@@ -1012,8 +1121,8 @@ export function ArticleContent({
                         level === 2
                           ? "pl-0 font-semibold"
                           : level === 3
-                          ? "pl-4 font-medium"
-                          : "pl-0";
+                            ? "pl-4 font-medium"
+                            : "pl-0";
                       const isActive = activeHeadingId === id;
                       return (
                         <a
@@ -1065,6 +1174,275 @@ export function ArticleContent({
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     No headings found
                   </p>
+                </div>
+              )}
+            </div>
+
+            {/* NEW Report Form Section - ADDED AT THE END */}
+            <div className="bg-white dark:bg-[#000000]/95 p-6 mt-6">
+              {!showReportForm ? (
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                      <Flag className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-black dark:text-white">
+                        Report Issues
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Help improve content quality
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      Found an issue? Help us maintain quality content.
+                    </p>
+
+                    {!isAuthenticated ? (
+                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Shield className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                          <span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                            Authors Only
+                          </span>
+                        </div>
+                        <p className="text-xs text-yellow-700 dark:text-yellow-400/80">
+                          You must be logged in as an author to report issues or
+                          suggest corrections.
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <button
+                      onClick={() => setShowReportForm(true)}
+                      disabled={!isAuthenticated}
+                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
+                        isAuthenticated
+                          ? "bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      {isAuthenticated ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Flag className="w-4 h-4" />
+                          Report or Suggest
+                        </span>
+                      ) : (
+                        "Login to Report"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : submitSuccess ? (
+                <div>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg">
+                      <CheckCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
+                        Report Submitted
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        Thank you for your contribution
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                      Thank you for helping improve our content. We'll review it
+                      shortly.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setShowReportForm(false);
+                        setSubmitSuccess(false);
+                      }}
+                      className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                        <AlertTriangle className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-black dark:text-white">
+                          Report/Suggest Correction
+                        </h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          Provide details about the issue
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowReportForm(false)}
+                      className="text-red-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      title="Cancel"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-700 dark:text-red-400">
+                        {errorMessage}
+                      </p>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmitReport}>
+                    <div className="space-y-4">
+                      {/* Auto-filled article info */}
+                      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            <svg
+                              className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              Article Being Reported
+                            </p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
+                              {article.title}
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">
+                              Link:{" "}
+                              {typeof window !== "undefined"
+                                ? window.location.href
+                                : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Report Type Dropdown */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Report Type *
+                        </label>
+                        <select
+                          value={reportType}
+                          onChange={(e) => setReportType(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 focus:border-transparent"
+                          required
+                        >
+                          <option value="abuse">🚨 Report Abuse</option>
+                          <option value="correction">
+                            📝 Suggest Correction
+                          </option>
+                          <option value="inaccurate">
+                            ⚠️ Inaccurate Information
+                          </option>
+                          <option value="plagiarism">
+                            🔍 Plagiarism Concern
+                          </option>
+                          <option value="other">❓ Other Issue</option>
+                        </select>
+                      </div>
+
+                      {/* Description */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Description *
+                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                            {reportType === "abuse"
+                              ? "(Describe the abusive content)"
+                              : "(Explain what needs correction)"}
+                          </span>
+                        </label>
+                        <textarea
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          placeholder={
+                            reportType === "abuse"
+                              ? "Please describe the abusive content, harassment, spam, or inappropriate material..."
+                              : reportType === "correction"
+                                ? "What's factually incorrect? Please be specific about the error..."
+                                : "Please describe the issue in detail..."
+                          }
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 focus:border-transparent"
+                          required
+                        />
+                      </div>
+
+                      {/* Correction Field - Only for correction reports */}
+                      {reportType === "correction" && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Correct Information *
+                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                              (Please provide accurate information)
+                            </span>
+                          </label>
+                          <textarea
+                            value={suggestedCorrection}
+                            onChange={(e) =>
+                              setSuggestedCorrection(e.target.value)
+                            }
+                            placeholder="Please provide the correct information with sources if possible..."
+                            rows={2}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                            required
+                          />
+                        </div>
+                      )}
+
+                      {/* Submit Button */}
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full py-3 px-4 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              Submit{" "}
+                              {reportType === "abuse"
+                                ? "Abuse Report"
+                                : reportType === "correction"
+                                  ? "Suggestion"
+                                  : "Report"}
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Info Text */}
+                      <div className="text-center mt-4">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Reports are only accepted from registered authors.
+                          {reportType === "abuse" &&
+                            " Abuse reports are reviewed within 24 hours."}
+                          {reportType === "correction" &&
+                            " Correction suggestions are reviewed within 48 hours."}
+                        </p>
+                      </div>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>
