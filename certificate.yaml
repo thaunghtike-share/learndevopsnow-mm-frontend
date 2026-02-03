@@ -30,13 +30,28 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: ldn-wildcard
+  name: ldn-mm-wildcard
   namespace: learndevopsnow
 spec:
-  secretName: ldn-tls-secret
+  secretName: tls-secret-ldn-mm
   issuerRef:
     kind: Issuer
     name: ldn-new-issuer
-  commonName: "*.learndevopsnow.it.com"
+  commonName: "*.learndevopsnow-mm.blog"
   dnsNames:
-    - "*.learndevopsnow.it.com"
+    - "*.learndevopsnow-mm.blog"
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ldn-mm-root
+  namespace: learndevopsnow
+spec:
+  secretName: tls-secret-ldn-mm-root
+  issuerRef:
+    kind: Issuer
+    name: ldn-new-issuer
+  commonName: "learndevopsnow-mm.blog"
+  dnsNames:
+    - "learndevopsnow-mm.blog"
