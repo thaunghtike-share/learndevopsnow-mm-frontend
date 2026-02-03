@@ -6,56 +6,15 @@ import rehypeRaw from "rehype-raw";
 import React from "react";
 import "highlight.js/styles/atom-one-light.css";
 import CountUp from "react-countup";
-import {
-  Settings,
-  Cloud,
-  Bot,
-  Building,
-  Lock,
-  BarChart3,
-  Server,
-  Code,
-  Folder,
-  ChevronRight,
-  Container,
-  GitBranch,
-  PlusCircle,
-  User,
-  Home,
-} from "lucide-react";
+import { BarChart3, ChevronRight, Home } from "lucide-react";
 import { motion } from "framer-motion";
 import { visit } from "unist-util-visit";
 import { CommentsReactions } from "./comment-reactions";
-import {
-  ArrowRight,
-  Linkedin,
-  ListOrdered,
-  CalendarDays,
-  Clipboard,
-  Check,
-  Eye,
-  TrendingUp,
-  TagIcon,
-  ChevronLeft,
-  Clock,
-  FileText,
-  Award,
-  Star,
-  Trophy,
-  Zap,
-  Crown,
-  Hash,
-  Lightbulb,
-  AlertTriangle,
-  Info,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, ListOrdered, TrendingUp, ChevronLeft, FileText } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { SimpleTTSPlayer } from "./tts-player";
 import { ShareButtons } from "./share-buttons";
-import { BellSubscription } from "./subscription-button";
 import { SaveButton } from "./SaveButton";
 
 interface Article {
@@ -95,11 +54,6 @@ interface Author {
   articles_count?: number;
 }
 
-interface Tag {
-  id: number;
-  name: string;
-}
-
 interface Category {
   id: number;
   name: string;
@@ -126,8 +80,7 @@ interface ArticleContentProps {
 function flattenChildren(children: any): string {
   if (typeof children === "string") return children;
   if (Array.isArray(children)) return children.map(flattenChildren).join("");
-  if (children?.props?.children)
-    return flattenChildren(children.props.children);
+  if (children?.props?.children) return flattenChildren(children.props.children);
   return "";
 }
 
@@ -148,59 +101,8 @@ function excerpt(content: string) {
   return plainText.length === 120 ? plainText + "..." : plainText;
 }
 
-
-
-const isYouTubeParagraph = (
-  children: any
-): { isYouTube: boolean; url?: string; title?: string } => {
-  const text = flattenChildren(children);
-
-  // Check for markdown link pattern [text](url)
-  const markdownLinkMatch = text.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-  if (markdownLinkMatch) {
-    const [, title, url] = markdownLinkMatch;
-    if (extractYouTubeId(url)) {
-      return { isYouTube: true, url, title };
-    }
-  }
-
-  // Check for plain URL
-  const urlRegex = /(https?:\/\/[^\s]+)/;
-  const urlMatch = text.match(urlRegex);
-  if (urlMatch && extractYouTubeId(urlMatch[0])) {
-    return { isYouTube: true, url: urlMatch[0] };
-  }
-
-  return { isYouTube: false };
-};
-
-const CopyButton = ({ code }: { code: string }) => {
-  const [copied, setCopied] = useState(false);
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <Button
-      onClick={handleCopy}
-      variant="ghost"
-      size="sm"
-      className="absolute top-3 right-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg border border-sky-300 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:text-sky-800 dark:hover:text-sky-200 hover:bg-white dark:hover:bg-gray-700 hover:border-sky-400 dark:hover:border-sky-500 px-3 py-2 text-xs transition-all duration-200 shadow-sm hover:shadow-md"
-    >
-      {copied ? (
-        <Check className="w-3 h-3 mr-1" />
-      ) : (
-        <Clipboard className="w-3 h-3 mr-1" />
-      )}
-      {copied ? "Copied!" : "Copy"}
-    </Button>
-  );
-};
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
-// Inline code component - Update to quote/italic style
 const InlineCode = ({ children, ...props }: any) => (
   <code
     className="text-gray-700 dark:text-gray-300 italic px-1 text-base font-sans"
@@ -210,14 +112,12 @@ const InlineCode = ({ children, ...props }: any) => (
   </code>
 );
 
-// YouTube embed function
 const extractYouTubeId = (url: string): string | null => {
   const patterns = [
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([a-zA-Z0-9_-]{11})/,
   ];
-
   for (const pattern of patterns) {
     const match = url.match(pattern);
     if (match && match[1]) {
@@ -227,10 +127,8 @@ const extractYouTubeId = (url: string): string | null => {
   return null;
 };
 
-// YouTube Embed Component
 const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
   const videoId = extractYouTubeId(url);
-
   if (!videoId) {
     return (
       <a
@@ -243,7 +141,6 @@ const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
       </a>
     );
   }
-
   return (
     <div className="my-8 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="relative pt-[56.25%] bg-gradient-to-br from-gray-900 to-black overflow-hidden">
@@ -257,7 +154,6 @@ const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
           referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
-
       <div className="p-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -269,12 +165,10 @@ const YouTubeEmbed = ({ url, title }: { url: string; title?: string }) => {
               <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
             </svg>
           </div>
-
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-gray-900 dark:text-white test-sm md:text-sm mb-2 line-clamp-2">
               {title || "YouTube Video"}
             </h4>
-
             <a
               href={url}
               target="_blank"
@@ -309,24 +203,16 @@ export function ArticleContent({
   categories,
   readCount,
 }: ArticleContentProps) {
-  const articleUrl = typeof window !== "undefined" ? window.location.href : "";
   const [topReadArticles, setTopReadArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeHeadingId, setActiveHeadingId] = useState<string>("");
-  const [tocVisible, setTocVisible] = useState(false);
-
-  // Add fullscreen image state
   const [fullscreenImage, setFullscreenImage] = useState<{
     src: string;
     alt: string;
   } | null>(null);
-  // Store object URL for any Blob src so we can revoke it when replaced
   const objectUrlRef = useRef<string | null>(null);
 
-  // Define validHeadings - ONLY H2, H3 (removed H1)
   const validHeadings = headings.filter(({ text, level }) => {
     const cleanText = text.trim();
-    // ONLY include levels 2, 3 (removed H1)
     const isLevelValid = level >= 2 && level <= 3;
     const isValidHeading =
       cleanText.length > 0 &&
@@ -335,13 +221,6 @@ export function ArticleContent({
       !cleanText.match(/^[#`\s]*$/);
     return isValidHeading;
   });
-
-  // Add loading state at the component level
-  useEffect(() => {
-    if (article && article.content) {
-      setIsLoading(false);
-    }
-  }, [article]);
 
   const effectiveAuthor = author || {
     id: article.author,
@@ -388,14 +267,12 @@ export function ArticleContent({
     fetchTopReadArticles();
   }, []);
 
-  // FIXED: Effect for tracking active heading - PROPERLY FIXED
   useEffect(() => {
     const observerOptions = {
       root: null,
       rootMargin: "-100px 0px -60% 0px",
       threshold: 0.1,
     };
-
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -403,20 +280,13 @@ export function ArticleContent({
         }
       });
     };
-
-    const observer = new IntersectionObserver(
-      observerCallback,
-      observerOptions
-    );
-
-    // Observe all heading elements
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
     validHeadings.forEach(({ id }) => {
       const element = document.getElementById(id);
       if (element) {
         observer.observe(element);
       }
     });
-
     return () => {
       validHeadings.forEach(({ id }) => {
         const element = document.getElementById(id);
@@ -432,11 +302,9 @@ export function ArticleContent({
       .replace(/(#{1,6} .+)\n(```)/g, "$1\n\n$2")
       .replace(/([^\n])\n(!\[)/g, "$1\n\n$2")
       .replace(/(!\[.*?\]$$.*?$$)\n([^\n])/g, "$1\n\n$2");
-
     fixedContent = fixedContent.replace(/^(- .*?)(?=\n-|\n$)/gm, (match) => {
       return match.replace(/\n/g, " ");
     });
-
     return fixedContent;
   }
 
@@ -447,7 +315,6 @@ export function ArticleContent({
           const link = node.children[0];
           const url = link.url || "";
           const youtubeId = extractYouTubeId(url);
-
           if (youtubeId) {
             node.type = "html";
             node.value = `<div data-youtube-id="${youtubeId}" data-youtube-title="${
@@ -465,7 +332,6 @@ export function ArticleContent({
       <main className="px-4 md:px-11 py-5 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         <article className="lg:col-span-3">
           <div className="mb-10 md:mb-12">
-            {/* Breadcrumb Navigation - Fixed Alignment */}
             <nav aria-label="Breadcrumb" className="mb-5 sm:mb-7 px-2 sm:px-0">
               <div className="flex items-baseline gap-2 sm:gap-3 text-sm sm:text-base font-medium">
                 <Link
@@ -475,18 +341,14 @@ export function ArticleContent({
                   <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 group-hover:scale-110 transition-transform" />
                   Home
                 </Link>
-
                 <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 dark:text-gray-500 mx-1 flex-shrink-0" />
-
                 <Link
                   href="/articles"
                   className="text-black dark:text-gray-200 hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1 py-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   Articles
                 </Link>
-
                 <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 dark:text-gray-500 mx-1 flex-shrink-0" />
-
                 <Link
                   href={`/categories/${slugify(categoryName)}`}
                   className="text-black dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-all duration-250 truncate px-1.5 py-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold relative group"
@@ -502,14 +364,11 @@ export function ArticleContent({
                 </Link>
               </div>
             </nav>
-
-            {/* Main Title */}
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
               <h1 className="text-2xl sm:text-3xl md:text-4xl text-black dark:text-white leading-[1.2] sm:leading-[1.15] tracking-tight flex-1">
                 {article.title}
               </h1>
             </div>
-
             {article.cover_image && (
               <div className="mb-6 sm:mb-8 md:mb-10 overflow-hidden">
                 <div
@@ -530,11 +389,8 @@ export function ArticleContent({
                 </div>
               </div>
             )}
-
-            {/* Author Info and Date */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="flex items-center gap-3">
-                {/* Author Avatar */}
                 <Link href={`/authors/${authorSlug}`} className="group">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-white dark:border-gray-800 shadow-md group-hover:scale-105 transition-transform duration-300">
                     <img
@@ -544,8 +400,6 @@ export function ArticleContent({
                     />
                   </div>
                 </Link>
-
-                {/* Author Name and Date */}
                 <div className="flex flex-col">
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                     <Link
@@ -559,19 +413,14 @@ export function ArticleContent({
                     </div>
                     <div className="flex items-center gap-1 text-black dark:text-gray-400 text-sm sm:text-base">
                       <span>
-                        {new Date(article.published_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}
+                        {new Date(article.published_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
                   </div>
-
-                  {/* Views count */}
                   <div className="flex items-center gap-1.5 mt-1">
                     <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 text-black dark:text-gray-400" />
                     <span className="text-black dark:text-gray-400 text-sm sm:text-base">
@@ -585,15 +434,12 @@ export function ArticleContent({
                   </div>
                 </div>
               </div>
-
               <SaveButton
                 articleId={article.id}
                 articleTitle={article.title}
                 size="md"
                 showLabel={true}
               />
-
-              {/* TTS Player - HIDDEN ON MOBILE */}
               <div className="hidden sm:block">
                 <SimpleTTSPlayer
                   text={article.content}
@@ -601,8 +447,6 @@ export function ArticleContent({
                 />
               </div>
             </div>
-
-            {/* Tags */}
             {tagNames.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                 {tagNames.map((tag, index) => (
@@ -622,7 +466,6 @@ export function ArticleContent({
               </div>
             )}
           </div>
-
           <div className="prose prose-lg max-w-none dark:prose-invert">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkYouTube]}
@@ -634,10 +477,8 @@ export function ArticleContent({
                   const codeProps = child?.props || {};
                   const className = codeProps.className || "";
                   const childrenContent = codeProps.children || "";
-
                   const match = /language-(\w+)/.exec(className || "");
                   let language = match?.[1]?.toLowerCase() || "";
-
                   const extractCodeString = (children: any): string => {
                     if (typeof children === "string") return children;
                     if (Array.isArray(children)) {
@@ -650,13 +491,8 @@ export function ArticleContent({
                     }
                     return String(children);
                   };
-
-                  const codeString = extractCodeString(childrenContent).replace(
-                    /\n$/,
-                    ""
-                  );
+                  const codeString = extractCodeString(childrenContent).replace(/\n$/, "");
                   const lines = codeString.split("\n");
-
                   const getLanguageName = (lang: string): string => {
                     if (!lang || lang.trim() === "") return "Code";
                     const langMap: { [key: string]: string } = {
@@ -699,7 +535,6 @@ export function ArticleContent({
                       lang.charAt(0).toUpperCase() + lang.slice(1)
                     );
                   };
-
                   return (
                     <div className="relative my-8 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
                       <div className="flex items-center justify-between bg-gray-900 text-gray-300 px-4 py-2.5 border-b border-gray-800">
@@ -713,7 +548,6 @@ export function ArticleContent({
                           {lines.length} line{lines.length !== 1 ? "s" : ""}
                         </span>
                       </div>
-
                       <div className="relative">
                         <pre
                           className={`p-6 overflow-x-auto bg-gray-950 text-gray-100 text-sm font-mono leading-relaxed`}
@@ -763,7 +597,6 @@ export function ArticleContent({
                     </h1>
                   );
                 },
-
                 h2: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
@@ -776,7 +609,6 @@ export function ArticleContent({
                     </h2>
                   );
                 },
-
                 h3: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
@@ -789,7 +621,6 @@ export function ArticleContent({
                     </h3>
                   );
                 },
-
                 h4: ({ children, ...props }) => {
                   const id = slugify(flattenChildren(children));
                   return (
@@ -816,29 +647,22 @@ export function ArticleContent({
                   return <div {...props} />;
                 },
                 p: ({ children, node, ...props }) => {
-                  // Check if this paragraph contains only an image
                   const childrenArray = React.Children.toArray(children);
                   const hasOnlyImage =
                     childrenArray.length === 1 &&
                     React.isValidElement(childrenArray[0]) &&
                     childrenArray[0].type === "img";
-
-                  // Also check for multiple children where first is an image
                   const hasImageAsFirstChild =
                     childrenArray.length > 0 &&
                     React.isValidElement(childrenArray[0]) &&
                     childrenArray[0].type === "img";
-
                   if (hasOnlyImage || hasImageAsFirstChild) {
-                    // For images, render a div wrapper instead of p
                     return (
                       <div className="my-8 w-full overflow-hidden cursor-pointer group">
                         {children}
                       </div>
                     );
                   }
-
-                  // Regular paragraph
                   return (
                     <p
                       className="mb-6 text-base leading-relaxed text-black dark:text-gray-300"
@@ -961,7 +785,6 @@ export function ArticleContent({
                   />
                 ),
                 img: ({ ...props }) => {
-                  // Simple img component - the wrapper is handled by the p component above
                   return (
                     <img
                       {...props}
@@ -969,25 +792,20 @@ export function ArticleContent({
                       alt={props.alt || "Article image"}
                       onClick={() => {
                         if (props.src) {
-                          // Determine src value: if it's a string use it, otherwise create an object URL for a Blob
                           let srcValue: string;
                           if (typeof props.src === "string") {
                             srcValue = props.src;
                           } else {
-                            // Revoke previous object URL if present to avoid leaks
                             if (objectUrlRef.current) {
                               try {
                                 URL.revokeObjectURL(objectUrlRef.current);
-                              } catch (e) {
-                                /* ignore revoke errors */
-                              }
+                              } catch (e) {}
                             }
                             objectUrlRef.current = URL.createObjectURL(
                               props.src as Blob
                             );
                             srcValue = objectUrlRef.current;
                           }
-
                           setFullscreenImage({
                             src: srcValue,
                             alt: props.alt || "Article image",
@@ -1002,8 +820,6 @@ export function ArticleContent({
               {fixMarkdownSpacing(article.content)}
             </ReactMarkdown>
           </div>
-
-          {/* Enhanced Comments Box Design */}
           <div className="mt-12">
             <div className="">
               <div className="flex items-center gap-3 mb-6 pb-4">
@@ -1034,7 +850,6 @@ export function ArticleContent({
               />
             </div>
           </div>
-
           <div className="mb-8">
             <ShareButtons
               articleId={article.id}
@@ -1042,8 +857,6 @@ export function ArticleContent({
               url={typeof window !== "undefined" ? window.location.href : ""}
             />
           </div>
-
-          {/* Recent Articles - Beautiful React-like design */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -1058,7 +871,6 @@ export function ArticleContent({
                 const itemAuthor = authors.find((a) => a.id === article.author);
                 const coverImage = article.cover_image || "/devops.webp";
                 const articleExcerpt = excerpt(article.content || "");
-
                 return (
                   <Link
                     href={`/articles/${article.slug}`}
@@ -1069,9 +881,7 @@ export function ArticleContent({
                       whileHover={{ y: -8 }}
                       className="relative overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500"
                     >
-                      {/* Gradient border effect */}
                       <div className="absolute inset-0 bg-gradient-to-br from-sky-500 via-blue-400 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
-
                       <div className="relative">
                         <div className="mb-4 overflow-hidden">
                           <img
@@ -1080,17 +890,14 @@ export function ArticleContent({
                             className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-700"
                           />
                         </div>
-
                         <div className="p-5">
                           <div className="space-y-3">
                             <h4 className="font-semibold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 text-lg leading-tight">
                               {article.title}
                             </h4>
-
                             <p className="text-sm text-black/70 dark:text-gray-400 leading-relaxed line-clamp-2">
                               {articleExcerpt}
                             </p>
-
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-800 shadow-lg">
@@ -1131,7 +938,6 @@ export function ArticleContent({
               })}
             </div>
           </div>
-
           <div className="mt-12 flex items-center justify-between gap-4">
             {prevArticle && (
               <Link
@@ -1151,7 +957,6 @@ export function ArticleContent({
                 </div>
               </Link>
             )}
-
             {nextArticle && (
               <Link
                 href={`/articles/${nextArticle.slug}`}
@@ -1172,8 +977,6 @@ export function ArticleContent({
             )}
           </div>
         </article>
-
-        {/* Beautiful Blue Theme TOC Sidebar - FIXED Scroll Tracking */}
         <aside
           className="hidden lg:block lg:col-span-1"
           style={{
@@ -1187,7 +990,6 @@ export function ArticleContent({
           }}
         >
           <div className="space-y-4">
-            {/* Beautiful Blue Theme Table of Contents */}
             <div className="bg-white dark:bg-[#000000]/95 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
@@ -1202,28 +1004,24 @@ export function ArticleContent({
                   </p>
                 </div>
               </div>
-
               {validHeadings.length > 0 ? (
                 <div className="max-h-[500px] overflow-y-auto pr-2 scrollbar-hide">
                   <nav className="space-y-1">
                     {validHeadings.map(({ id, text, level }) => {
-                      // Indentation - H2 is now top level, H3 indented
                       const indent =
                         level === 2
                           ? "pl-0 font-semibold"
                           : level === 3
                           ? "pl-4 font-medium"
                           : "pl-0";
-
                       const isActive = activeHeadingId === id;
-
                       return (
                         <a
                           key={id}
                           href={`#${id}`}
                           className={`${indent} py-2.5 px-3 rounded-xl transition-all duration-300 group block ${
                             isActive
-                              ? "" // No background
+                              ? ""
                               : "hover:bg-gray-50 dark:hover:bg-gray-800 hover:translate-x-1"
                           }`}
                           onClick={(e) => {
@@ -1237,12 +1035,10 @@ export function ArticleContent({
                                 elementPosition +
                                 window.pageYOffset -
                                 headerOffset;
-
                               window.scrollTo({
                                 top: offsetPosition,
                                 behavior: "smooth",
                               });
-
                               history.replaceState(null, "", `#${id}`);
                             }
                           }}
@@ -1250,7 +1046,7 @@ export function ArticleContent({
                           <span
                             className={`text-sm truncate transition-colors ${
                               isActive
-                                ? "text-blue-600 dark:text-blue-400 font-semibold" // Just blue text
+                                ? "text-blue-600 dark:text-blue-400 font-semibold"
                                 : "text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"
                             }`}
                           >

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from 'react-hot-toast';
 
 interface SaveButtonProps {
   articleId: number;
@@ -60,8 +61,7 @@ export function SaveButton({
   const handleSaveToggle = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      // Show login modal or redirect
-      alert("Please login to save articles");
+      toast.error("Please login to save articles");
       return;
     }
 
@@ -69,7 +69,6 @@ export function SaveButton({
 
     try {
       if (isSaved) {
-        // Unsave
         const response = await fetch(
           `${API_BASE_URL}/articles/unsave/${articleId}/`,
           {
@@ -82,9 +81,9 @@ export function SaveButton({
 
         if (response.ok) {
           setIsSaved(false);
+          toast.success("Article removed from saved");
         }
       } else {
-        // Save
         const response = await fetch(`${API_BASE_URL}/articles/save/`, {
           method: "POST",
           headers: {
@@ -93,17 +92,18 @@ export function SaveButton({
           },
           body: JSON.stringify({
             article_id: articleId,
-            notes: "", // Optional: Add notes field in UI
+            notes: "",
           }),
         });
 
         if (response.ok) {
           setIsSaved(true);
+          toast.success("Article saved successfully");
         }
       }
     } catch (error) {
       console.error("Error toggling save:", error);
-      alert("Failed to save article. Please try again.");
+      toast.error("Failed to save article. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -173,7 +173,6 @@ export function SaveButton({
         </span>
       )}
 
-      {/* Tooltip */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
